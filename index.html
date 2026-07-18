@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Learning Platform - MVP Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+        }
+        .chinese-font {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .nav-link {
+            transition: all 0.2s;
+        }
+        .nav-link:hover {
+            color: #3b82f6;
+        }
+        .nav-link.active {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .card-hover {
+            transition: all 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        .btn-primary {
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .vocab-item {
+            transition: all 0.2s;
+        }
+        .vocab-item:hover {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav id="navbar" class="bg-white shadow-sm border-b border-gray-200 fixed w-full top-0 z-50 hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" onclick="navigateTo('dashboard')" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold chinese-font text-lg">中</span>
+                        </div>
+                        <span class="font-semibold text-gray-900">Chinese Learning</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="#" onclick="navigateTo('dashboard')" class="nav-link text-gray-600 text-sm font-medium" data-section="dashboard">Dashboard</a>
+                    <a href="#" onclick="navigateTo('hsk-list')" class="nav-link text-gray-600 text-sm font-medium" data-section="hsk-list">HSK Levels</a>
+                    <a href="#" onclick="navigateTo('progress')" class="nav-link text-gray-600 text-sm font-medium" data-section="progress">Progress</a>
+                    <a href="#" onclick="navigateTo('profile')" class="nav-link text-gray-600 text-sm font-medium" data-section="profile">Profile</a>
+                    <div class="flex items-center space-x-3">
+                        <img id="nav-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=learner123" alt="Avatar" class="w-8 h-8 rounded-full">
+                        <button onclick="logout()" class="text-sm text-gray-600 hover:text-red-600 transition">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Auth Section -->
+        <section id="auth-section" class="section active">
+            <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+                <div class="max-w-md w-full space-y-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white font-bold chinese-font text-3xl">中</span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">Chinese Learning Platform</h2>
+                        <p class="mt-2 text-sm text-gray-600">Học tiếng Trung HSK 1-6 hiệu quả</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="login-form" class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+                        <div class="text-center">
+                            <h3 class="text-2xl font-semibold text-gray-900">Đăng nhập</h3>
+                            <p class="mt-2 text-sm text-gray-600">Hoặc <a href="#" onclick="toggleAuthForm('register')" class="text-blue-600 hover:underline">đăng ký tài khoản mới</a></p>
+                        </div>
+                        <form class="space-y-4" onsubmit="handleLogin(event)">
+                            <div>
+                                <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input id="login-email" type="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="email@example.com">
+                            </div>
+                            <div>
+                                <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                                <input id="login-password" type="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="••••••••">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input id="remember" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <label for="remember" class="ml-2 block text-sm text-gray-700">Ghi nhớ đăng nhập</label>
+                                </div>
+                                <a href="#" class="text-sm text-blue-600 hover:underline">Quên mật khẩu?</a>
+                            </div>
+                            <button type="submit" class="w-full btn-primary bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Đăng nhập
+                            </button>
+                        </form>
+                        <div class="text-center text-sm text-gray-500">
+                            <p>Demo: Sử dụng bất kỳ email/password nào</p>
+                        </div>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div id="register-form" class="bg-white rounded-2xl shadow-xl p-8 space-y-6 hidden">
+                        <div class="text-center">
+                            <h3 class="text-2xl font-semibold text-gray-900">Đăng ký</h3>
+                            <p class="mt-2 text-sm text-gray-600">Hoặc <a href="#" onclick="toggleAuthForm('login')" class="text-blue-600 hover:underline">đăng nhập với tài khoản có sẵn</a></p>
+                        </div>
+                        <form class="space-y-4" onsubmit="handleRegister(event)">
+                            <div>
+                                <label for="register-username" class="block text-sm font-medium text-gray-700 mb-1">Tên người dùng</label>
+                                <input id="register-username" type="text" required minlength="3" maxlength="20" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="username">
+                            </div>
+                            <div>
+                                <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input id="register-email" type="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="email@example.com">
+                            </div>
+                            <div>
+                                <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                                <input id="register-password" type="password" required minlength="8" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Tối thiểu 8 ký tự">
+                            </div>
+                            <div>
+                                <label for="register-confirm" class="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu</label>
+                                <input id="register-confirm" type="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nhập lại mật khẩu">
+                            </div>
+                            <button type="submit" class="w-full btn-primary bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Đăng ký
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HSK List Section -->
+        <section id="hsk-list-section" class="section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">HSK Levels</h1>
+                    <p class="mt-2 text-gray-600">Chọn trình độ để bắt đầu học</p>
+                </div>
+                <div id="hsk-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- HSK cards will be rendered here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Xin chào, <span id="dashboard-username">User</span>! 👋</h1>
+                    <p class="mt-2 text-gray-600">Tiếp tục hành trình học tiếng Trung của bạn</p>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <span class="text-2xl">📚</span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Từ vựng đã học</p>
+                                <p id="stat-words" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                <span class="text-2xl">✅</span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Bài hoàn thành</p>
+                                <p id="stat-lessons" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                                <span class="text-2xl">🔥</span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Chuỗi ngày học</p>
+                                <p id="stat-streak" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                                <span class="text-2xl">📅</span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Ngày hoạt động</p>
+                                <p id="stat-days" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue Learning -->
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 mb-8 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-semibold mb-1">Tiếp tục học</h2>
+                            <p id="continue-lesson-text" class="text-blue-100">Học bài tiếp theo để duy trì chuỗi ngày học</p>
+                        </div>
+                        <button onclick="continueLearning()" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition">
+                            Tiếp tục →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- HSK Progress Cards -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Tiến độ theo trình độ</h2>
+                    <div id="hsk-progress-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Progress cards will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Hoạt động gần đây</h2>
+                    <div id="recent-activity" class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+                        <!-- Recent activity items will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Section -->
+        <section id="progress-section" class="section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Tiến độ học tập</h1>
+                    <p class="mt-2 text-gray-600">Theo dõi sự tiến bộ của bạn</p>
+                </div>
+
+                <!-- Overall Progress -->
+                <div class="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Tổng tiến độ</h2>
+                        <span id="overall-progress-percent" class="text-2xl font-bold text-blue-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+                        <div id="overall-progress-bar" class="progress-bar bg-blue-600 h-4 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p id="progress-total-lessons" class="text-2xl font-bold text-gray-900">0</p>
+                            <p class="text-sm text-gray-600">Tổng bài học</p>
+                        </div>
+                        <div>
+                            <p id="progress-completed-lessons" class="text-2xl font-bold text-green-600">0</p>
+                            <p class="text-sm text-gray-600">Đã hoàn thành</p>
+                        </div>
+                        <div>
+                            <p id="progress-remaining-lessons" class="text-2xl font-bold text-orange-600">0</p>
+                            <p class="text-sm text-gray-600">Còn lại</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HSK Level Progress -->
+                <div id="hsk-level-progress" class="space-y-4">
+                    <!-- HSK level progress items will be rendered here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Lesson Detail Section -->
+        <section id="lesson-detail-section" class="section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Breadcrumb -->
+                <nav class="flex mb-6" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-2">
+                        <li><a href="#" onclick="navigateTo('hsk-list')" class="text-gray-500 hover:text-gray-700">HSK Levels</a></li>
+                        <li><span class="text-gray-400">/</span></li>
+                        <li><span id="breadcrumb-hsk" class="text-gray-500">HSK 1</span></li>
+                        <li><span class="text-gray-400">/</span></li>
+                        <li><span id="breadcrumb-lesson" class="text-gray-900 font-medium">Lesson</span></li>
+                    </ol>
+                </nav>
+
+                <!-- Lesson Header -->
+                <div class="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <span id="lesson-hsk-badge" class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full mb-2">HSK 1</span>
+                            <h1 id="lesson-title" class="text-3xl font-bold text-gray-900">Greetings</h1>
+                        </div>
+                        <button onclick="toggleLessonComplete()" id="complete-btn" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition">
+                            ✓ Hoàn thành
+                        </button>
+                    </div>
+                    <p id="lesson-description" class="text-gray-600">Mô tả bài học</p>
+                </div>
+
+                <!-- Vocabulary List -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <div class="p-6 border-b border-gray-100">
+                        <h2 class="text-xl font-semibold text-gray-900">Từ vựng <span id="vocab-count" class="text-gray-500">(0 từ)</span></h2>
+                    </div>
+                    <div id="vocabulary-list" class="divide-y divide-gray-100">
+                        <!-- Vocabulary items will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile-section" class="section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Profile Header -->
+                <div class="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100 text-center">
+                    <img id="profile-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=learner123" alt="Avatar" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h2 id="profile-username" class="text-2xl font-bold text-gray-900">Username</h2>
+                    <p id="profile-email" class="text-gray-600 mb-4">email@example.com</p>
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+                        Chỉnh sửa profile
+                    </button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 text-center">
+                        <p class="text-sm text-gray-600 mb-1">Từ vựng đã học</p>
+                        <p id="profile-words" class="text-3xl font-bold text-blue-600">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 text-center">
+                        <p class="text-sm text-gray-600 mb-1">Bài hoàn thành</p>
+                        <p id="profile-lessons" class="text-3xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 text-center">
+                        <p class="text-sm text-gray-600 mb-1">Chuỗi ngày học</p>
+                        <p id="profile-streak" class="text-3xl font-bold text-orange-600">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 text-center">
+                        <p class="text-sm text-gray-600 mb-1">Ngày hoạt động</p>
+                        <p id="profile-days" class="text-3xl font-bold text-purple-600">0</p>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Cài đặt</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-700">Nhắc nhở học tập</span>
+                            <button class="text-blue-600 hover:underline">Cài đặt</button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-700">Ngôn ngữ giao diện</span>
+                            <span class="text-gray-500">Tiếng Việt</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-700">Phiên bản</span>
+                            <span class="text-gray-500">MVP v0.1.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>© 2025 Chinese Learning Platform. MVP Prototype.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== FAKE DATA =====
+        const fakeData = {
+            currentUser: {
+                id: 1,
+                username: "learner123",
+                email: "learner@example.com",
+                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=learner123",
+                stats: {
+                    wordsLearned: 342,
+                    lessonsCompleted: 28,
+                    studyStreak: 7,
+                    daysActive: 45
+                }
+            },
+
+            hskLevels: [
+                { id: 1, level: "HSK 1", title: "Beginner", description: "150 basic words", lessons: 10, progress: 100, completedLessons: 10 },
+                { id: 2, level: "HSK 2", title: "Elementary", description: "300 words", lessons: 15, progress: 73, completedLessons: 11 },
+                { id: 3, level: "HSK 3", title: "Intermediate", description: "600 words", lessons: 20, progress: 45, completedLessons: 9 },
+                { id: 4, level: "HSK 4", title: "Upper Intermediate", description: "1200 words", lessons: 25, progress: 20, completedLessons: 5 },
+                { id: 5, level: "HSK 5", title: "Advanced", description: "2500 words", lessons: 30, progress: 5, completedLessons: 2 },
+                { id: 6, level: "HSK 6", title: "Proficient", description: "5000+ words", lessons: 35, progress: 0, completedLessons: 0 }
+            ],
+
+            lessons: {
+                1: [
+                    { id: 1, hskLevel: 1, title: "Greetings", vocabCount: 15, completed: true },
+                    { id: 2, hskLevel: 1, title: "Numbers 1-10", vocabCount: 12, completed: true },
+                    { id: 3, hskLevel: 1, title: "Family Members", vocabCount: 18, completed: true },
+                    { id: 4, hskLevel: 1, title: "Colors", vocabCount: 10, completed: false }
+                ],
+                2: [
+                    { id: 11, hskLevel: 2, title: "Daily Routine", vocabCount: 20, completed: true },
+                    { id: 12, hskLevel: 2, title: "Food & Drinks", vocabCount: 25, completed: true },
+                    { id: 13, hskLevel: 2, title: "Shopping", vocabCount: 22, completed: false }
+                ]
+            },
+
+            vocabularies: {
+                1: [
+                    { id: 1, hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Xin chào", isFavorite: true },
+                    { id: 2, hanzi: "我", pinyin: "wǒ", meaning: "Tôi", isFavorite: false },
+                    { id: 3, hanzi: "你", pinyin: "nǐ", meaning: "Bạn", isFavorite: true },
+                    { id: 4, hanzi: "他", pinyin: "tā", meaning: "Anh ấy/Hắn", isFavorite: false },
+                    { id: 5, hanzi: "她", pinyin: "tā", meaning: "Cô ấy/Nàng", isFavorite: false },
+                    { id: 6, hanzi: "好", pinyin: "hǎo", meaning: "Tốt", isFavorite: true },
+                    { id: 7, hanzi: "谢谢", pinyin: "xiè xie", meaning: "Cảm ơn", isFavorite: true },
+                    { id: 8, hanzi: "再见", pinyin: "zài jiàn", meaning: "Tạm biệt", isFavorite: false }
+                ],
+                11: [
+                    { id: 51, hanzi: "起床", pinyin: "qǐ chuáng", meaning: "Thức dậy", isFavorite: false },
+                    { id: 52, hanzi: "吃早饭", pinyin: "chī zǎo fàn", meaning: "Ăn sáng", isFavorite: true },
+                    { id: 53, hanzi: "上班", pinyin: "shàng bān", meaning: "Đi làm", isFavorite: false },
+                    { id: 54, hanzi: "回家", pinyin: "huí jiā", meaning: "Về nhà", isFavorite: true },
+                    { id: 55, hanzi: "睡觉", pinyin: "shuì jiào", meaning: "Ngủ", isFavorite: false }
+                ]
+            },
+
+            recentActivity: [
+                { lessonId: 11, title: "Daily Routine", completedAt: "2025-07-17", hskLevel: 2 },
+                { lessonId: 3, title: "Family Members", completedAt: "2025-07-16", hskLevel: 1 },
+                { lessonId: 12, title: "Food & Drinks", completedAt: "2025-07-15", hskLevel: 2 }
+            ]
+        };
+
+        // ===== STATE =====
+        let isAuthenticated = false;
+        let currentLesson = null;
+
+        // ===== NAVIGATION =====
+        function navigateTo(section, lessonId = null) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+            // Show target section
+            if (section === 'lesson-detail' && lessonId) {
+                currentLesson = fakeData.lessons[lessonId][0];
+                renderLessonDetail();
+                document.getElementById('lesson-detail-section').classList.add('active');
+            } else {
+                document.getElementById(section + '-section').classList.add('active');
+            }
+
+            // Update nav active state
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === section) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Render section content
+            switch(section) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'hsk-list':
+                    renderHskList();
+                    break;
+                case 'progress':
+                    renderProgress();
+                    break;
+                case 'profile':
+                    renderProfile();
+                    break;
+            }
+        }
+
+        function showSection(sectionId) {
+            navigateTo(sectionId);
+        }
+
+        // ===== AUTH =====
+        function toggleAuthForm(form) {
+            document.getElementById('login-form').classList.toggle('hidden', form === 'register');
+            document.getElementById('register-form').classList.toggle('hidden', form === 'login');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            isAuthenticated = true;
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('currentUser', JSON.stringify(fakeData.currentUser));
+            showNavbar();
+            navigateTo('dashboard');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+
+            if (password !== confirm) {
+                alert('Mật khẩu không khớp!');
+                return;
+            }
+
+            isAuthenticated = true;
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('currentUser', JSON.stringify(fakeData.currentUser));
+            showNavbar();
+            navigateTo('dashboard');
+        }
+
+        function logout() {
+            isAuthenticated = false;
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('currentUser');
+            hideNavbar();
+            navigateTo('auth');
+        }
+
+        function showNavbar() {
+            document.getElementById('navbar').classList.remove('hidden');
+        }
+
+        function hideNavbar() {
+            document.getElementById('navbar').classList.add('hidden');
+        }
+
+        // ===== RENDER FUNCTIONS =====
+        function renderDashboard() {
+            const user = fakeData.currentUser;
+            document.getElementById('dashboard-username').textContent = user.username;
+            document.getElementById('nav-avatar').src = user.avatar;
+
+            // Stats
+            document.getElementById('stat-words').textContent = user.stats.wordsLearned;
+            document.getElementById('stat-lessons').textContent = user.stats.lessonsCompleted;
+            document.getElementById('stat-streak').textContent = user.stats.studyStreak;
+            document.getElementById('stat-days').textContent = user.stats.daysActive;
+
+            // Continue learning
+            const nextLesson = findNextIncompleteLesson();
+            if (nextLesson) {
+                document.getElementById('continue-lesson-text').textContent = `Tiếp tục: ${nextLesson.title}`;
+            }
+
+            // HSK Progress Cards
+            renderHskProgressCards();
+
+            // Recent Activity
+            renderRecentActivity();
+        }
+
+        function findNextIncompleteLesson() {
+            for (const hskId in fakeData.lessons) {
+                const lessons = fakeData.lessons[hskId];
+                const incomplete = lessons.find(l => !l.completed);
+                if (incomplete) return incomplete;
+            }
+            return null;
+        }
+
+        function renderHskProgressCards() {
+            const container = document.getElementById('hsk-progress-cards');
+            container.innerHTML = fakeData.hskLevels.map(hsk => `
+                <div class="bg-white rounded-xl p-4 border border-gray-100 card-hover cursor-pointer" onclick="navigateTo('hsk-list')">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium text-gray-900">${hsk.level}</span>
+                        <span class="text-xs text-gray-500">${hsk.completedLessons}/${hsk.lessons} bài</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="progress-bar ${hsk.progress === 100 ? 'bg-green-500' : 'bg-blue-600'} h-2 rounded-full" style="width: ${hsk.progress}%"></div>
+                    </div>
+                    <p class="text-xs text-gray-600">${hsk.progress}% hoàn thành</p>
+                </div>
+            `).join('');
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recent-activity');
+            container.innerHTML = fakeData.recentActivity.map(activity => `
+                <div class="p-4 flex items-center justify-between hover:bg-gray-50">
+                    <div>
+                        <p class="font-medium text-gray-900">${activity.title}</p>
+                        <p class="text-sm text-gray-500">${activity.hskLevel} • Hoàn thành ${activity.completedAt}</p>
+                    </div>
+                    <span class="text-green-600">✓</span>
+                </div>
+            `).join('');
+        }
+
+        function renderHskList() {
+            const container = document.getElementById('hsk-cards-grid');
+            container.innerHTML = fakeData.hskLevels.map(hsk => `
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 card-hover cursor-pointer" onclick="viewHskLevel(${hsk.id})">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-2xl font-bold text-blue-600">${hsk.level}</span>
+                        ${hsk.progress === 100 ? '<span class="text-green-600 text-xl">✓</span>' : ''}
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">${hsk.title}</h3>
+                    <p class="text-gray-600 mb-4">${hsk.description}</p>
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">${hsk.completedLessons}/${hsk.lessons} bài</span>
+                            <span class="text-gray-600">${hsk.progress}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar ${hsk.progress === 100 ? 'bg-green-500' : 'bg-blue-600'} h-2 rounded-full" style="width: ${hsk.progress}%"></div>
+                        </div>
+                    </div>
+                    <button class="w-full btn-primary bg-blue-600 text-white py-2 rounded-lg font-medium">
+                        ${hsk.progress > 0 ? 'Tiếp tục' : 'Bắt đầu'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderProgress() {
+            const user = fakeData.currentUser;
+
+            // Calculate overall progress
+            const totalLessons = fakeData.hskLevels.reduce((sum, hsk) => sum + hsk.lessons, 0);
+            const completedLessons = fakeData.hskLevels.reduce((sum, hsk) => sum + hsk.completedLessons, 0);
+            const overallProgress = Math.round((completedLessons / totalLessons) * 100);
+
+            document.getElementById('overall-progress-percent').textContent = overallProgress + '%';
+            document.getElementById('overall-progress-bar').style.width = overallProgress + '%';
+            document.getElementById('progress-total-lessons').textContent = totalLessons;
+            document.getElementById('progress-completed-lessons').textContent = completedLessons;
+            document.getElementById('progress-remaining-lessons').textContent = totalLessons - completedLessons;
+
+            // HSK Level Progress
+            const container = document.getElementById('hsk-level-progress');
+            container.innerHTML = fakeData.hskLevels.map(hsk => `
+                <div class="bg-white rounded-xl p-6 border border-gray-100">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-semibold text-gray-900">${hsk.level} - ${hsk.title}</span>
+                        <span class="text-sm text-gray-500">${hsk.completedLessons}/${hsk.lessons} bài</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="progress-bar ${hsk.progress === 100 ? 'bg-green-500' : 'bg-blue-600'} h-3 rounded-full" style="width: ${hsk.progress}%"></div>
+                    </div>
+                    <p class="text-right text-sm text-gray-600 mt-2">${hsk.progress}% hoàn thành</p>
+                </div>
+            `).join('');
+        }
+
+        function renderLessonDetail() {
+            if (!currentLesson) return;
+
+            document.getElementById('lesson-hsk-badge').textContent = 'HSK ' + currentLesson.hskLevel;
+            document.getElementById('breadcrumb-hsk').textContent = 'HSK ' + currentLesson.hskLevel;
+            document.getElementById('breadcrumb-lesson').textContent = currentLesson.title;
+            document.getElementById('lesson-title').textContent = currentLesson.title;
+            document.getElementById('vocab-count').textContent = `(${currentLesson.vocabCount} từ)`;
+
+            const vocab = fakeData.vocabularies[currentLesson.id] || fakeData.vocabularies[11];
+            const container = document.getElementById('vocabulary-list');
+            container.innerHTML = vocab.map(v => `
+                <div class="vocab-item p-4 flex items-center justify-between hover:bg-gray-50">
+                    <div class="flex-1">
+                        <p class="text-2xl font-medium chinese-font text-gray-900 mb-1">${v.hanzi}</p>
+                        <p class="text-gray-600 mb-1">${v.pinyin}</p>
+                        <p class="text-sm text-gray-500">${v.meaning}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="p-2 hover:bg-gray-100 rounded-full" title="Audio (placeholder)">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010-7.072m0 0a5 5 0 007.072 7.072m0 0a5 5 0 007.072 7.072m0 0a5 5 0 01-7.072-7.072m0 0a5 5 0 007.072-7.072"/>
+                            </svg>
+                        </button>
+                        <button onclick="toggleFavorite(${v.id})" class="p-2 hover:bg-gray-100 rounded-full" title="Yêu thích">
+                            <span class="${v.isFavorite ? 'text-red-500' : 'text-gray-400'}">${v.isFavorite ? '♥' : '♡'}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProfile() {
+            const user = fakeData.currentUser;
+            document.getElementById('profile-avatar').src = user.avatar;
+            document.getElementById('profile-username').textContent = user.username;
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('profile-words').textContent = user.stats.wordsLearned;
+            document.getElementById('profile-lessons').textContent = user.stats.lessonsCompleted;
+            document.getElementById('profile-streak').textContent = user.stats.studyStreak;
+            document.getElementById('profile-days').textContent = user.stats.daysActive;
+        }
+
+        // ===== INTERACTIONS =====
+        function viewHskLevel(hskId) {
+            const lessons = fakeData.lessons[hskId] || [];
+            if (lessons.length > 0) {
+                navigateTo('lesson-detail', hskId);
+            }
+        }
+
+        function continueLearning() {
+            const nextLesson = findNextIncompleteLesson();
+            if (nextLesson) {
+                navigateTo('lesson-detail', nextLesson.hskLevel);
+            }
+        }
+
+        function toggleLessonComplete() {
+            const btn = document.getElementById('complete-btn');
+            if (btn.classList.contains('bg-green-600')) {
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                btn.textContent = 'Hoàn thành';
+            } else {
+                btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.textContent = '✓ Đã hoàn thành';
+            }
+        }
+
+        function toggleFavorite(vocabId) {
+            // Toggle favorite in fake data
+            for (const lessonId in fakeData.vocabularies) {
+                const vocab = fakeData.vocabularies[lessonId].find(v => v.id === vocabId);
+                if (vocab) {
+                    vocab.isFavorite = !vocab.isFavorite;
+                    break;
+                }
+            }
+            // Re-render
+            renderLessonDetail();
+        }
+
+        // ===== INITIALIZATION =====
+        function init() {
+            // Check if user is logged in
+            const savedAuth = localStorage.getItem('isAuthenticated');
+            if (savedAuth === 'true') {
+                isAuthenticated = true;
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    fakeData.currentUser = JSON.parse(savedUser);
+                }
+                showNavbar();
+                navigateTo('dashboard');
+            } else {
+                hideNavbar();
+                navigateTo('auth');
+            }
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
