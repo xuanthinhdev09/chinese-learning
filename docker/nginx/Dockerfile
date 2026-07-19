@@ -4,13 +4,13 @@ FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 
 # Copy frontend package files
-COPY ../frontend/package*.json ./
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm ci
 
 # Copy frontend source and build
-COPY ../frontend/ ./
+COPY frontend/ ./
 RUN npm run build
 
 

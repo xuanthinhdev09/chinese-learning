@@ -46,8 +46,8 @@ services:
 
   nginx:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/nginx/Dockerfile
     container_name: chinese_learning_nginx_prod
     restart: unless-stopped
     ports:
