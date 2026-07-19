@@ -31,12 +31,17 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files and install production dependencies only
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev && npx prisma generate
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
+
+# Copy Prisma client from builder
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
@@ -51,5 +56,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Start application
-CMD ["npm", "run", "start:prod"]
+# Start application with entrypoint (runs migrations first)
+ENTRYPOINT ["docker-entrypoint.sh"]
