@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: chinese_learning_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-chinese_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-chinese_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-chinese_learning}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chinese_learning_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-chinese_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: chinese_learning_backend_prod
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-chinese_admin}:${POSTGRES_PASSWORD:-chinese_pass}@postgres:5432/${POSTGRES_DB:-chinese_learning}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-7d}
+      PORT: 3000
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - chinese_learning_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: chinese_learning_nginx_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    networks:
+      - chinese_learning_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  chinese_learning_network:
+    driver: bridge

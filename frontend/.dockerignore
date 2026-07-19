@@ -1,0 +1,53 @@
+# Dependencies
+node_modules
+npm-debug.log
+package-lock.json
+yarn.lock
+
+# Build output
+dist
+build
+out
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Testing
+coverage
+
+# Logs
+logs
+*.log
+
+# Docker
+Dockerfile
+Dockerfile.*
+.dockerignore
+
+# Documentation
+README.md
+docs
+
+# Misc
+*.md
+!README.md
+
+# Vite cache
+.vite
+.cache

@@ -1,5 +1,5 @@
 # Multi-stage build for Vite + React frontend
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -16,19 +16,33 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:22-alpine AS production
 
 WORKDIR /app
 
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
 # Copy package files and install production dependencies only
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm ci --omit=dev
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 
-# Expose port
+# Change ownership to nodejs user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port (for preview, though nginx serves in production)
 EXPOSE 5173
 
-# Start application (in production, use nginx or similar)
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=10s \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:5173/ || exit 1
+
+# Start application (in production, nginx serves the static files)
 CMD ["npm", "run", "preview"]

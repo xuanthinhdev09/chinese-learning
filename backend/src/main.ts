@@ -28,6 +28,16 @@ async function bootstrap() {
   // Global exception filter for better error logging
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  // Health check endpoint for Docker container monitoring
+  app.getHttpAdapter().get('/health', (req, res) => {
+    res.status(200).json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+    });
+  });
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`🚀 Backend server running on http://localhost:${port}`);
