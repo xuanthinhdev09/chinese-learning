@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
+import { useLanguagePreference } from '../../stores/language-preference-store';
 import { FlashcardCard } from '../../components/vocabulary/flashcard-card';
 import { QuizCard } from '../../components/vocabulary/quiz-card';
+import { QuizFillBlank } from '../../components/vocabulary/quiz-fill-blank';
+import { QuizPinyinMatch } from '../../components/vocabulary/quiz-pinyin-match';
 
 export function VocabularyStudyPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [showStart, setShowStart] = useState(true);
+  const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
+  const [quizResults, setQuizResults] = useState<Array<{ isCorrect: boolean }>>([]);
 
   const {
     vocabularies,
@@ -19,32 +26,93 @@ export function VocabularyStudyPage() {
     clearError,
   } = useVocabularyStore();
 
+  const { preference, togglePreference } = useLanguagePreference();
+
   const hskLevels = [
-    { level: 1, name: 'HSK 1', words: 500, description: 'Cơ bản - 500 từ vựng' },
+    { level: 1, name: 'HSK 1', words: 150, description: 'Cơ bản - 150 từ vựng' },
     { level: 2, name: 'HSK 2', words: 772, description: 'Sơ cấp - 772 từ vựng' },
   ];
 
-  const handleStartStudying = async (mode: 'flashcard' | 'quiz') => {
-    if (!selectedLevel) return;
+  const studyModes = [
+    { id: 'flashcard', name: 'Flashcards', emoji: '📇', description: 'Ôn tập với thẻ từ', color: 'bg-blue-500' },
+    { id: 'quiz', name: 'Quiz Meaning', emoji: '🎯', description: 'Chọn nghĩa đúng', color: 'bg-green-500' },
+    { id: 'fill-blank', name: 'Fill Blank', emoji: '✏️', description: 'Điền vào chỗ trống', color: 'bg-purple-500' },
+    { id: 'pinyin-match', name: 'Pinyin Match', emoji: '🔊', description: 'Chọn Pinyin đúng', color: 'bg-orange-500' },
+  ] as const;
 
+  const handleStartStudying = async (mode: 'flashcard' | 'quiz' | 'fill-blank' | 'pinyin-match', level?: number) => {
+    // Use provided level, or selectedLevel, or default to 1
+    const levelToUse = level ?? selectedLevel ?? currentLevel ?? 1;
+
+    setSelectedLevel(levelToUse);
     setShowStart(false);
+    setCurrentQuizIndex(0);
+    setQuizResults([]);
     setStudyMode(mode);
 
+    // Update URL params for refresh support
+    setSearchParams({ level: levelToUse.toString(), mode });
+
     if (mode === 'flashcard') {
-      await loadByHSKLevel(selectedLevel);
+      await loadByHSKLevel(levelToUse);
     } else {
-      await startQuiz(selectedLevel);
+      await startQuiz(levelToUse, preference);
     }
   };
+
+  const handleQuizAnswer = (isCorrect: boolean) => {
+    setQuizResults([...quizResults, { isCorrect }]);
+  };
+
+  const handleNextQuizQuestion = () => {
+    if (currentQuizIndex < vocabularies.length - 1) {
+      setCurrentQuizIndex(currentQuizIndex + 1);
+    }
+  };
+
+  const getLanguageLabel = () => {
+    switch (preference) {
+      case 'vietnamese': return '🇻🇳 Tiếng Việt';
+      case 'english': return '🇬🇧 English';
+      case 'both': return '🌐 Cả hai';
+      default: return '🇻🇳 Tiếng Việt';
+    }
+  };
+
+  const currentVocabulary = vocabularies[currentQuizIndex];
 
   const handleBackToLevels = () => {
     setShowStart(true);
     setSelectedLevel(null);
+    // Clear URL params
+    setSearchParams({});
   };
 
   const handleChangeLevel = () => {
     setShowStart(true);
   };
+
+  // Restore state from URL params on mount or when URL changes
+  useEffect(() => {
+    const levelParam = searchParams.get('level');
+    const modeParam = searchParams.get('mode');
+
+    if (levelParam && modeParam) {
+      const level = parseInt(levelParam, 10);
+      const mode = modeParam as 'flashcard' | 'quiz' | 'fill-blank' | 'pinyin-match';
+
+      setSelectedLevel(level);
+      setShowStart(false);
+      setStudyMode(mode);
+
+      // Load vocabulary data
+      if (mode === 'flashcard') {
+        loadByHSKLevel(level);
+      } else {
+        startQuiz(level, preference);
+      }
+    }
+  }, [searchParams, setStudyMode, loadByHSKLevel, startQuiz, preference]); // Run when URL params change
 
   // Clear error on unmount
   useEffect(() => {
@@ -58,12 +126,25 @@ export function VocabularyStudyPage() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-            HSK Vocabulary Study
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
-            Learn Chinese vocabulary with flashcards and quizzes
-          </p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                HSK Vocabulary Study
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Learn Chinese vocabulary with multiple study modes
+              </p>
+            </div>
+
+            {/* Language Toggle */}
+            <button
+              onClick={togglePreference}
+              className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors flex items-center gap-2"
+              title="Change language preference"
+            >
+              <span className="text-lg">{getLanguageLabel()}</span>
+            </button>
+          </div>
 
           {error && (
             <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -95,30 +176,21 @@ export function VocabularyStudyPage() {
                   {hsk.description}
                 </p>
 
-                <div className="space-y-3">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStartStudying('flashcard');
-                    }}
-                    disabled={isLoading}
-                    className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    <span>📇</span>
-                    <span>Study Flashcards</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStartStudying('quiz');
-                    }}
-                    disabled={isLoading}
-                    className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    <span>🎯</span>
-                    <span>Take Quiz</span>
-                  </button>
+                <div className="grid grid-cols-2 gap-3">
+                  {studyModes.map((mode) => (
+                    <button
+                      key={mode.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartStudying(mode.id, hsk.level);
+                      }}
+                      disabled={isLoading}
+                      className={`px-4 py-3 ${mode.color} text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-1`}
+                    >
+                      <span className="text-2xl">{mode.emoji}</span>
+                      <span className="text-sm font-semibold">{mode.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             ))}
@@ -145,6 +217,15 @@ export function VocabularyStudyPage() {
             <span className="text-gray-600 dark:text-gray-400">
               {currentLevel && `HSK ${currentLevel}`}
             </span>
+
+            {/* Language Toggle */}
+            <button
+              onClick={togglePreference}
+              className="px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors text-sm flex items-center gap-1"
+              title="Change language preference"
+            >
+              {getLanguageLabel()}
+            </button>
 
             {!vocabularies.length && !isLoading && (
               <button
@@ -180,7 +261,22 @@ export function VocabularyStudyPage() {
         {/* Content */}
         {!isLoading && (
           <>
-            {studyMode === 'flashcard' ? <FlashcardCard /> : <QuizCard />}
+            {studyMode === 'flashcard' && <FlashcardCard />}
+            {studyMode === 'quiz' && <QuizCard />}
+            {studyMode === 'fill-blank' && currentVocabulary && (
+              <QuizFillBlank
+                vocabulary={currentVocabulary}
+                onAnswer={handleQuizAnswer}
+                onNext={handleNextQuizQuestion}
+              />
+            )}
+            {studyMode === 'pinyin-match' && currentVocabulary && (
+              <QuizPinyinMatch
+                vocabulary={currentVocabulary}
+                onAnswer={handleQuizAnswer}
+                onNext={handleNextQuizQuestion}
+              />
+            )}
           </>
         )}
       </div>
