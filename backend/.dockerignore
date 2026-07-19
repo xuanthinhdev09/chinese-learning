@@ -29,8 +29,8 @@ Thumbs.db
 coverage
 .nyc_output
 
-# Prisma (generated in container)
-prisma/migrations
+# Prisma (generated in container - but we need migrations!)
+# prisma/migrations
 
 # Logs
 logs
