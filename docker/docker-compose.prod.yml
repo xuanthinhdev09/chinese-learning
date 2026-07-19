@@ -47,6 +47,8 @@ services:
     build:
       context: ..
       dockerfile: docker/nginx/Dockerfile
+      args:
+        VITE_API_URL: /api
     container_name: chinese_learning_nginx_prod
     restart: unless-stopped
     ports:

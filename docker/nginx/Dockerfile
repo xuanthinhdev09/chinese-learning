@@ -3,6 +3,10 @@ FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app
 
+# Accept API URL as build argument
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=${VITE_API_URL}
+
 # Copy frontend package files
 COPY frontend/package*.json ./
 
