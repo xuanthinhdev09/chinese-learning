@@ -15,7 +15,7 @@ interface HSK30CsvRow {
   CEDICT: string;
 }
 
-interface ImportVocabularyItem {
+export interface ImportVocabularyItem {
   lessonId: string;
   hanzi: string;
   traditional: string;

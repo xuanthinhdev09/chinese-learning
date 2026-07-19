@@ -9,6 +9,7 @@ import HskDetailPage from './pages/hsk/hsk-detail-page';
 import LessonDetailPage from './pages/lessons/lesson-detail-page';
 import ProfilePage from './pages/profile/profile-page';
 import { VocabularyStudyPage } from './pages/vocabulary/vocabulary-study-page';
+import { ReviewDashboardPage } from './pages/vocabulary/review-dashboard-page';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -135,6 +136,14 @@ function App() {
           element={
             <ProtectedRoute>
               <VocabularyStudyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vocabulary/review"
+          element={
+            <ProtectedRoute>
+              <ReviewDashboardPage />
             </ProtectedRoute>
           }
         />

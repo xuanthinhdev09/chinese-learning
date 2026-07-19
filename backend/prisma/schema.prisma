@@ -1,6 +1,3 @@
-// This is your Prisma schema file for MVP Chinese Learning Platform
-// MVP: 5 tables only - Users, RefreshTokens, HskLevels, Lessons, Vocabularies, UserProgress
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,92 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User table for authentication
 model User {
-  id           String        @id @default(cuid())
-  email        String        @unique
-  username     String        @unique
-  passwordHash String
-  avatar       String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  deletedAt    DateTime?
-
-  // Relations
-  refreshTokens RefreshToken[]
-  userProgress  UserProgress[]
+  id                 String                   @id @default(cuid())
+  email              String                   @unique
+  username           String                   @unique
+  passwordHash       String
+  avatar             String?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  deletedAt          DateTime?
+  refreshTokens      RefreshToken[]
+  userProgress       UserProgress[]
+  vocabularyProgress UserVocabularyProgress[]
 
   @@map("users")
 }
 
-// Refresh tokens for JWT authentication
 model RefreshToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
   expiresAt DateTime
   createdAt DateTime @default(now())
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
 }
 
-// HSK levels (1-6)
 model HskLevel {
   id          String   @id @default(cuid())
-  level       Int      @unique // HSK 1-6
+  level       Int      @unique
   name        String
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Relations
-  lessons Lesson[]
+  lessons     Lesson[]
 
   @@map("hsk_levels")
 }
 
-// Lessons within HSK levels
 model Lesson {
-  id          String   @id @default(cuid())
-  hskLevelId  String
-  title       String
-  description String?
-  order       Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  hskLevel     HskLevel        @relation(fields: [hskLevelId], references: [id], onDelete: Cascade)
-  vocabularies Vocabulary[]
+  id           String         @id @default(cuid())
+  hskLevelId   String
+  title        String
+  description  String?
+  order        Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  hskLevel     HskLevel       @relation(fields: [hskLevelId], references: [id], onDelete: Cascade)
   userProgress UserProgress[]
+  vocabularies Vocabulary[]
 
   @@map("lessons")
 }
 
-// Vocabulary items within lessons (HSK 3.0 compatible)
 model Vocabulary {
-  id          String   @id @default(cuid())
-  lessonId    String
-  hanzi       String              // Simplified Chinese
-  traditional String?             // Traditional Chinese
-  pinyin      String
-  meaning     String
-  audioUrl    String?
-  example     String?
-  wordType    String?
-  pos         String?             // Part of Speech (V, N, Adj, etc.)
-  hskCode     String?             // HSK 3.0 code (e.g., "L1-0001")
-  hskLevel    Int?                // HSK level 1-9 (for filtering)
-  variants    String?             // Word variants (pipe-separated)
-  cedict      String?             // CC-CEDICT reference
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  id           String                   @id @default(cuid())
+  lessonId     String
+  hanzi        String
+  traditional  String?
+  pinyin       String
+  meaning      String
+  audioUrl     String?
+  example      String?
+  wordType     String?
+  pos          String?
+  hskCode      String?
+  hskLevel     Int?
+  variants     String?
+  cedict       String?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  userProgress UserVocabularyProgress[]
+  lesson       Lesson                   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@index([lessonId])
   @@index([hskLevel])
@@ -103,7 +87,27 @@ model Vocabulary {
   @@map("vocabularies")
 }
 
-// User progress tracking
+model UserVocabularyProgress {
+  id             String     @id @default(cuid())
+  userId         String
+  vocabularyId   String
+  masteryLevel   Int        @default(0)
+  reviewCount    Int        @default(0)
+  correctCount   Int        @default(0)
+  lastReviewedAt DateTime?
+  nextReviewAt   DateTime?
+  isMastered     Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabulary     Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vocabularyId])
+  @@index([userId, nextReviewAt])
+  @@index([userId, isMastered])
+  @@map("user_vocabulary_progress")
+}
+
 model UserProgress {
   id          String    @id @default(cuid())
   userId      String
@@ -112,10 +116,8 @@ model UserProgress {
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
-  // Relations
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
   @@map("user_progress")

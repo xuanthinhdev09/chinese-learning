@@ -1,6 +1,8 @@
 import { useVocabularyStore } from '../../stores/vocabulary-store';
+import { useLanguagePreference, getDisplayMeaning } from '../../stores/language-preference-store';
 
 export function QuizCard() {
+  const { preference } = useLanguagePreference();
   const {
     vocabularies,
     currentIndex,
@@ -17,6 +19,59 @@ export function QuizCard() {
   const progress = vocabularies.length > 0 ? `${currentIndex + 1}/${vocabularies.length}` : '0/0';
   const score = vocabularies.length > 0 ? Math.round((correctCount / vocabularies.length) * 100) : 0;
 
+  // Get meaning based on language preference
+  const getCurrentMeaning = () => {
+    if (!current) return '';
+    return getDisplayMeaning(
+      current.vietnamese || '',
+      current.english || '',
+      preference
+    );
+  };
+
+  // Get the correct meaning for options
+  const getCorrectMeaning = () => {
+    return getCurrentMeaning();
+  };
+
+  // Generate wrong options from other vocabularies
+  const generateWrongOptions = () => {
+    if (!current || !vocabularies.length) return [];
+
+    return vocabularies
+      .filter((v) => v.id !== current.id)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3)
+      .map((v) => ({
+        id: v.id,
+        text: getDisplayMeaning(
+          v.vietnamese || '',
+          v.english || '',
+          preference
+        ),
+        isCorrect: false,
+      }));
+  };
+
+  // Shuffle options including correct answer
+  const generateOptions = () => {
+    const wrongOptions = generateWrongOptions();
+    const correctOption = {
+      id: current.id,
+      text: getCorrectMeaning(),
+      isCorrect: true,
+    };
+
+    return [...wrongOptions, correctOption]
+      .sort(() => Math.random() - 0.5)
+      .map((opt, idx) => ({ ...opt, id: `option-${idx}` }));
+  };
+
+  // Use generated options or fallback to quiz state
+  const displayOptions = quiz.options.length > 0
+    ? quiz.options
+    : generateOptions();
+
   // Quiz completed screen
   if (quizCompleted) {
     return (
@@ -31,7 +86,7 @@ export function QuizCard() {
               {score}%
             </p>
             <p className="text-gray-600 dark:text-gray-400">
-              {correctCount} / {vocabularies.length} correct
+              {correctCount} / {vocabularies.length} đúng
             </p>
           </div>
 
@@ -40,13 +95,13 @@ export function QuizCard() {
               onClick={resetQuiz}
               className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
-              Try Again
+              Làm lại
             </button>
             <button
               onClick={() => window.history.back()}
               className="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
-              Back to Levels
+              Quay lại
             </button>
           </div>
         </div>
@@ -58,7 +113,7 @@ export function QuizCard() {
     return (
       <div className="max-w-md mx-auto p-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
-          <p className="text-gray-500">No quiz loaded</p>
+          <p className="text-gray-500 dark:text-gray-400">No quiz loaded</p>
         </div>
       </div>
     );
@@ -70,11 +125,11 @@ export function QuizCard() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-gray-500">Quiz Progress</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Tiến độ</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">{progress}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Score</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Điểm</p>
             <p className="text-lg font-semibold text-blue-500">{score}%</p>
           </div>
         </div>
@@ -91,7 +146,7 @@ export function QuizCard() {
         {/* Question */}
         <div className="text-center mb-8">
           {current.hskCode && (
-            <span className="text-xs text-gray-500 mb-2 block">{current.hskCode}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">{current.hskCode}</span>
           )}
 
           <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
@@ -112,12 +167,12 @@ export function QuizCard() {
             </span>
           )}
 
-          <p className="text-gray-600 dark:text-gray-400 mt-6">What does this mean?</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-6">Nghĩa của từ này là gì?</p>
         </div>
 
         {/* Options */}
         <div className="space-y-3">
-          {quiz.options.map((option, index) => {
+          {displayOptions.map((option, index) => {
             const isSelected = quiz.selectedOption === option.id;
             const showCorrect = quiz.showResult && option.isCorrect;
             const showWrong = quiz.showResult && isSelected && !option.isCorrect;
@@ -168,14 +223,14 @@ export function QuizCard() {
             disabled={!quiz.selectedOption}
             className="w-full mt-6 px-4 py-3 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
           >
-            Submit Answer
+            Gửi câu trả lời
           </button>
         ) : (
           <button
             onClick={nextQuizQuestion}
             className="w-full mt-6 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            {currentIndex >= vocabularies.length - 1 ? 'See Results' : 'Next Question'}
+            {currentIndex >= vocabularies.length - 1 ? 'Xem kết quả' : 'Câu tiếp theo'}
           </button>
         )}
 
@@ -184,11 +239,11 @@ export function QuizCard() {
           <div className="mt-4 text-center">
             {quiz.isCorrect ? (
               <p className="text-green-600 dark:text-green-400 font-semibold">
-                ✓ Correct! {current.hanzi} means "{current.meaning}"
+                ✓ Chính xác! {current.hanzi} nghĩa là "{getCorrectMeaning()}"
               </p>
             ) : (
               <p className="text-red-600 dark:text-red-400 font-semibold">
-                ✗ The correct answer is "{current.meaning}"
+                ✗ Đáp án đúng là "{getCorrectMeaning()}"
               </p>
             )}
           </div>

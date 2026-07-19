@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { vocabularyApi, Vocabulary } from '../api/vocabulary-api';
+import { getDisplayMeaning, LanguagePreference } from './language-preference-store';
 
-type StudyMode = 'flashcard' | 'quiz';
+type StudyMode = 'flashcard' | 'quiz' | 'fill-blank' | 'pinyin-match';
 
 interface QuizOption {
   id: string;
@@ -28,10 +29,17 @@ interface VocabularyState {
   isLoading: boolean;
   error: string | null;
 
+  // Language Preference
+  languagePreference: LanguagePreference;
+
   // Quiz State
   quiz: QuizState;
   correctCount: number;
   quizCompleted: boolean;
+
+  // Progress State
+  isSavingProgress: boolean;
+  progressError: string | null;
 
   // Actions
   loadByHSKLevel: (level: number) => Promise<void>;
@@ -39,17 +47,34 @@ interface VocabularyState {
   previousCard: () => void;
   flipCard: () => void;
   setStudyMode: (mode: StudyMode) => void;
-  startQuiz: (level: number) => Promise<void>;
+  startQuiz: (level: number, preference?: LanguagePreference) => Promise<void>;
+  setLanguagePreference: (pref: LanguagePreference) => void;
   selectQuizOption: (optionId: string) => void;
   submitQuizAnswer: () => void;
   nextQuizQuestion: () => void;
   resetQuiz: () => void;
   clearError: () => void;
+
+  // Progress actions
+  rateCard: (vocabularyId: string, quality: number) => Promise<void>;
+  loadDueVocabularies: (limit?: number) => Promise<void>;
+  getProgressStats: () => Promise<ProgressStatsResponse | null>;
+  clearProgressError: () => void;
+}
+
+export interface ProgressStatsResponse {
+  total: number;
+  new: number;
+  learning: number;
+  mastered: number;
+  dueToday: number;
+  streak: number;
 }
 
 const createQuizOptions = (
   currentVocab: Vocabulary,
-  allVocab: Vocabulary[]
+  allVocab: Vocabulary[],
+  preference: LanguagePreference = 'vietnamese'
 ): QuizOption[] => {
   // Get 3 random wrong answers
   const wrongAnswers = allVocab
@@ -58,14 +83,18 @@ const createQuizOptions = (
     .slice(0, 3)
     .map((v) => ({
       id: v.id,
-      text: v.meaning,
+      text: getDisplayMeaning(v.vietnamese || '', v.english || '', preference),
       isCorrect: false,
     }));
 
-  // Add correct answer
+  // Add correct answer with language preference
   const correctAnswer = {
     id: currentVocab.id,
-    text: currentVocab.meaning,
+    text: getDisplayMeaning(
+      currentVocab.vietnamese || '',
+      currentVocab.english || '',
+      preference
+    ),
     isCorrect: true,
   };
 
@@ -84,6 +113,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   isFlipped: false,
   isLoading: false,
   error: null,
+  languagePreference: 'vietnamese',
   quiz: {
     options: [],
     selectedOption: null,
@@ -92,10 +122,12 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
   correctCount: 0,
   quizCompleted: false,
+  isSavingProgress: false,
+  progressError: null,
 
   // Load vocabulary by HSK level
   loadByHSKLevel: async (level: number) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, progressError: null });
     try {
       const vocabularies = await vocabularyApi.getByHSKLevel(level);
       set({
@@ -110,6 +142,51 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
         error: error instanceof Error ? error.message : 'Failed to load vocabulary',
         isLoading: false,
       });
+    }
+  },
+
+  // Load due vocabularies for review
+  loadDueVocabularies: async (limit: number = 20) => {
+    set({ isLoading: true, error: null, progressError: null });
+    try {
+      const result = await vocabularyApi.getDueVocabularies(limit);
+      const vocabularies = result.vocabularies.map((v) => ({
+        ...v,
+        lessonId: '',
+        audioUrl: null,
+        example: null,
+        wordType: null,
+        variants: v.progress?.easeFactor ? String(v.progress.easeFactor) : null,
+        cedict: null,
+        createdAt: '',
+        updatedAt: '',
+      }));
+
+      set({
+        vocabularies,
+        currentLevel: null,
+        currentIndex: 0,
+        isFlipped: false,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to load due vocabularies',
+        isLoading: false,
+      });
+    }
+  },
+
+  // Get progress stats
+  getProgressStats: async () => {
+    try {
+      const stats = await vocabularyApi.getProgressStats();
+      return stats;
+    } catch (error) {
+      set({
+        progressError: error instanceof Error ? error.message : 'Failed to fetch progress stats',
+      });
+      return null;
     }
   },
 
@@ -133,7 +210,8 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
 
   setStudyMode: (mode: StudyMode) => {
     set({ studyMode: mode });
-    if (mode === 'flashcard') {
+    // Reset quiz state when changing modes
+    if (mode !== 'quiz' && mode !== 'fill-blank' && mode !== 'pinyin-match') {
       set({
         quiz: { options: [], selectedOption: null, showResult: false, isCorrect: null },
         correctCount: 0,
@@ -143,11 +221,11 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   // Quiz
-  startQuiz: async (level: number) => {
-    set({ isLoading: true, error: null });
+  startQuiz: async (level: number, preference: LanguagePreference = 'vietnamese') => {
+    set({ isLoading: true, error: null, languagePreference: preference });
     try {
       const vocabularies = await vocabularyApi.getByHSKLevel(level);
-      const options = createQuizOptions(vocabularies[0], vocabularies);
+      const options = createQuizOptions(vocabularies[0], vocabularies, preference);
 
       set({
         vocabularies,
@@ -172,6 +250,11 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
     }
   },
 
+  // Set language preference
+  setLanguagePreference: (pref: LanguagePreference) => {
+    set({ languagePreference: pref });
+  },
+
   selectQuizOption: (optionId: string) => {
     set((state) => ({
       quiz: { ...state.quiz, selectedOption: optionId },
@@ -192,13 +275,14 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   nextQuizQuestion: () => {
-    const { vocabularies, currentIndex } = get();
+    const { vocabularies, currentIndex, languagePreference } = get();
     const nextIndex = currentIndex + 1;
 
     if (nextIndex >= vocabularies.length) {
       set({ quizCompleted: true });
     } else {
-      const options = createQuizOptions(vocabularies[nextIndex], vocabularies);
+      // Generate new options for next question
+      const options = createQuizOptions(vocabularies[nextIndex], vocabularies, languagePreference);
       set({
         currentIndex: nextIndex,
         quiz: {
@@ -212,10 +296,10 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   resetQuiz: () => {
-    const { vocabularies, currentLevel } = get();
+    const { vocabularies, currentLevel, languagePreference } = get();
     if (!vocabularies.length || !currentLevel) return;
 
-    const options = createQuizOptions(vocabularies[0], vocabularies);
+    const options = createQuizOptions(vocabularies[0], vocabularies, languagePreference);
     set({
       currentIndex: 0,
       quiz: {
@@ -229,5 +313,26 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
     });
   },
 
+  // Rate card and save progress
+  rateCard: async (vocabularyId: string, quality: number) => {
+    set({ isSavingProgress: true, progressError: null });
+    try {
+      await vocabularyApi.recordProgress({ vocabularyId, quality });
+      set({ isSavingProgress: false });
+
+      // Auto-advance to next card
+      const { vocabularies, currentIndex } = get();
+      if (currentIndex < vocabularies.length - 1) {
+        set({ currentIndex: currentIndex + 1, isFlipped: false });
+      }
+    } catch (error) {
+      set({
+        isSavingProgress: false,
+        progressError: error instanceof Error ? error.message : 'Failed to save progress',
+      });
+    }
+  },
+
   clearError: () => set({ error: null }),
+  clearProgressError: () => set({ progressError: null }),
 }));

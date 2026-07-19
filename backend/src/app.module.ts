@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { HskModule } from './hsk/hsk.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
+import { SpacedRepetitionModule } from './spaced-repetition/spaced-repetition.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { VocabularyModule } from './vocabulary/vocabulary.module';
     HskModule,
     LessonsModule,
     VocabularyModule,
+    SpacedRepetitionModule,
   ],
 })
 export class AppModule {}
