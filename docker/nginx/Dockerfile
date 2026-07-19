@@ -21,7 +21,7 @@ FROM nginx:alpine
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
-COPY default.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Create directory for SSL certificates (if needed later)
 RUN mkdir -p /etc/nginx/ssl
