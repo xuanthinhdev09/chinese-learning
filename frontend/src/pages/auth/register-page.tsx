@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth-store';
+import { Button, Input } from '../../components/ui';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -32,112 +33,151 @@ export default function RegisterPage() {
       await register(email, username, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'Đăng ký thất bại');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-primary-light via-white to-background-alt">
       <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-3xl chinese-text">中</span>
+        {/* Logo/Header */}
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-bold text-4xl chinese-text">中</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Chinese Learning Platform</h1>
-          <p className="mt-2 text-sm text-gray-600">Tạo tài khoản mới</p>
+          <h1 className="text-3xl font-bold text-foreground font-display">Chinese Learning</h1>
+          <p className="mt-2 text-sm text-muted">Tạo tài khoản mới để bắt đầu học</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Đăng ký</h2>
+        {/* Register Card */}
+        <div className="card-elevated p-8 animate-slide-up">
+          <h2 className="text-2xl font-semibold text-foreground mb-6">Đăng ký</h2>
 
+          {/* Error message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-lg">
-              {error}
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg animate-shake">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">⚠️</span>
+                <span className="text-sm">{error}</span>
+              </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Tên người dùng
-              </label>
+            <Input
+              id="username"
+              type="text"
+              label="Tên người dùng"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              minLength={3}
+              maxLength={20}
+              placeholder="username"
+              error={error && !username ? 'Vui lòng nhập tên người dùng' : ''}
+            />
+
+            <Input
+              id="email"
+              type="email"
+              label="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="email@example.com"
+              error={error && !email ? 'Vui lòng nhập email' : ''}
+            />
+
+            <Input
+              id="password"
+              type="password"
+              label="Mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              placeholder="Tối thiểu 8 ký tự"
+              error={error && !password ? 'Vui lòng nhập mật khẩu' : ''}
+            />
+
+            <Input
+              id="confirmPassword"
+              type="password"
+              label="Xác nhận mật khẩu"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={8}
+              placeholder="Nhập lại mật khẩu"
+              error={
+                error && !confirmPassword
+                  ? 'Vui lòng xác nhận mật khẩu'
+                  : password !== confirmPassword && error !== 'Mật khẩu phải có ít nhất 8 ký tự!'
+                  ? 'Mật khẩu không khớp'
+                  : ''
+              }
+            />
+
+            {/* Terms agreement */}
+            <div className="flex items-start gap-2">
               <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="checkbox"
                 required
-                minLength={3}
-                maxLength={20}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="username"
+                className="mt-1 rounded border-border text-primary focus:ring-primary"
               />
+              <label className="text-sm text-muted">
+                Tôi đồng ý với{' '}
+                <Link to="/terms" className="text-primary hover:underline">
+                  Điều khoản dịch vụ
+                </Link>{' '}
+                và{' '}
+                <Link to="/privacy" className="text-primary hover:underline">
+                  Chính sách bảo mật
+                </Link>
+              </label>
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="email@example.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Mật khẩu
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Tối thiểu 8 ký tự"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Xác nhận mật khẩu
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Nhập lại mật khẩu"
-              />
-            </div>
-
-            <button
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              fullWidth
+              className="mt-6"
             >
-              {isLoading ? <div className="spinner mx-auto" /> : 'Đăng ký'}
-            </button>
+              {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
+            </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <span className="text-sm text-gray-600">Đã có tài khoản? </span>
-            <Link to="/login" className="text-sm text-blue-600 hover:underline font-medium">
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted">hoặc</span>
+            </div>
+          </div>
+
+          {/* Login link */}
+          <div className="text-center">
+            <span className="text-sm text-muted">Đã có tài khoản? </span>
+            <Link
+              to="/login"
+              className="text-sm text-primary font-medium hover:underline ml-1"
+            >
               Đăng nhập
             </Link>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-xs text-muted">
+            Bắt đầu hành trình học tiếng Trung của bạn ngay hôm nay
+          </p>
         </div>
       </div>
     </div>
