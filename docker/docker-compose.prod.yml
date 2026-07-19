@@ -64,10 +64,6 @@ volumes:
   postgres_data:
     driver: local
 
-volumes:
-  postgres_data:
-    driver: local
-
 networks:
   chinese_learning_network:
     driver: bridge
