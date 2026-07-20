@@ -9,9 +9,11 @@ interface User {
 
 interface AuthState {
   user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -21,18 +23,20 @@ interface AuthState {
 // API base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
+  accessToken: null,
   isAuthenticated: false,
   isLoading: true,
 
   setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
 
+  setToken: (token) => set({ accessToken: token }),
+
   login: async (email, password) => {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
 
@@ -42,14 +46,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     const data = await response.json();
-    set({ user: data.user, isAuthenticated: true, isLoading: false });
+    set({
+      user: data.user,
+      accessToken: data.accessToken,
+      isAuthenticated: true,
+      isLoading: false
+    });
   },
 
   register: async (email, username, password) => {
     const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ email, username, password }),
     });
 
@@ -62,41 +70,52 @@ export const useAuthStore = create<AuthState>((set) => ({
     const loginResponse = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
 
     if (loginResponse.ok) {
       const data = await loginResponse.json();
-      set({ user: data.user, isAuthenticated: true, isLoading: false });
+      set({
+        user: data.user,
+        accessToken: data.accessToken,
+        isAuthenticated: true,
+        isLoading: false
+      });
     }
   },
 
   logout: async () => {
     try {
+      const { accessToken } = get();
       await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
-        credentials: 'include',
+        headers: accessToken ? {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        } : {},
       });
     } finally {
-      set({ user: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
     }
   },
 
   checkAuth: async () => {
     try {
+      const { accessToken } = get();
       const response = await fetch(`${API_URL}/users/me`, {
-        credentials: 'include',
+        headers: accessToken ? {
+          'Authorization': `Bearer ${accessToken}`,
+        } : {},
       });
 
       if (response.ok) {
         const user = await response.json();
         set({ user, isAuthenticated: true, isLoading: false });
       } else {
-        set({ user: null, isAuthenticated: false, isLoading: false });
+        set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
       }
     } catch {
-      set({ user: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
     }
   },
 }));
