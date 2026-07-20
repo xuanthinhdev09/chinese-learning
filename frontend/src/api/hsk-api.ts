@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { apiClient } from '../lib/api-client';
 
 export interface HskLevel {
   id: string;
@@ -24,9 +24,7 @@ export interface LessonSummary {
 
 export const hskApi = {
   async getLevels(): Promise<HskLevel[]> {
-    const response = await fetch(`${API_URL}/hsk`, {
-      credentials: 'include',
-    });
+    const response = await apiClient.get('/hsk');
 
     if (!response.ok) {
       throw new Error('Failed to fetch HSK levels');
@@ -36,9 +34,7 @@ export const hskApi = {
   },
 
   async getLevel(id: string): Promise<HskDetail> {
-    const response = await fetch(`${API_URL}/hsk/${id}`, {
-      credentials: 'include',
-    });
+    const response = await apiClient.get(`/hsk/${id}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch HSK level');

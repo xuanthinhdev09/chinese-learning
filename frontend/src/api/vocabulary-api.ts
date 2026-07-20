@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { apiClient } from '../lib/api-client';
 
 // HSK 3.0 Vocabulary with new fields
 export interface Vocabulary {
@@ -124,10 +124,7 @@ function processVocabulary(item: any): Vocabulary {
 
 export const vocabularyApi = {
   async getByLesson(lessonId: string): Promise<Vocabulary[]> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/lesson/${lessonId}`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get(`/vocabulary/lesson/${lessonId}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch vocabulary');
@@ -138,10 +135,7 @@ export const vocabularyApi = {
   },
 
   async getByHSKLevel(level: number): Promise<Vocabulary[]> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/hsk-level/${level}`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get(`/vocabulary/hsk-level/${level}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch vocabulary by HSK level');
@@ -152,10 +146,7 @@ export const vocabularyApi = {
   },
 
   async getStatistics(): Promise<VocabularyStats> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/statistics`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get('/vocabulary/statistics');
 
     if (!response.ok) {
       throw new Error('Failed to fetch vocabulary statistics');
@@ -169,15 +160,10 @@ export const vocabularyApi = {
     csvContent: string,
     maxLevel?: number
   ): Promise<ImportResult> {
-    const response = await fetch(`${API_URL}/vocabulary/import`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        lessonId,
-        csvContent,
-        maxLevel,
-      }),
+    const response = await apiClient.post('/vocabulary/import', {
+      lessonId,
+      csvContent,
+      maxLevel,
     });
 
     if (!response.ok) {
@@ -188,13 +174,7 @@ export const vocabularyApi = {
   },
 
   async clearLesson(lessonId: string): Promise<{ message: string }> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/lesson/${lessonId}/clear`,
-      {
-        method: 'POST',
-        credentials: 'include',
-      }
-    );
+    const response = await apiClient.post(`/vocabulary/lesson/${lessonId}/clear`);
 
     if (!response.ok) {
       throw new Error('Failed to clear lesson vocabulary');
@@ -205,12 +185,7 @@ export const vocabularyApi = {
 
   // Progress API endpoints
   async recordProgress(data: CreateProgressDto): Promise<ProgressResponse> {
-    const response = await fetch(`${API_URL}/vocabulary/progress`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
+    const response = await apiClient.post('/vocabulary/progress', data);
 
     if (!response.ok) {
       throw new Error('Failed to record progress');
@@ -220,10 +195,7 @@ export const vocabularyApi = {
   },
 
   async getDueVocabularies(limit: number = 20): Promise<DueVocabulariesResponse> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/progress/due?limit=${limit}`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get(`/vocabulary/progress/due?limit=${limit}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch due vocabularies');
@@ -237,10 +209,7 @@ export const vocabularyApi = {
   },
 
   async getProgressStats(): Promise<ProgressStatsResponse> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/progress/stats`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get('/vocabulary/progress/stats');
 
     if (!response.ok) {
       throw new Error('Failed to fetch progress stats');
@@ -250,10 +219,7 @@ export const vocabularyApi = {
   },
 
   async getVocabularyProgress(vocabularyId: string): Promise<ProgressResponse | null> {
-    const response = await fetch(
-      `${API_URL}/vocabulary/progress/${vocabularyId}`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get(`/vocabulary/progress/${vocabularyId}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch vocabulary progress');

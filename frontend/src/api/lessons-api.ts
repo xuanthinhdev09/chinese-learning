@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { apiClient } from '../lib/api-client';
 
 export interface Lesson {
   id: string;
@@ -47,10 +47,7 @@ export const lessonsApi = {
     if (params.page) queryParams.set('page', params.page.toString());
     if (params.limit) queryParams.set('limit', params.limit.toString());
 
-    const response = await fetch(
-      `${API_URL}/lessons?${queryParams.toString()}`,
-      { credentials: 'include' }
-    );
+    const response = await apiClient.get(`/lessons?${queryParams.toString()}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch lessons');
@@ -60,9 +57,7 @@ export const lessonsApi = {
   },
 
   async getLesson(id: string): Promise<LessonDetail> {
-    const response = await fetch(`${API_URL}/lessons/${id}`, {
-      credentials: 'include',
-    });
+    const response = await apiClient.get(`/lessons/${id}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch lesson');

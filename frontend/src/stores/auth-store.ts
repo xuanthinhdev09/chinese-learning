@@ -31,7 +31,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
 
-  setToken: (token) => set({ accessToken: token }),
+  setToken: (token) => {
+    set({ accessToken: token });
+    // Sync with localStorage for apiClient
+    if (token) {
+      localStorage.setItem('accessToken', token);
+    } else {
+      localStorage.removeItem('accessToken');
+    }
+  },
 
   login: async (email, password) => {
     const response = await fetch(`${API_URL}/auth/login`, {
@@ -52,6 +60,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isAuthenticated: true,
       isLoading: false
     });
+    // Save to localStorage
+    localStorage.setItem('accessToken', data.accessToken);
   },
 
   register: async (email, username, password) => {
@@ -81,6 +91,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true,
         isLoading: false
       });
+      // Save to localStorage
+      localStorage.setItem('accessToken', data.accessToken);
     }
   },
 
@@ -96,26 +108,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     } finally {
       set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
+      // Clear from localStorage
+      localStorage.removeItem('accessToken');
     }
   },
 
   checkAuth: async () => {
     try {
+      // Get token from localStorage first
+      const storedToken = localStorage.getItem('accessToken');
+      if (!storedToken) {
+        set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
+        return;
+      }
+
       const { accessToken } = get();
+      const token = accessToken || storedToken;
+
       const response = await fetch(`${API_URL}/users/me`, {
-        headers: accessToken ? {
-          'Authorization': `Bearer ${accessToken}`,
+        headers: token ? {
+          'Authorization': `Bearer ${token}`,
         } : {},
       });
 
       if (response.ok) {
         const user = await response.json();
-        set({ user, isAuthenticated: true, isLoading: false });
+        set({ user, accessToken: token, isAuthenticated: true, isLoading: false });
       } else {
+        // Token invalid, clear everything
         set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
+        localStorage.removeItem('accessToken');
       }
     } catch {
       set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
+      localStorage.removeItem('accessToken');
     }
   },
 }));
