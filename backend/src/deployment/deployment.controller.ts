@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { DeploymentService } from './deployment.service';
-import { Public } from '../common/decorators/public.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('deployment')
 export class DeploymentController {
