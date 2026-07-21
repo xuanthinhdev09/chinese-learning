@@ -30,7 +30,6 @@ export function VocabularyStudyPage() {
 
   const hskLevels = [
     { level: 1, name: 'HSK 1', words: 150, description: 'Cơ bản - 150 từ vựng' },
-    { level: 2, name: 'HSK 2', words: 772, description: 'Sơ cấp - 772 từ vựng' },
   ];
 
   const studyModes = [
@@ -41,7 +40,6 @@ export function VocabularyStudyPage() {
   ] as const;
 
   const handleStartStudying = async (mode: 'flashcard' | 'quiz' | 'fill-blank' | 'pinyin-match', level?: number) => {
-    // Use provided level, or selectedLevel, or default to 1
     const levelToUse = level ?? selectedLevel ?? currentLevel ?? 1;
 
     setSelectedLevel(levelToUse);
@@ -50,7 +48,6 @@ export function VocabularyStudyPage() {
     setQuizResults([]);
     setStudyMode(mode);
 
-    // Update URL params for refresh support
     setSearchParams({ level: levelToUse.toString(), mode });
 
     if (mode === 'flashcard') {
@@ -81,18 +78,7 @@ export function VocabularyStudyPage() {
 
   const currentVocabulary = vocabularies[currentQuizIndex];
 
-  const handleBackToLevels = () => {
-    setShowStart(true);
-    setSelectedLevel(null);
-    // Clear URL params
-    setSearchParams({});
-  };
-
-  const handleChangeLevel = () => {
-    setShowStart(true);
-  };
-
-  // Restore state from URL params on mount or when URL changes
+  // Restore state from URL params
   useEffect(() => {
     const levelParam = searchParams.get('level');
     const modeParam = searchParams.get('mode');
@@ -105,14 +91,13 @@ export function VocabularyStudyPage() {
       setShowStart(false);
       setStudyMode(mode);
 
-      // Load vocabulary data
       if (mode === 'flashcard') {
         loadByHSKLevel(level);
       } else {
         startQuiz(level, preference);
       }
     }
-  }, [searchParams, setStudyMode, loadByHSKLevel, startQuiz, preference]); // Run when URL params change
+  }, [searchParams, setStudyMode, loadByHSKLevel, startQuiz, preference]);
 
   // Clear error on unmount
   useEffect(() => {
@@ -124,77 +109,72 @@ export function VocabularyStudyPage() {
   // Level selection screen
   if (showStart) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                HSK Vocabulary Study
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Learn Chinese vocabulary with multiple study modes
-              </p>
-            </div>
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              HSK Vocabulary Study
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Learn Chinese vocabulary with multiple study modes
+            </p>
+          </div>
 
-            {/* Language Toggle */}
-            <button
-              onClick={togglePreference}
-              className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors flex items-center gap-2"
-              title="Change language preference"
+          <button
+            onClick={togglePreference}
+            className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors flex items-center gap-2"
+            title="Change language preference"
+          >
+            <span className="text-lg">{getLanguageLabel()}</span>
+          </button>
+        </div>
+
+        {error && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {hskLevels.map((hsk) => (
+            <div
+              key={hsk.level}
+              onClick={() => setSelectedLevel(hsk.level)}
+              className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 cursor-pointer transition-all hover:shadow-xl ${
+                selectedLevel === hsk.level ? 'ring-2 ring-blue-500' : ''
+              }`}
             >
-              <span className="text-lg">{getLanguageLabel()}</span>
-            </button>
-          </div>
-
-          {error && (
-            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
-            </div>
-          )}
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {hskLevels.map((hsk) => (
-              <div
-                key={hsk.level}
-                onClick={() => setSelectedLevel(hsk.level)}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 cursor-pointer transition-all hover:shadow-xl ${
-                  selectedLevel === hsk.level
-                    ? 'ring-2 ring-blue-500'
-                    : ''
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {hsk.name}
-                  </h2>
-                  <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm">
-                    {hsk.words} words
-                  </span>
-                </div>
-
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  {hsk.description}
-                </p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {studyModes.map((mode) => (
-                    <button
-                      key={mode.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartStudying(mode.id, hsk.level);
-                      }}
-                      disabled={isLoading}
-                      className={`px-4 py-3 ${mode.color} text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-1`}
-                    >
-                      <span className="text-2xl">{mode.emoji}</span>
-                      <span className="text-sm font-semibold">{mode.name}</span>
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {hsk.name}
+                </h2>
+                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm">
+                  {hsk.words} words
+                </span>
               </div>
-            ))}
-          </div>
+
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {hsk.description}
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                {studyModes.map((mode) => (
+                  <button
+                    key={mode.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartStudying(mode.id, hsk.level);
+                    }}
+                    disabled={isLoading}
+                    className={`px-4 py-3 ${mode.color} text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-1`}
+                  >
+                    <span className="text-2xl">{mode.emoji}</span>
+                    <span className="text-sm font-semibold">{mode.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -202,84 +182,45 @@ export function VocabularyStudyPage() {
 
   // Study mode screen
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+    <div className="max-w-4xl mx-auto">
+      {error && (
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
           <button
-            onClick={handleBackToLevels}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            onClick={clearError}
+            className="mt-2 text-sm underline"
           >
-            ← Back to Levels
+            Dismiss
           </button>
-
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600 dark:text-gray-400">
-              {currentLevel && `HSK ${currentLevel}`}
-            </span>
-
-            {/* Language Toggle */}
-            <button
-              onClick={togglePreference}
-              className="px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors text-sm flex items-center gap-1"
-              title="Change language preference"
-            >
-              {getLanguageLabel()}
-            </button>
-
-            {!vocabularies.length && !isLoading && (
-              <button
-                onClick={handleChangeLevel}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              >
-                Change Level
-              </button>
-            )}
-          </div>
         </div>
+      )}
 
-        {/* Error */}
-        {error && (
-          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
-            <button
-              onClick={clearError}
-              className="mt-2 text-sm underline"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
+      {isLoading && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading vocabulary...</p>
+        </div>
+      )}
 
-        {/* Loading */}
-        {isLoading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading vocabulary...</p>
-          </div>
-        )}
-
-        {/* Content */}
-        {!isLoading && (
-          <>
-            {studyMode === 'flashcard' && <FlashcardCard />}
-            {studyMode === 'quiz' && <QuizCard />}
-            {studyMode === 'fill-blank' && currentVocabulary && (
-              <QuizFillBlank
-                vocabulary={currentVocabulary}
-                onAnswer={handleQuizAnswer}
-                onNext={handleNextQuizQuestion}
-              />
-            )}
-            {studyMode === 'pinyin-match' && currentVocabulary && (
-              <QuizPinyinMatch
-                vocabulary={currentVocabulary}
-                onAnswer={handleQuizAnswer}
-                onNext={handleNextQuizQuestion}
-              />
-            )}
-          </>
-        )}
-      </div>
+      {!isLoading && (
+        <>
+          {studyMode === 'flashcard' && <FlashcardCard />}
+          {studyMode === 'quiz' && <QuizCard />}
+          {studyMode === 'fill-blank' && currentVocabulary && (
+            <QuizFillBlank
+              vocabulary={currentVocabulary}
+              onAnswer={handleQuizAnswer}
+              onNext={handleNextQuizQuestion}
+            />
+          )}
+          {studyMode === 'pinyin-match' && currentVocabulary && (
+            <QuizPinyinMatch
+              vocabulary={currentVocabulary}
+              onAnswer={handleQuizAnswer}
+              onNext={handleNextQuizQuestion}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

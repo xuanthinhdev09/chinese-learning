@@ -92,7 +92,7 @@
                             <span class="text-white font-bold chinese-font text-3xl">中</span>
                         </div>
                         <h2 class="text-3xl font-bold text-gray-900">Chinese Learning Platform</h2>
-                        <p class="mt-2 text-sm text-gray-600">Học tiếng Trung HSK 1-6 hiệu quả</p>
+                        <p class="mt-2 text-sm text-gray-600">Học tiếng Trung HSK 1 hiệu quả</p>
                     </div>
 
                     <!-- Login Form -->
@@ -419,12 +419,7 @@
             },
 
             hskLevels: [
-                { id: 1, level: "HSK 1", title: "Beginner", description: "150 basic words", lessons: 10, progress: 100, completedLessons: 10 },
-                { id: 2, level: "HSK 2", title: "Elementary", description: "300 words", lessons: 15, progress: 73, completedLessons: 11 },
-                { id: 3, level: "HSK 3", title: "Intermediate", description: "600 words", lessons: 20, progress: 45, completedLessons: 9 },
-                { id: 4, level: "HSK 4", title: "Upper Intermediate", description: "1200 words", lessons: 25, progress: 20, completedLessons: 5 },
-                { id: 5, level: "HSK 5", title: "Advanced", description: "2500 words", lessons: 30, progress: 5, completedLessons: 2 },
-                { id: 6, level: "HSK 6", title: "Proficient", description: "5000+ words", lessons: 35, progress: 0, completedLessons: 0 }
+                { id: 1, level: "HSK 1", title: "Beginner", description: "150 basic words", lessons: 10, progress: 70, completedLessons: 7 }
             ],
 
             lessons: {
@@ -432,12 +427,13 @@
                     { id: 1, hskLevel: 1, title: "Greetings", vocabCount: 15, completed: true },
                     { id: 2, hskLevel: 1, title: "Numbers 1-10", vocabCount: 12, completed: true },
                     { id: 3, hskLevel: 1, title: "Family Members", vocabCount: 18, completed: true },
-                    { id: 4, hskLevel: 1, title: "Colors", vocabCount: 10, completed: false }
-                ],
-                2: [
-                    { id: 11, hskLevel: 2, title: "Daily Routine", vocabCount: 20, completed: true },
-                    { id: 12, hskLevel: 2, title: "Food & Drinks", vocabCount: 25, completed: true },
-                    { id: 13, hskLevel: 2, title: "Shopping", vocabCount: 22, completed: false }
+                    { id: 4, hskLevel: 1, title: "Colors", vocabCount: 10, completed: true },
+                    { id: 5, hskLevel: 1, title: "Time", vocabCount: 12, completed: true },
+                    { id: 6, hskLevel: 1, title: "Days of Week", vocabCount: 7, completed: true },
+                    { id: 7, hskLevel: 1, title: "Basic Verbs", vocabCount: 15, completed: true },
+                    { id: 8, hskLevel: 1, title: "Common Adjectives", vocabCount: 20, completed: false },
+                    { id: 9, hskLevel: 1, title: "Places", vocabCount: 12, completed: false },
+                    { id: 10, hskLevel: 1, title: "Food", vocabCount: 15, completed: false }
                 ]
             },
 
@@ -446,25 +442,30 @@
                     { id: 1, hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Xin chào", isFavorite: true },
                     { id: 2, hanzi: "我", pinyin: "wǒ", meaning: "Tôi", isFavorite: false },
                     { id: 3, hanzi: "你", pinyin: "nǐ", meaning: "Bạn", isFavorite: true },
-                    { id: 4, hanzi: "他", pinyin: "tā", meaning: "Anh ấy/Hắn", isFavorite: false },
-                    { id: 5, hanzi: "她", pinyin: "tā", meaning: "Cô ấy/Nàng", isFavorite: false },
+                    { id: 4, hanzi: "他", pinyin: "tā", meaning: "Anh ấy", isFavorite: false },
+                    { id: 5, hanzi: "她", pinyin: "tā", meaning: "Cô ấy", isFavorite: false },
                     { id: 6, hanzi: "好", pinyin: "hǎo", meaning: "Tốt", isFavorite: true },
                     { id: 7, hanzi: "谢谢", pinyin: "xiè xie", meaning: "Cảm ơn", isFavorite: true },
-                    { id: 8, hanzi: "再见", pinyin: "zài jiàn", meaning: "Tạm biệt", isFavorite: false }
+                    { id: 8, hanzi: "再见", pinyin: "zài jiàn", meaning: "Tạm biệt", isFavorite: false },
+                    { id: 9, hanzi: "是", pinyin: "shì", meaning: "Là", isFavorite: true },
+                    { id: 10, hanzi: "不", pinyin: "bú", meaning: "Không", isFavorite: false }
                 ],
-                11: [
-                    { id: 51, hanzi: "起床", pinyin: "qǐ chuáng", meaning: "Thức dậy", isFavorite: false },
-                    { id: 52, hanzi: "吃早饭", pinyin: "chī zǎo fàn", meaning: "Ăn sáng", isFavorite: true },
-                    { id: 53, hanzi: "上班", pinyin: "shàng bān", meaning: "Đi làm", isFavorite: false },
-                    { id: 54, hanzi: "回家", pinyin: "huí jiā", meaning: "Về nhà", isFavorite: true },
-                    { id: 55, hanzi: "睡觉", pinyin: "shuì jiào", meaning: "Ngủ", isFavorite: false }
+                8: [
+                    { id: 51, hanzi: "大", pinyin: "dà", meaning: "To", isFavorite: false },
+                    { id: 52, hanzi: "小", pinyin: "xiǎo", meaning: "Nhỏ", isFavorite: true },
+                    { id: 53, hanzi: "多", pinyin: "duō", meaning: "Nhiều", isFavorite: false },
+                    { id: 54, hanzi: "少", pinyin: "shǎo", meaning: "Ít", isFavorite: true },
+                    { id: 55, hanzi: "高", pinyin: "gāo", meaning: "Cao", isFavorite: false },
+                    { id: 56, hanzi: "矮", pinyin: "ǎi", meaning: "Thấp", isFavorite: false },
+                    { id: 57, hanzi: "长", pinyin: "cháng", meaning: "Dài", isFavorite: true },
+                    { id: 58, hanzi: "短", pinyin: "duǎn", meaning: "Ngắn", isFavorite: false }
                 ]
             },
 
             recentActivity: [
-                { lessonId: 11, title: "Daily Routine", completedAt: "2025-07-17", hskLevel: 2 },
-                { lessonId: 3, title: "Family Members", completedAt: "2025-07-16", hskLevel: 1 },
-                { lessonId: 12, title: "Food & Drinks", completedAt: "2025-07-15", hskLevel: 2 }
+                { lessonId: 7, title: "Basic Verbs", completedAt: "2025-07-17", hskLevel: 1 },
+                { lessonId: 6, title: "Days of Week", completedAt: "2025-07-16", hskLevel: 1 },
+                { lessonId: 5, title: "Time", completedAt: "2025-07-15", hskLevel: 1 }
             ]
         };
 

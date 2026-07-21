@@ -10,6 +10,7 @@ import LessonDetailPage from './pages/lessons/lesson-detail-page';
 import ProfilePage from './pages/profile/profile-page';
 import { VocabularyStudyPage } from './pages/vocabulary/vocabulary-study-page';
 import { ReviewDashboardPage } from './pages/vocabulary/review-dashboard-page';
+import { ProtectedLayout } from './components/layout/protected-layout';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -87,66 +88,19 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Navigate to="/dashboard" replace />
+              <ProtectedLayout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hsk"
-          element={
-            <ProtectedRoute>
-              <HskListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hsk/:id"
-          element={
-            <ProtectedRoute>
-              <HskDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/lessons/:lessonId"
-          element={
-            <ProtectedRoute>
-              <LessonDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/vocabulary/study"
-          element={
-            <ProtectedRoute>
-              <VocabularyStudyPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/vocabulary/review"
-          element={
-            <ProtectedRoute>
-              <ReviewDashboardPage />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="hsk" element={<HskListPage />} />
+          <Route path="hsk/:id" element={<HskDetailPage />} />
+          <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="vocabulary/study" element={<VocabularyStudyPage />} />
+          <Route path="vocabulary/review" element={<ReviewDashboardPage />} />
+        </Route>
 
         {/* Catch all - redirect to dashboard */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

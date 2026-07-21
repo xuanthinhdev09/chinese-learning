@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Colors */
+  /* Colors - Light Mode */
   --color-primary: #4F46E5;
   --color-primary-dark: #4338CA;
   --color-primary-light: #EEF2FF;
@@ -18,6 +18,16 @@
   --color-border: #E5E7EB;
   --color-destructive: #DC2626;
   --color-warning: #F59E0B;
+}
+
+/* Dark Mode Colors */
+.dark {
+  --color-background: #111827;
+  --color-background-alt: #1F2937;
+  --color-foreground: #F9FAFB;
+  --color-muted: #9CA3AF;
+  --color-border: #374151;
+  --color-primary-light: #312E81;
 
   /* Typography */
   --font-display: 'Poppins', sans-serif;

@@ -6,10 +6,12 @@ import { cn } from '../../../utils/cn';
 
 export interface HeaderProps {
   className?: string;
+  onMobileMenuToggle?: () => void;
+  isMobileMenuOpen?: boolean;
 }
 
 export const Header = React.forwardRef<HTMLElement, HeaderProps>(
-  ({ className = '' }, ref) => {
+  ({ className = '', onMobileMenuToggle, isMobileMenuOpen = false }, ref) => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuthStore();
 
@@ -40,6 +42,34 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                 </span>
               </button>
             </div>
+
+            {/* Mobile Hamburger Menu */}
+            {isAuthenticated && onMobileMenuToggle && (
+              <button
+                onClick={onMobileMenuToggle}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <div className="w-6 h-5 flex flex-col justify-center gap-1.5">
+                  <span
+                    className={`block h-0.5 w-6 bg-foreground transition-all ${
+                      isMobileMenuOpen ? 'translate-y-2 rotate-45' : ''
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 w-6 bg-foreground transition-all ${
+                      isMobileMenuOpen ? 'opacity-0' : ''
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 w-6 bg-foreground transition-all ${
+                      isMobileMenuOpen ? '-translate-y-2 -rotate-45' : ''
+                    }`}
+                  />
+                </div>
+              </button>
+            )}
 
             {/* Navigation */}
             {isAuthenticated && (

@@ -52,7 +52,7 @@ export function ReviewDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
+    <>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -179,6 +179,6 @@ export function ReviewDashboardPage() {
           </ul>
         </div>
       </div>
-    </div>
+    </>
   );
 }

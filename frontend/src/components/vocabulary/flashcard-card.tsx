@@ -121,7 +121,7 @@ export function FlashcardCard() {
             'transition-all duration-300 ease-out',
             'hover:shadow-lg'
           )}
-          style={{ minHeight: '320px', perspective: '1000px' }}
+          style={{ minHeight: '400px', perspective: '1000px' }}
         >
           <div
             className={cn(
@@ -135,11 +135,11 @@ export function FlashcardCard() {
           >
             {/* Front */}
             <div
-              className="absolute inset-0 backface-hidden p-6 sm:p-8 flex flex-col items-center justify-center"
+              className="absolute inset-0 backface-hidden px-6 sm:px-8 pt-12 pb-6 sm:pb-8 flex flex-col items-center justify-start"
               style={{ backfaceVisibility: 'hidden' }}
             >
               {/* Header with TTS button and speed control */}
-              <div className="absolute top-4 right-4 flex items-center gap-2">
+              <div className="absolute top-6 right-4 flex items-center gap-2">
                 {ttsSupported && (
                   <>
                     {/* Speed control dropdown */}
@@ -247,7 +247,7 @@ export function FlashcardCard() {
 
             {/* Back */}
             <div
-              className="absolute inset-0 backface-hidden p-6 sm:p-8 flex flex-col items-center justify-center bg-background-alt"
+              className="absolute inset-0 backface-hidden px-6 sm:px-8 pt-12 pb-6 sm:pb-8 flex flex-col items-center justify-start bg-background-alt"
               style={{
                 backfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',

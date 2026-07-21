@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth-store';
-import { Header } from '../../components/layout';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Progress, Button, CircularProgress } from '../../components/ui';
 import { PageLoading } from '../../components/common';
 
@@ -50,18 +49,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-
-      {/* Main Content */}
-      <main className="container-custom py-8 animate-fade-in">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground font-display mb-2">
-            Xin chào, {user?.username}! 👋
-          </h1>
-          <p className="text-muted">Tiếp tục hành trình học tiếng Trung của bạn</p>
-        </div>
+    <>
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground font-display mb-2">
+          Xin chào, {user?.username}! 👋
+        </h1>
+        <p className="text-muted">Tiếp tục hành trình học tiếng Trung của bạn</p>
+      </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -108,22 +103,22 @@ export default function DashboardPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="accent" className="text-xs">Đang học</Badge>
-                  <span className="text-sm text-muted">HSK 2</span>
+                  <span className="text-sm text-muted">HSK 1</span>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  HSK 2 - Sơ cấp
+                  HSK 1 - Cơ bản
                 </h3>
-                <p className="text-muted mb-4">Còn 5 bài để hoàn thành level này</p>
-                <Progress value={73} color="accent" size="md" showLabel />
+                <p className="text-muted mb-4">Còn 3 bài để hoàn thành level này</p>
+                <Progress value={70} color="accent" size="md" showLabel />
               </div>
               <div className="text-center">
                 <CircularProgress value={73} size={80} showLabel color="accent" />
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-border">
-              <Link to="/lessons/15">
+              <Link to="/lessons/8">
                 <Button variant="primary" className="w-full sm:w-auto">
-                  Tiếp tục Bài 15 →
+                  Tiếp tục Bài 8 →
                 </Button>
               </Link>
             </div>
@@ -144,7 +139,7 @@ export default function DashboardPage() {
                 <h3 className="text-2xl font-semibold mb-2 font-display">Học Từ Vựng</h3>
                 <p className="text-primary-light text-sm mb-4">Flashcard & Quiz thông minh</p>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/20">
-                  <span className="text-sm">HSK 1-2</span>
+                  <span className="text-sm">HSK 1</span>
                   <Badge variant="muted" className="bg-white/20 text-white border-0">Hot</Badge>
                 </div>
               </Card>
@@ -174,12 +169,12 @@ export default function DashboardPage() {
                   <div className="w-14 h-14 bg-primary-light rounded-lg flex items-center justify-center">
                     <span className="text-3xl">📚</span>
                   </div>
-                  <Badge variant="primary">6 levels</Badge>
+                  <Badge variant="primary">MVP</Badge>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Tất Cả HSK Levels</h3>
-                <p className="text-muted text-sm mb-4">HSK 1-6 với đầy đủ bài học</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">HSK 1 - Cơ bản</h3>
+                <p className="text-muted text-sm mb-4">150 từ vựng cơ bản nhất</p>
                 <div className="grid grid-cols-3 gap-1 mt-4">
-                  {[1, 2, 3, 4, 5, 6].map((level) => (
+                  {[1].map((level) => (
                     <div
                       key={level}
                       className="text-center p-2 rounded bg-background-alt"
@@ -231,7 +226,7 @@ export default function DashboardPage() {
                   <span className="text-lg">✅</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-foreground font-medium">Hoàn thành HSK 2 Bài 14</p>
+                  <p className="text-foreground font-medium">Hoàn thành HSK 1 Bài 7</p>
                   <p className="text-sm text-muted">2 giờ trước</p>
                 </div>
               </div>
@@ -258,7 +253,6 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </>
   );
 }
