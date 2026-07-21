@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileUploadZone } from './components/file-upload-zone';
 import { ImportProgress } from './components/import-progress';
 import { ValidationErrors } from './components/validation-errors';
@@ -18,6 +18,21 @@ import type {
 } from '../../api/import-api';
 import { Header } from '../../components/layout/header/header';
 import { Breadcrumbs } from '../../components/layout/breadcrumbs/breadcrumbs';
+import { apiClient } from '../../lib/api-client';
+
+interface ImportedLesson {
+  id: string;
+  title: string;
+  description: string | null;
+  order: number;
+  slug: string;
+  hskLevel: {
+    id: string;
+    level: number;
+    name: string;
+  };
+  vocabularyCount: number;
+}
 
 interface ImportStep {
   id: number;
@@ -72,9 +87,32 @@ export default function ImportPage() {
     setCurrentStep,
   } = useImportStore();
 
+  const [importedLessons, setImportedLessons] = useState<ImportedLesson[]>([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
+
   const lessonsMutation = useImportLessonsMutation();
   const vocabulariesMutation = useImportVocabulariesMutation();
   const conversationsMutation = useImportConversationsMutation();
+
+  // Fetch imported lessons after successful lesson import
+  useEffect(() => {
+    const fetchImportedLessons = async () => {
+      if (lessons.result && lessons.result.hsk_level) {
+        setLoadingLessons(true);
+        try {
+          const response = await apiClient.get(`/lessons?hskLevelId=${lessons.result.hsk_level}`);
+          const data = await response.json();
+          setImportedLessons(data.data || []);
+        } catch (error) {
+          console.error('Failed to fetch imported lessons:', error);
+        } finally {
+          setLoadingLessons(false);
+        }
+      }
+    };
+
+    fetchImportedLessons();
+  }, [lessons.result]);
 
   const { progress } = useImportProgress(
     isImporting,
@@ -245,6 +283,8 @@ export default function ImportPage() {
               mutationError={mutation?.error || null}
               progress={progress}
               validation={validation}
+              importedLessons={step.id === 1 ? importedLessons : undefined}
+              loadingLessons={loadingLessons}
             />
           );
         })}
@@ -331,6 +371,8 @@ interface ImportStepProps {
   mutationError: Error | null;
   progress: { progress: number; created_count: number; skipped_count: number; error_count: number } | null;
   validation: ValidationResult | null;
+  importedLessons?: ImportedLesson[];
+  loadingLessons?: boolean;
 }
 
 function ImportStep({
@@ -345,6 +387,8 @@ function ImportStep({
   mutationError,
   progress,
   validation,
+  importedLessons = [],
+  loadingLessons = false,
 }: ImportStepProps) {
   const statusColors = {
     locked: 'border-gray-200 bg-gray-50',
@@ -450,6 +494,47 @@ function ImportStep({
               </button>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Imported Lessons Display for Step 1 */}
+      {step.id === 1 && hasResult && importedLessons.length > 0 && (
+        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-800 mb-3">
+            Imported Lessons (Use these slugs in vocabulary data)
+          </h4>
+          {loadingLessons ? (
+            <p className="text-sm text-blue-600">Loading lessons...</p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {importedLessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className="bg-white border border-blue-100 rounded p-3 text-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-800">
+                        {lesson.order}. {lesson.title}
+                      </div>
+                      {lesson.description && (
+                        <div className="text-gray-600 text-xs mt-1">
+                          {lesson.description}
+                        </div>
+                      )}
+                      <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                        <span>HSK {lesson.hskLevel.level}</span>
+                        <span>Vocab: {lesson.vocabularyCount}</span>
+                      </div>
+                    </div>
+                    <div className="bg-blue-100 px-2 py-1 rounded text-xs font-mono text-blue-700">
+                      {lesson.slug}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

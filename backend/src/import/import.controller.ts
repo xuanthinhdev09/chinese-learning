@@ -54,12 +54,9 @@ export class ImportController {
   @Post('vocabularies')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async importVocabularies(
-    @Body() dto: ImportVocabulariesDto,
-    @Body('lesson_mapping') lessonMapping?: Record<string, string>
-  ) {
+  async importVocabularies(@Body() dto: ImportVocabulariesDto) {
     try {
-      return await this.importService.importVocabularies(dto, lessonMapping);
+      return await this.importService.importVocabularies(dto, dto.lesson_mapping);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -75,13 +72,9 @@ export class ImportController {
   @Post('conversations')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async importConversations(
-    @Body() dto: ImportConversationsDto,
-    @Body('lesson_mapping') lessonMapping: Record<string, string>,
-    @Body('vocab_mapping') vocabMapping: Record<string, string>
-  ) {
+  async importConversations(@Body() dto: ImportConversationsDto) {
     try {
-      return await this.importService.importConversations(dto, lessonMapping, vocabMapping);
+      return await this.importService.importConversations(dto, dto.lesson_mapping, dto.vocab_mapping);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

@@ -1,10 +1,12 @@
-import { IsInt, IsOptional, IsString, IsArray, ValidateNested, IsUrl, Matches, MaxLength, Min, Max } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsArray, ValidateNested, IsUrl, Matches, MaxLength, Min, Max, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 
 // Regex patterns
 const LESSON_SLUG_REGEX = /^lesson-order-\d+$/;
-const HANZI_REGEX = /^[一-鿿\s]+$/;
-const PINYIN_REGEX = /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s',.!?;:"'()]+$/;
+// Include Chinese characters, spaces, and common Chinese punctuation (、，？！。：；""''（）—) plus ASCII dots for ellipsis
+const HANZI_REGEX = /^[一-鿿\s、，？！。：；""''（）—.]+$/;
+// Include pinyin with tone marks (uppercase and lowercase), spaces, and common punctuation
+const PINYIN_REGEX = /^[a-zA-Zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s',.!?;:"'()]+$/;
 // Vocabulary slug format: "vocab-hanzi-{hanzi}" or with lesson context
 const VOCAB_SLUG_REGEX = /^vocab-hanzi-[一-鿿]+(?:-lesson-\d+)?$/;
 
@@ -74,4 +76,12 @@ export class ImportConversationsDto {
   @ValidateNested({ each: true })
   @Type(() => ConversationItemDto)
   conversations: ConversationItemDto[];
+
+  @IsOptional()
+  @IsObject()
+  lesson_mapping?: Record<string, string>;
+
+  @IsOptional()
+  @IsObject()
+  vocab_mapping?: Record<string, string>;
 }

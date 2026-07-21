@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, IsArray, ValidateNested, Matches, MaxLength, Min, Max } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsArray, ValidateNested, Matches, MaxLength, Min, Max, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 
 // Regex for Chinese characters (Hanzi)
@@ -10,6 +10,11 @@ const PINYIN_REGEX = /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s']+
 
 // Lesson slug format: "lesson-order-{n}"
 const LESSON_SLUG_REGEX = /^lesson-order-\d+$/;
+
+// Record type validator for lesson_mapping
+export class LessonMappingDto implements Record<string, string> {
+  [key: string]: string;
+}
 
 export class VocabularyItemDto {
   @IsString()
@@ -69,4 +74,8 @@ export class ImportVocabulariesDto {
   @ValidateNested({ each: true })
   @Type(() => VocabularyItemDto)
   vocabularies: VocabularyItemDto[];
+
+  @IsOptional()
+  @IsObject()
+  lesson_mapping?: Record<string, string>;
 }

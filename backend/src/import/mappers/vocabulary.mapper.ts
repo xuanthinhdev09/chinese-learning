@@ -12,6 +12,7 @@ export class VocabularyMapper {
   /**
    * Convert DTO to Prisma create input for Vocabulary
    * Note: Combines english and vietnamese into meaning field
+   * Note: Example pinyin and vietnamese are not stored in DB (only example field exists)
    */
   static toCreateDto(vocab: VocabularyItemDto, lessonId: string, hskLevel: number) {
     return {
@@ -21,8 +22,6 @@ export class VocabularyMapper {
       meaning: `${vocab.english} | ${vocab.vietnamese}`,
       wordType: vocab.word_type || null,
       example: vocab.example || null,
-      examplePinyin: vocab.example_pinyin || null,
-      exampleVietnamese: vocab.example_vietnamese || null,
       hskLevel
     };
   }
