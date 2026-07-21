@@ -36,6 +36,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { path: '/hsk', icon: '📚', label: 'HSK Levels' },
     { path: '/vocabulary/study', icon: '📇', label: 'Vocabulary' },
     { path: '/vocabulary/review', icon: '🔄', label: 'Review' },
+    { path: '/import', icon: '📤', label: 'Import Data' },
   ];
 
   const secondaryNavItems = [

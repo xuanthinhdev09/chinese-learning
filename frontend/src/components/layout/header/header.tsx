@@ -98,11 +98,18 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                 >
                   Review
                 </button>
+                <button
+                  onClick={() => navigate('/import')}
+                  className="text-sm font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  <span>📤</span>
+                  <span>Import</span>
+                </button>
               </nav>
             )}
 
             {/* User menu */}
-            {isAuthenticated && (
+            {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <span className="hidden sm:block text-sm text-muted">
                   {user?.email}
@@ -120,6 +127,23 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                   onClick={handleLogout}
                 >
                   Logout
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/login')}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate('/register')}
+                >
+                  Sign Up
                 </Button>
               </div>
             )}

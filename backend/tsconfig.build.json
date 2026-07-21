@@ -5,6 +5,8 @@
     "test",
     "dist",
     "**/*spec.ts",
-    "**/*test.ts"
+    "**/*test.ts",
+    "src/import/cli",
+    "scripts"
   ]
 }

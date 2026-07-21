@@ -14,6 +14,7 @@ const breadcrumbMap: Record<string, BreadcrumbConfig> = {
   '/vocabulary': { path: '/vocabulary', label: 'Vocabulary', icon: '📇' },
   '/lessons': { path: '/lessons', label: 'Lessons', icon: '📖' },
   '/profile': { path: '/profile', label: 'Profile', icon: '👤' },
+  '/import': { path: '/import', label: 'Import', icon: '📤' },
 };
 
 // Get parent paths for nested routes

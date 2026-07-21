@@ -11,6 +11,7 @@ import ProfilePage from './pages/profile/profile-page';
 import { VocabularyStudyPage } from './pages/vocabulary/vocabulary-study-page';
 import { ReviewDashboardPage } from './pages/vocabulary/review-dashboard-page';
 import { ProtectedLayout } from './components/layout/protected-layout';
+import ImportPage from './pages/import/import-page';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -82,6 +83,9 @@ function App() {
             </PublicRoute>
           }
         />
+
+        {/* Public import route (no auth required) */}
+        <Route path="/import" element={<ImportPage />} />
 
         {/* Protected routes */}
         <Route

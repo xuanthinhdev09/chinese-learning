@@ -9,6 +9,7 @@ import { LessonsModule } from './lessons/lessons.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { SpacedRepetitionModule } from './spaced-repetition/spaced-repetition.module';
 import { DeploymentModule } from './deployment/deployment.module';
+import { ImportModule } from './import/import.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DeploymentModule } from './deployment/deployment.module';
     VocabularyModule,
     SpacedRepetitionModule,
     DeploymentModule,
+    ImportModule,
   ],
 })
 export class AppModule {}
