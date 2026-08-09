@@ -1,0 +1,331 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('https://cdn.icomoon.io/253248/PC/icomoon.eot?n0gvdc');
+  src:  url('https://cdn.icomoon.io/253248/PC/icomoon.eot?n0gvdc#iefix') format('embedded-opentype'),
+    url('https://cdn.icomoon.io/253248/PC/icomoon.woff2?n0gvdc') format('woff2'),
+    url('https://cdn.icomoon.io/253248/PC/icomoon.ttf?n0gvdc') format('truetype'),
+    url('https://cdn.icomoon.io/253248/PC/icomoon.woff?n0gvdc') format('woff'),
+    url('https://cdn.icomoon.io/253248/PC/icomoon.svg?n0gvdc#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-alart1:before {
+  content: "\e952";
+  color: #e94335;
+}
+.icon-tab_lucky:before {
+  content: "\e900";
+  color: #707070;
+}
+.icon-add-circle:before {
+  content: "\e901";
+}
+.icon-add1:before {
+  content: "\e902";
+}
+.icon-agency:before {
+  content: "\e903";
+  color: #515151;
+}
+.icon-arrow-down:before {
+  content: "\e904";
+}
+.icon-arrow-left:before {
+  content: "\e905";
+}
+.icon-arrow-right:before {
+  content: "\e906";
+}
+.icon-arrow-up:before {
+  content: "\e907";
+  color: #666;
+}
+.icon-attention:before {
+  content: "\e908";
+  color: #f33d3d;
+}
+.icon-call:before {
+  content: "\e909";
+  color: #c9c9c9;
+}
+.icon-check:before {
+  content: "\e90a";
+  color: #999;
+}
+.icon-chongzhi:before {
+  content: "\e90b";
+}
+.icon-close:before {
+  content: "\e90c";
+}
+.icon-dating:before {
+  content: "\e90d";
+  color: #707070;
+}
+.icon-delet:before {
+  content: "\e90e";
+}
+.icon-delete:before {
+  content: "\e90f";
+  color: #ccc;
+}
+.icon-dianhua:before {
+  content: "\e910";
+}
+.icon-duijiang:before {
+  content: "\e911";
+}
+.icon-eye-close11:before {
+  content: "\e912";
+}
+.icon-eye-open:before {
+  content: "\e913";
+}
+.icon-footer_champion:before {
+  content: "\e914";
+  color: #ccc;
+}
+.icon-footer_cold:before {
+  content: "\e915";
+  color: #888;
+}
+.icon-footer_exchange:before {
+  content: "\e916";
+  color: #888;
+}
+.icon-footer_fast:before {
+  content: "\e917";
+  color: #888;
+}
+.icon-footer_hot:before {
+  content: "\e918";
+  color: #ccc;
+}
+.icon-footer_money:before {
+  content: "\e919";
+  color: #ccc;
+}
+.icon-footer_safety:before {
+  content: "\e91a";
+  color: #888;
+}
+.icon-footer_user:before {
+  content: "\e91b";
+  color: #ccc;
+}
+.icon-gengduo:before {
+  content: "\e91c";
+  color: #515151;
+}
+.icon-go:before {
+  content: "\e91d";
+  color: #999;
+}
+.icon-hideeyes:before {
+  content: "\e91e";
+  color: #999;
+}
+.icon-high:before {
+  content: "\e91f";
+  color: #707070;
+}
+.icon-huiyuan:before {
+  content: "\e920";
+}
+.icon-invite:before {
+  content: "\e921";
+  color: #c9c9c9;
+}
+.icon-laba:before {
+  content: "\e922";
+}
+.icon-left-copy:before {
+  content: "\e923";
+  color: #d81e06;
+}
+.icon-load-locker:before {
+  content: "\e924";
+}
+.icon-loading:before {
+  content: "\e925";
+  color: #fff;
+}
+.icon-mail:before {
+  content: "\e926";
+  color: #ccc;
+}
+.icon-my-other-Refresh:before {
+  content: "\e927";
+}
+.icon-navavatar1:before {
+  content: "\e928";
+}
+.icon-others:before {
+  content: "\e929";
+}
+.icon-passw:before {
+  content: "\e92a";
+  color: #c9c9c9;
+}
+.icon-phone:before {
+  content: "\e92b";
+}
+.icon-point-empty:before {
+  content: "\e92c";
+  color: #515151;
+}
+.icon-point-full:before {
+  content: "\e92d";
+  color: #cb0101;
+}
+.icon-problem:before {
+  content: "\e92e";
+}
+.icon-QQ:before {
+  content: "\e92f";
+  color: #ccc;
+}
+.icon-reload:before {
+  content: "\e930";
+  color: #666;
+}
+.icon-right-core:before {
+  content: "\e931";
+  color: #d81e06;
+}
+.icon-right:before {
+  content: "\e932";
+  color: #f33d3d;
+}
+.icon-ruleEmpty:before {
+  content: "\e933";
+  color: #515151;
+}
+.icon-search:before {
+  content: "\e934";
+}
+.icon-shouye:before {
+  content: "\e935";
+}
+.icon-showeyes:before {
+  content: "\e936";
+  color: #999;
+}
+.icon-subtraction:before {
+  content: "\e937";
+}
+.icon-tab_bet:before {
+  content: "\e938";
+  color: #707070;
+}
+.icon-tab_k:before {
+  content: "\e939";
+  color: #707070;
+}
+.icon-tab_lhc:before {
+  content: "\e93a";
+  color: #707070;
+}
+.icon-tab_pk:before {
+  content: "\e93b";
+  color: #707070;
+}
+.icon-tab_sfc:before {
+  content: "\e93c";
+  color: #707070;
+}
+.icon-tab_ssc:before {
+  content: "\e93d";
+  color: #707070;
+}
+.icon-tab_X:before {
+  content: "\e93e";
+  color: #707070;
+}
+.icon-table_alert:before {
+  content: "\e93f";
+  color: #e94335;
+}
+.icon-tikuan:before {
+  content: "\e940";
+}
+.icon-touzhu:before {
+  content: "\e941";
+}
+.icon-triangleDown:before {
+  content: "\e942";
+}
+.icon-trophy:before {
+  content: "\e943";
+  color: #515151;
+}
+.icon-TVMovement:before {
+  content: "\e944";
+  color: #515151;
+}
+.icon-user_d:before {
+  content: "\e945";
+  color: #c9c9c9;
+}
+.icon-user-info:before {
+  content: "\e946";
+  color: #515151;
+}
+.icon-user-login:before {
+  content: "\e947";
+  color: #c3c2c2;
+}
+.icon-verifi_d:before {
+  content: "\e948";
+  color: #ccc;
+}
+.icon-vip:before {
+  content: "\e949";
+  color: #515151;
+}
+.icon-weixuanzhong:before {
+  content: "\e94a";
+}
+.icon-weixuanzhongjiaojiapeishuai .path1:before {
+  content: "\e94b";
+  color: rgb(255, 255, 255);
+}
+.icon-weixuanzhongjiaojiapeishuai .path2:before {
+  content: "\e94c";
+  margin-left: -1em;
+  color: rgb(165, 165, 165);
+}
+.icon-x-solid:before {
+  content: "\e94d";
+  color: #bfbfbf;
+}
+.icon-xiangshang:before {
+  content: "\e94e";
+}
+.icon-xiangxia:before {
+  content: "\e94f";
+}
+.icon-xuanzhong:before {
+  content: "\e950";
+  color: #d81e06;
+}
+.icon-xuanzhongjiaojiapeishuai:before {
+  content: "\e951";
+}
