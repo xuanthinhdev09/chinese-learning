@@ -6,7 +6,7 @@ export class HskService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    const levels = await this.prisma.hskLevel.findMany({
+    const levels = await this.prisma.course.findMany({
       orderBy: { level: 'asc' },
       include: {
         _count: {
@@ -22,7 +22,7 @@ export class HskService {
   }
 
   async findOne(id: string) {
-    const level = await this.prisma.hskLevel.findUnique({
+    const level = await this.prisma.course.findUnique({
       where: { id },
       include: {
         lessons: {

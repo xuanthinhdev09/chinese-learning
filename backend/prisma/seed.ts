@@ -5,22 +5,26 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
 
-  // Create HSK levels
-  const hsk1 = await prisma.hskLevel.upsert({
-    where: { level: 1 },
+  // Create HSK courses (stable ids because level is no longer unique)
+  const hsk1 = await prisma.course.upsert({
+    where: { id: 'course-hsk-1' },
     update: {},
     create: {
+      id: 'course-hsk-1',
       level: 1,
+      type: 'HSK',
       name: 'HSK 1',
       description: 'Cơ bản - 150 từ vựng',
     },
   });
 
-  const hsk2 = await prisma.hskLevel.upsert({
-    where: { level: 2 },
+  const hsk2 = await prisma.course.upsert({
+    where: { id: 'course-hsk-2' },
     update: {},
     create: {
+      id: 'course-hsk-2',
       level: 2,
+      type: 'HSK',
       name: 'HSK 2',
       description: 'Sơ cấp - 300 từ vựng',
     },
@@ -34,7 +38,7 @@ async function main() {
     update: {},
     create: {
       id: 'hsk1-lesson-1',
-      hskLevelId: hsk1.id,
+      courseId: hsk1.id,
       title: 'Bài 1: Xin chào (你好)',
       description: 'Học cách chào hỏi và giới thiệu bản thân',
       order: 1,
@@ -46,7 +50,7 @@ async function main() {
     update: {},
     create: {
       id: 'hsk1-lesson-2',
-      hskLevelId: hsk1.id,
+      courseId: hsk1.id,
       title: 'Bài 2: Số đếm (数字)',
       description: 'Học các số từ 1 đến 10',
       order: 2,
@@ -58,7 +62,7 @@ async function main() {
     update: {},
     create: {
       id: 'hsk1-lesson-3',
-      hskLevelId: hsk1.id,
+      courseId: hsk1.id,
       title: 'Bài 3: Gia đình (家庭)',
       description: 'Học từ vựng về gia đình',
       order: 3,
@@ -71,7 +75,7 @@ async function main() {
     update: {},
     create: {
       id: 'hsk2-lesson-1',
-      hskLevelId: hsk2.id,
+      courseId: hsk2.id,
       title: 'Bài 1: Thời gian (时间)',
       description: 'Học cách nói về thời gian',
       order: 1,
@@ -83,7 +87,7 @@ async function main() {
     update: {},
     create: {
       id: 'hsk2-lesson-2',
-      hskLevelId: hsk2.id,
+      courseId: hsk2.id,
       title: 'Bài 2: Ngày tháng (日期)',
       description: 'Học ngày tháng và năm',
       order: 2,

@@ -16,9 +16,10 @@ model User {
   createdAt          DateTime                 @default(now())
   updatedAt          DateTime                 @updatedAt
   deletedAt          DateTime?
-  refreshTokens      RefreshToken[]
-  userProgress       UserProgress[]
-  vocabularyProgress UserVocabularyProgress[]
+  refreshTokens        RefreshToken[]
+  userProgress         UserProgress[]
+  vocabularyProgress   UserVocabularyProgress[]
+  dialogueProgress     UserDialogueProgress[]
 
   @@map("users")
 }
@@ -34,30 +35,35 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
-model HskLevel {
+// Multi-source learning course: built-in HSK levels ("HSK") and imported
+// custom textbooks ("CUSTOM"). Table name kept as hsk_levels for continuity.
+model Course {
   id          String   @id @default(cuid())
-  level       Int      @unique
+  level       Int
+  type        String   @default("HSK")
   name        String
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   lessons     Lesson[]
 
+  @@index([type, level])
   @@map("hsk_levels")
 }
 
 model Lesson {
-  id             String         @id @default(cuid())
-  hskLevelId     String
-  title          String
-  description    String?
-  order          Int
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  hskLevel       HskLevel       @relation(fields: [hskLevelId], references: [id], onDelete: Cascade)
-  userProgress   UserProgress[]
-  vocabularies   Vocabulary[]
-  conversations  Conversation[]
+  id                String                 @id @default(cuid())
+  courseId          String
+  title             String
+  description       String?
+  order             Int
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  course            Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userProgress      UserProgress[]
+  vocabularies      Vocabulary[]
+  conversations     Conversation[]
+  dialogueProgress  UserDialogueProgress[]
 
   @@map("lessons")
 }
@@ -79,6 +85,7 @@ model Vocabulary {
   cedict       String?
   createdAt    DateTime                 @default(now())
   updatedAt    DateTime                 @updatedAt
+  isKeyword    Boolean                  @default(false)
   userProgress UserVocabularyProgress[]
   conversationVocabularies ConversationVocabulary[]
   lesson       Lesson                   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
@@ -101,6 +108,7 @@ model Conversation {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
 
+  speaker                String?
   lesson                 Lesson              @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   conversationVocabularies ConversationVocabulary[]
 
@@ -145,6 +153,25 @@ model UserVocabularyProgress {
   @@map("user_vocabulary_progress")
 }
 
+// Dialogue (conversation) spaced repetition. Stage drives the review interval:
+// 0→+1d, 1→+3d, 2→+7d, 3→+14d; stage 4 = graduated (no further schedule).
+model UserDialogueProgress {
+  id             String    @id @default(cuid())
+  userId         String
+  lessonId       String
+  stage          Int       @default(0)
+  lastReviewedAt DateTime?
+  nextReviewAt   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson         Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, nextReviewAt])
+  @@map("user_dialogue_progress")
+}
+
 model UserProgress {
   id          String    @id @default(cuid())
   userId      String
@@ -158,4 +185,24 @@ model UserProgress {
 
   @@unique([userId, lessonId])
   @@map("user_progress")
+}
+
+// Cache row for one synthesized TTS audio file. Audio is immutable — a changed
+// synthesis parameter (text, voice, speed, pause, format) yields a new cacheKey.
+// Files live on disk under TTS_STORAGE_DIR; this table only maps key → file.
+model TtsAudio {
+  id           String   @id @default(cuid())
+  cacheKey     String   @unique
+  type         String // 'text' | 'dialogue'
+  text         String // plain text, or JSON array of dialogue lines
+  voice        String // primary voice; for dialogue, JSON array of voices
+  locale       String   @default("zh-CN")
+  speed        Float    @default(1.0)
+  pauseMs      Int?
+  outputFormat String   @default("audio-24khz-48kbitrate-mono-mp3")
+  filePath     String
+  charCount    Int
+  createdAt    DateTime @default(now())
+
+  @@map("tts_audio")
 }

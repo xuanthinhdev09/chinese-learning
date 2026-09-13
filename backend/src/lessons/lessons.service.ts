@@ -7,20 +7,21 @@ export class LessonsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: LessonQueryDto) {
-    const { hskLevelId, page = 1, limit = 10 } = query;
+    // API keeps the legacy hskLevelId query param; internally it maps to courseId
+    const { hskLevelId: courseId, page = 1, limit = 10 } = query;
     const skip = (page - 1) * limit;
 
-    const where = hskLevelId ? { hskLevelId } : {};
+    const where = courseId ? { courseId } : {};
 
     const [data, total] = await Promise.all([
       this.prisma.lesson.findMany({
         where,
         skip,
         take: limit,
-        orderBy: [{ hskLevel: { level: 'asc' } }, { order: 'asc' }],
+        orderBy: [{ course: { level: 'asc' } }, { order: 'asc' }],
         include: {
-          hskLevel: {
-            select: { id: true, level: true, name: true },
+          course: {
+            select: { id: true, level: true, name: true, type: true },
           },
           _count: {
             select: { vocabularies: true },
@@ -31,8 +32,10 @@ export class LessonsService {
     ]);
 
     return {
-      data: data.map((lesson) => ({
+      data: data.map(({ course, ...lesson }) => ({
         ...lesson,
+        // legacy response field kept for frontend compatibility
+        hskLevel: course,
         vocabularyCount: lesson._count.vocabularies,
       })),
       total,
@@ -46,8 +49,8 @@ export class LessonsService {
     const lesson = await this.prisma.lesson.findUnique({
       where: { id },
       include: {
-        hskLevel: {
-          select: { id: true, level: true, name: true },
+        course: {
+          select: { id: true, level: true, name: true, type: true },
         },
         vocabularies: {
           orderBy: { id: 'asc' },
@@ -59,6 +62,11 @@ export class LessonsService {
       throw new NotFoundException('Lesson not found');
     }
 
-    return lesson;
+    const { course, ...rest } = lesson;
+    return {
+      ...rest,
+      // legacy response field kept for frontend compatibility
+      hskLevel: course,
+    };
   }
 }
