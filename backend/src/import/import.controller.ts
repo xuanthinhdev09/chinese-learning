@@ -10,9 +10,11 @@ import {
   ValidationPipe,
   BadRequestException,
   UseInterceptors,
-  UploadedFile
+  UploadedFile,
+  UseGuards
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImportService } from './import.service';
 import { ImportLessonsDto } from './dto/import-lessons.dto';
 import { ImportVocabulariesDto } from './dto/import-vocabularies.dto';
@@ -30,6 +32,7 @@ interface MulterFile {
 }
 
 @Controller('import')
+@UseGuards(JwtAuthGuard)
 export class ImportController {
   constructor(private readonly importService: ImportService) {}
 
@@ -127,7 +130,7 @@ export class ImportController {
       }
 
       const json = JSON.parse(file.buffer.toString('utf-8'));
-      return await this.importService.importLessons(json);
+      return await this.importService.importAuto(json);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -162,6 +165,33 @@ export class ImportController {
         : undefined;
 
       return await this.importService.importVocabularies(dto, lessonMapping);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to parse uploaded file',
+        error: error.message
+      });
+    }
+  }
+
+  @Post('upload/textbook-v2')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+    })
+  )
+  async uploadTextbookV2(@UploadedFile() file: MulterFile) {
+    try {
+      if (!file) {
+        throw new BadRequestException('No file uploaded');
+      }
+
+      const json = JSON.parse(file.buffer.toString('utf-8'));
+      return await this.importService.importTextbookV2(json);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

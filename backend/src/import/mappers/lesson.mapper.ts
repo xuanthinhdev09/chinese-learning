@@ -11,9 +11,9 @@ export class LessonMapper {
   /**
    * Convert DTO to Prisma create input
    */
-  static toCreateDto(lesson: LessonItemDto, hskLevelId: string) {
+  static toCreateDto(lesson: LessonItemDto, courseId: string) {
     return {
-      hskLevelId,
+      courseId,
       title: lesson.title,
       description: lesson.description || null,
       order: lesson.order
