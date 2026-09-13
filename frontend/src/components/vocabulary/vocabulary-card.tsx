@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Vocabulary } from '../../api/vocabulary-api';
-import { useChineseTTS } from '../../hooks/use-chinese-tts';
+import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
 import { Badge } from '../ui';
 
@@ -17,12 +17,12 @@ export default function VocabularyCard({
   onSpeak,
   className = ''
 }: VocabularyCardProps) {
-  const { speak, isSpeaking } = useChineseTTS();
+  const { play, isBusy: isSpeaking } = useTtsAudio();
   const [hasSpoken, setHasSpoken] = useState(false);
 
   const handleSpeak = () => {
     if (vocabulary.hanzi) {
-      speak(vocabulary.hanzi);
+      play(vocabulary.hanzi);
       setHasSpoken(true);
       onSpeak?.(vocabulary);
     }
@@ -101,7 +101,7 @@ export interface VocabularyCardCompactProps {
 }
 
 export function VocabularyCardCompact({ vocabulary, className = '' }: VocabularyCardCompactProps) {
-  const { speak, isSpeaking } = useChineseTTS();
+  const { play, isBusy: isSpeaking } = useTtsAudio();
 
   return (
     <div className={cn('card p-4 hover:shadow-md transition-shadow', className)}>
@@ -124,7 +124,7 @@ export function VocabularyCardCompact({ vocabulary, className = '' }: Vocabulary
 
         {/* Audio button */}
         <button
-          onClick={() => vocabulary.hanzi && speak(vocabulary.hanzi)}
+          onClick={() => vocabulary.hanzi && play(vocabulary.hanzi)}
           disabled={isSpeaking || !vocabulary.hanzi}
           className={cn(
             'p-2 rounded-lg transition-colors',

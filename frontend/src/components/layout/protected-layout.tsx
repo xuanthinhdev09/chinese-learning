@@ -49,7 +49,9 @@ export function ProtectedLayout() {
       <Breadcrumbs />
       <main
         className={cn(
-          'container-custom transition-all duration-200',
+          'transition-all duration-200',
+          // /today breaks out to the wide container for the dialogue grid
+          location.pathname.startsWith('/today') ? 'container-custom-wide' : 'container-custom',
           hasBreadcrumbs ? 'pt-32 pb-8' : 'py-8'
         )}
       >

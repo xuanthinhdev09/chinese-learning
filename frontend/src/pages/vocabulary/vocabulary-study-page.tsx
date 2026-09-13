@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { useLanguagePreference } from '../../stores/language-preference-store';
+import { hskApi } from '../../api/hsk-api';
 import { FlashcardCard } from '../../components/vocabulary/flashcard-card';
 import { QuizCard } from '../../components/vocabulary/quiz-card';
 import { QuizFillBlank } from '../../components/vocabulary/quiz-fill-blank';
@@ -28,9 +29,32 @@ export function VocabularyStudyPage() {
 
   const { preference, togglePreference } = useLanguagePreference();
 
-  const hskLevels = [
-    { level: 1, name: 'HSK 1', words: 150, description: 'Cơ bản - 150 từ vựng' },
-  ];
+  // Real course list from the API; word counts stay out because the levels
+  // endpoint does not aggregate them (lesson count shown instead)
+  const [hskLevels, setHskLevels] = useState<
+    Array<{ level: number; name: string; description: string | null; lessonCount: number }>
+  >([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    hskApi
+      .getLevels()
+      .then((levels) => {
+        if (cancelled) return;
+        setHskLevels(
+          levels.map((hsk) => ({
+            level: hsk.level,
+            name: hsk.name,
+            description: hsk.description,
+            lessonCount: hsk.lessonCount,
+          }))
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const studyModes = [
     { id: 'flashcard', name: 'Flashcards', emoji: '📇', description: 'Ôn tập với thẻ từ', color: 'bg-blue-500' },
@@ -149,7 +173,7 @@ export function VocabularyStudyPage() {
                   {hsk.name}
                 </h2>
                 <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm">
-                  {hsk.words} words
+                  {hsk.lessonCount} bài học
                 </span>
               </div>
 

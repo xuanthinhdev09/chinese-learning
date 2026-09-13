@@ -35,7 +35,7 @@ export default function LoginPage() {
             <span className="text-white font-bold text-4xl chinese-text">中</span>
           </div>
           <h1 className="text-3xl font-bold text-foreground font-display">Chinese Learning</h1>
-          <p className="mt-2 text-sm text-muted">Học tiếng Trung HSK 1-6 hiệu quả</p>
+          <p className="mt-2 text-sm text-muted">Học tiếng Trung hiệu quả mỗi ngày</p>
         </div>
 
         {/* Login Card */}

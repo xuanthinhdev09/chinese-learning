@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuthStore } from './stores/auth-store';
 import LoginPage from './pages/auth/login-page';
@@ -11,7 +11,31 @@ import ProfilePage from './pages/profile/profile-page';
 import { VocabularyStudyPage } from './pages/vocabulary/vocabulary-study-page';
 import { ReviewDashboardPage } from './pages/vocabulary/review-dashboard-page';
 import { ProtectedLayout } from './components/layout/protected-layout';
-import ImportPage from './pages/import/import-page';
+import ImportPasswordGate from './pages/import/import-password-gate';
+import { TodaySessionPage } from './pages/today/today-session-page';
+
+// Component to serve static files
+function StaticFileRedirect() {
+  const location = useLocation();
+  // Redirect to the static file directly
+  useEffect(() => {
+    window.location.href = location.pathname + location.search + location.hash;
+  }, [location]);
+  return null;
+}
+
+// Route guard to allow static files and redirect others
+function RouteGuard() {
+  const location = useLocation();
+
+  // Allow bt-demo static files to pass through
+  if (location.pathname.startsWith('/bt-demo/')) {
+    return <StaticFileRedirect />;
+  }
+
+  // Redirect everything else to dashboard
+  return <Navigate to="/dashboard" replace />;
+}
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -34,12 +58,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Public route wrapper (redirect to dashboard if authenticated)
+// Public route wrapper (redirect to today's session if authenticated —
+// opening the app should land straight in learning)
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/today" replace />;
   }
 
   return <>{children}</>;
@@ -84,8 +109,8 @@ function App() {
           }
         />
 
-        {/* Public import route (no auth required) */}
-        <Route path="/import" element={<ImportPage />} />
+        {/* Public import route behind a soft passphrase gate */}
+        <Route path="/import" element={<ImportPasswordGate />} />
 
         {/* Protected routes */}
         <Route
@@ -96,7 +121,8 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<Navigate to="/today" replace />} />
+          <Route path="today" element={<TodaySessionPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="hsk" element={<HskListPage />} />
           <Route path="hsk/:id" element={<HskDetailPage />} />
@@ -106,8 +132,13 @@ function App() {
           <Route path="vocabulary/review" element={<ReviewDashboardPage />} />
         </Route>
 
-        {/* Catch all - redirect to dashboard */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {/* Catch all - redirect to dashboard, but exclude bt-demo static files */}
+        <Route
+          path="*"
+          element={
+            <RouteGuard />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

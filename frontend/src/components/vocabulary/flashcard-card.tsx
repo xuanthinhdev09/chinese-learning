@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
-import { useChineseTTS } from '../../hooks/use-chinese-tts';
+import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
 import { Button, Badge, CircularProgress, Progress } from '../ui';
 import { EmptyStates } from '../common';
@@ -34,7 +34,7 @@ export function FlashcardCard() {
     rateCard,
   } = useVocabularyStore();
 
-  const { speak, isSupported: ttsSupported, isSpeaking } = useChineseTTS();
+  const { play, isSupported: ttsSupported, isBusy: isSpeaking } = useTtsAudio();
 
   const [speechRate, setSpeechRate] = useState(0.8);
   const [showSpeedControl, setShowSpeedControl] = useState(false);
@@ -69,7 +69,7 @@ export function FlashcardCard() {
 
   const handleSpeak = () => {
     if (current) {
-      speak(current.hanzi, speechRate);
+      play(current.hanzi, { speed: speechRate });
     }
   };
 
@@ -167,7 +167,7 @@ export function FlashcardCard() {
                                   setSpeechRate(option.value);
                                   setShowSpeedControl(false);
                                   if (current) {
-                                    speak(current.hanzi, option.value);
+                                    play(current.hanzi, { speed: option.value });
                                   }
                                 }}
                                 className={cn(

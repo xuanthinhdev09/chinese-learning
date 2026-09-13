@@ -32,15 +32,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   // Navigation items grouped by section
   const mainNavItems = [
-    { path: '/dashboard', icon: '🏠', label: 'Dashboard' },
-    { path: '/hsk', icon: '📚', label: 'HSK Levels' },
-    { path: '/vocabulary/study', icon: '📇', label: 'Vocabulary' },
-    { path: '/vocabulary/review', icon: '🔄', label: 'Review' },
-    { path: '/import', icon: '📤', label: 'Import Data' },
-  ];
-
-  const secondaryNavItems = [
-    { path: '/profile', icon: '👤', label: 'Profile' },
+    { path: '/today', icon: '🎯', label: 'Hôm nay' },
+    { path: '/vocabulary/study', icon: '📇', label: 'Từ vựng' },
   ];
 
   return (
@@ -109,22 +102,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* Main Navigation */}
             <section className="flex flex-col gap-2">
               {mainNavItems.map((item) => (
-                <MenuItem
-                  key={item.path}
-                  icon={item.icon}
-                  label={item.label}
-                  onClick={() => handleNavigate(item.path)}
-                  isActive={isActive(item.path)}
-                />
-              ))}
-            </section>
-
-            {/* Divider */}
-            <div className="border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Secondary Navigation */}
-            <section className="flex flex-col gap-2">
-              {secondaryNavItems.map((item) => (
                 <MenuItem
                   key={item.path}
                   icon={item.icon}

@@ -75,35 +75,16 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
             {isAuthenticated && (
               <nav className="hidden md:flex items-center gap-6">
                 <button
-                  onClick={() => navigate('/dashboard')}
-                  className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+                  onClick={() => navigate('/today')}
+                  className="text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
                 >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => navigate('/hsk')}
-                  className="text-sm font-medium text-muted hover:text-foreground transition-colors"
-                >
-                  HSK Levels
+                  Hôm nay
                 </button>
                 <button
                   onClick={() => navigate('/vocabulary/study')}
                   className="text-sm font-medium text-muted hover:text-foreground transition-colors"
                 >
-                  Vocabulary
-                </button>
-                <button
-                  onClick={() => navigate('/vocabulary/review')}
-                  className="text-sm font-medium text-muted hover:text-foreground transition-colors"
-                >
-                  Review
-                </button>
-                <button
-                  onClick={() => navigate('/import')}
-                  className="text-sm font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1"
-                >
-                  <span>📤</span>
-                  <span>Import</span>
+                  Từ vựng
                 </button>
               </nav>
             )}
