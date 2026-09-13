@@ -36,6 +36,12 @@ services:
       REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-7d}
       PORT: 3000
       NODE_ENV: development
+      # Azure Neural TTS (optional — empty = TTS off, frontend falls back)
+      AZURE_SPEECH_KEY: ${AZURE_SPEECH_KEY:-}
+      AZURE_SPEECH_REGION: ${AZURE_SPEECH_REGION:-}
+      TTS_VOICE_MAP: ${TTS_VOICE_MAP:-}
+      TTS_PAUSE_MS: ${TTS_PAUSE_MS:-}
+      TTS_STORAGE_DIR: ${TTS_STORAGE_DIR:-}
     depends_on:
       postgres:
         condition: service_healthy
