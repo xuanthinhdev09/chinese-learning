@@ -10,6 +10,8 @@ import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { SpacedRepetitionModule } from './spaced-repetition/spaced-repetition.module';
 import { DeploymentModule } from './deployment/deployment.module';
 import { ImportModule } from './import/import.module';
+import { DailySessionModule } from './daily-session/daily-session.module';
+import { TtsModule } from './tts/tts.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { ImportModule } from './import/import.module';
     SpacedRepetitionModule,
     DeploymentModule,
     ImportModule,
+    DailySessionModule,
+    TtsModule,
   ],
 })
 export class AppModule {}

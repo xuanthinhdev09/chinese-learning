@@ -1,0 +1,183 @@
+import { NotFoundException } from '@nestjs/common';
+import { DailySessionService } from './daily-session.service';
+import { SpacedRepetitionService } from '../spaced-repetition/spaced-repetition.service';
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function buildPrismaMock() {
+  return {
+    userDialogueProgress: {
+      findMany: jest.fn().mockResolvedValue([]),
+      findFirst: jest.fn().mockResolvedValue(null),
+      findUnique: jest.fn().mockResolvedValue(null),
+      upsert: jest.fn().mockImplementation(({ where, create, update }) =>
+        Promise.resolve({ id: 'dp-1', userId: 'u1', lessonId: where.userId_lessonId.lessonId, ...update })
+      ),
+    },
+    lesson: {
+      findUnique: jest.fn().mockImplementation(({ where }) =>
+        Promise.resolve({ id: where.id, title: 'L', courseId: 'c1', order: 1 })
+      ),
+      findFirst: jest.fn().mockResolvedValue(null),
+    },
+    course: { findFirst: jest.fn().mockResolvedValue(null) },
+    vocabulary: { findMany: jest.fn().mockResolvedValue([]) },
+    userProgress: { upsert: jest.fn().mockResolvedValue({ isCompleted: true, completedAt: new Date() }) },
+  };
+}
+
+function buildService(prisma: ReturnType<typeof buildPrismaMock>) {
+  const spaced = {
+    getDueVocabularies: jest.fn().mockResolvedValue({ vocabularies: [], total: 0 }),
+    getStreak: jest.fn().mockResolvedValue(3),
+  } as unknown as SpacedRepetitionService;
+  return {
+    service: new DailySessionService(prisma as never, spaced),
+    spaced: spaced as jest.Mocked<SpacedRepetitionService>,
+  };
+}
+
+describe('DailySessionService — dialogue review schedule', () => {
+  it('records a first passed review at stage 1 with a 3-day interval', async () => {
+    const prisma = buildPrismaMock();
+    const { service } = buildService(prisma);
+
+    const result = await service.recordDialogueReview('u1', { lessonId: 'l1', passed: true });
+
+    expect(result.stage).toBe(1);
+    expect(result.graduated).toBe(false);
+    const expected = Date.now() + 3 * DAY_MS;
+    expect(new Date(result.nextReviewAt as string).getTime()).toBeGreaterThanOrEqual(expected - 5000);
+    expect(prisma.userDialogueProgress.upsert).toHaveBeenCalled();
+  });
+
+  it('graduates at stage 4 with no further review scheduled', async () => {
+    const prisma = buildPrismaMock();
+    prisma.userDialogueProgress.findUnique.mockResolvedValue({ stage: 3, lastReviewedAt: new Date() });
+    const { service } = buildService(prisma);
+
+    const result = await service.recordDialogueReview('u1', { lessonId: 'l1', passed: true });
+
+    expect(result.stage).toBe(4);
+    expect(result.graduated).toBe(true);
+    expect(result.nextReviewAt).toBeNull();
+  });
+
+  it('keeps the stage and schedules +1 day on a failed review', async () => {
+    const prisma = buildPrismaMock();
+    prisma.userDialogueProgress.findUnique.mockResolvedValue({ stage: 2, lastReviewedAt: new Date() });
+    const { service } = buildService(prisma);
+
+    const result = await service.recordDialogueReview('u1', { lessonId: 'l1', passed: false });
+
+    expect(result.stage).toBe(2);
+    expect(result.graduated).toBe(false);
+    const expected = Date.now() + 1 * DAY_MS;
+    expect(new Date(result.nextReviewAt as string).getTime()).toBeGreaterThanOrEqual(expected - 5000);
+  });
+
+  it('throws when the lesson does not exist', async () => {
+    const prisma = buildPrismaMock();
+    prisma.lesson.findUnique.mockResolvedValue(null);
+    const { service } = buildService(prisma);
+
+    await expect(
+      service.recordDialogueReview('u1', { lessonId: 'ghost', passed: true })
+    ).rejects.toThrow(NotFoundException);
+  });
+});
+
+describe('DailySessionService — plan composition', () => {
+  it('composes due dialogues, next lesson keywords, and completedToday', async () => {
+    const prisma = buildPrismaMock();
+    prisma.userDialogueProgress.findMany.mockResolvedValue([
+      {
+        lessonId: 'l1',
+        stage: 1,
+        nextReviewAt: new Date(),
+        lesson: {
+          title: 'Bài 1',
+          conversations: [
+            { id: 'cv1', order: 1, speaker: '妈妈', hanzi: '你好', pinyin: 'nǐ hǎo', vietnamese: 'Xin chào' },
+          ],
+        },
+      },
+    ]);
+    prisma.course.findFirst.mockResolvedValue({ id: 'c1' });
+    prisma.lesson.findFirst
+      // first call: resolveActiveCourseId (selects courseId only)
+      .mockResolvedValueOnce({ courseId: 'c1' })
+      // second call: findNextLesson
+      .mockResolvedValue({
+        id: 'l2',
+        title: 'Bài 2',
+        order: 2,
+        conversations: [{ id: 'cv2', order: 1, speaker: null, hanzi: '谢谢', pinyin: 'xiè xie', vietnamese: 'Cảm ơn' }],
+      });
+    prisma.userDialogueProgress.findFirst.mockResolvedValue({ id: 'dp-today' });
+    const { service, spaced } = buildService(prisma);
+
+    const plan = await service.getDailySession('u1');
+
+    expect(plan.dueDialogues).toHaveLength(1);
+    expect(plan.dueDialogues[0].lines[0].speaker).toBe('妈妈');
+    expect(plan.nextLesson?.lessonId).toBe('l2');
+    expect(plan.dueVocabularyTotal).toBe(0);
+    expect(plan.streak).toBe(3);
+    expect(plan.completedToday).toBe(true);
+    expect(spaced.getStreak).toHaveBeenCalledWith('u1');
+  });
+
+  it('reports an all-empty plan when nothing is due and course is finished', async () => {
+    const prisma = buildPrismaMock();
+    const { service } = buildService(prisma);
+
+    const plan = await service.getDailySession('u1');
+
+    expect(plan.dueDialogues).toEqual([]);
+    expect(plan.nextLesson).toBeNull();
+    expect(plan.completedToday).toBe(false);
+  });
+
+  it('honors an explicit courseId instead of resolving the active course', async () => {
+    const prisma = buildPrismaMock();
+    prisma.lesson.findFirst.mockResolvedValue({
+      id: 'l9',
+      title: 'Bài 9',
+      order: 9,
+      conversations: [],
+    });
+    const { service } = buildService(prisma);
+
+    await service.getDailySession('u1', 'c-explicit');
+
+    expect(prisma.course.findFirst).not.toHaveBeenCalled();
+    expect(prisma.lesson.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ courseId: 'c-explicit' }) })
+    );
+  });
+});
+
+describe('DailySessionService — session completion', () => {
+  it('marks the lesson completed and returns the streak', async () => {
+    const prisma = buildPrismaMock();
+    const { service, spaced } = buildService(prisma);
+
+    const result = await service.completeSession('u1', { lessonId: 'l1' });
+
+    expect(result.isCompleted).toBe(true);
+    expect(result.streak).toBe(3);
+    expect(prisma.userProgress.upsert).toHaveBeenCalled();
+    expect(spaced.getStreak).toHaveBeenCalled();
+  });
+
+  it('throws when completing a missing lesson', async () => {
+    const prisma = buildPrismaMock();
+    prisma.lesson.findUnique.mockResolvedValue(null);
+    const { service } = buildService(prisma);
+
+    await expect(service.completeSession('u1', { lessonId: 'ghost' })).rejects.toThrow(
+      NotFoundException
+    );
+  });
+});

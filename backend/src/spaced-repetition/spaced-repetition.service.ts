@@ -268,6 +268,14 @@ export class SpacedRepetitionService {
   }
 
   /**
+   * Public streak access for other modules (daily-session) — single source
+   * of truth for "days with learning activity"
+   */
+  async getStreak(userId: string): Promise<number> {
+    return this.calculateStreak(userId);
+  }
+
+  /**
    * Calculate learning streak (consecutive days with activity)
    * @param userId - User ID
    * @returns Number of consecutive days
@@ -282,15 +290,30 @@ export class SpacedRepetitionService {
       const dayStart = new Date(currentDate);
       const dayEnd = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
 
-      const hasActivity = await this.prisma.userVocabularyProgress.findFirst({
-        where: {
-          userId,
-          lastReviewedAt: {
-            gte: dayStart,
-            lt: dayEnd,
+      // Activity = vocabulary review OR dialogue review (dialogue shadowing
+      // is the primary daily-session signal; both keep the streak alive)
+      const [vocabActivity, dialogueActivity] = await Promise.all([
+        this.prisma.userVocabularyProgress.findFirst({
+          where: {
+            userId,
+            lastReviewedAt: {
+              gte: dayStart,
+              lt: dayEnd,
+            },
           },
-        },
-      });
+        }),
+        this.prisma.userDialogueProgress.findFirst({
+          where: {
+            userId,
+            lastReviewedAt: {
+              gte: dayStart,
+              lt: dayEnd,
+            },
+          },
+        }),
+      ]);
+
+      const hasActivity = Boolean(vocabActivity || dialogueActivity);
 
       if (hasActivity) {
         streak++;

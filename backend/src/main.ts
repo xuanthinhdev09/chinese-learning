@@ -7,6 +7,11 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Behind nginx (single reverse-proxy hop): trust X-Forwarded-For so
+  // req.ip is the real client IP — without this, per-IP rate limiting
+  // (throttler) would bucket ALL users under the proxy's address.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
   // Enable cookie parser for httpOnly cookies
   app.use(cookieParser());
 
