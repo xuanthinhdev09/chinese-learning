@@ -38,3 +38,9 @@ coverage/
 
 # Docker
 docker/postgres_data/
+
+# TTS audio cache (runtime artifacts)
+backend/storage/
+
+# TypeScript incremental build info
+*.tsbuildinfo
