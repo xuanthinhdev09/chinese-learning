@@ -50,3 +50,6 @@ docs
 # Misc
 *.md
 !README.md
+
+# TTS audio cache (runtime data, must not bake into image)
+storage

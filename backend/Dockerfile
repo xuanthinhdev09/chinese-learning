@@ -52,6 +52,10 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
 
+# TTS cache mount point: pre-create owned by nodejs so a named volume
+# mounts with writable ownership (docker would otherwise create it root-owned)
+RUN mkdir -p /app/storage/tts && chown -R nodejs:nodejs /app/storage
+
 # Switch to non-root user
 USER nodejs
 

@@ -17,8 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    ports:
-      - "5432:5432"
+    # No host port mapping: only the backend network needs Postgres.
+    # Use `docker exec` for manual DB access.
 
   backend:
     build:
@@ -40,8 +40,9 @@ services:
       TTS_PAUSE_MS: ${TTS_PAUSE_MS:-}
       TTS_STORAGE_DIR: ${TTS_STORAGE_DIR:-}
     volumes:
-      # Audio cache survives container rebuilds (LocalTtsStorage default: /app/storage/tts)
-      - ./storage/tts:/app/storage/tts
+      # Audio cache survives container rebuilds. Named volume (not bind mount)
+      # so it inherits the nodejs ownership prepared in the Dockerfile.
+      - tts_cache:/app/storage/tts
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,6 +68,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx/ssl:/etc/nginx/ssl:ro
+      # ACME HTTP-01 challenge files (see docs/deployment-guide.md)
+      - ./nginx/certbot:/var/www/certbot:ro
     depends_on:
       - backend
     networks:
@@ -74,6 +77,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  tts_cache:
     driver: local
 
 networks:

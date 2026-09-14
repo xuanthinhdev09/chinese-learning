@@ -7,7 +7,7 @@ MVP cho nền tảng học tiếng Trung HSK 1-6 với Authentication, Content S
 - **Backend:** NestJS, TypeScript, Prisma, PostgreSQL
 - **Frontend:** React, TypeScript, Vite, TailwindCSS
 - **Infrastructure:** Docker Compose
-- **Auth:** JWT (httpOnly cookies) + CSRF Protection
+- **Auth:** JWT (httpOnly cookies, sameSite strict)
 
 ## Prerequisites
 

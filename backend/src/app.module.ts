@@ -8,7 +8,6 @@ import { HskModule } from './hsk/hsk.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { SpacedRepetitionModule } from './spaced-repetition/spaced-repetition.module';
-import { DeploymentModule } from './deployment/deployment.module';
 import { ImportModule } from './import/import.module';
 import { DailySessionModule } from './daily-session/daily-session.module';
 import { TtsModule } from './tts/tts.module';
@@ -32,7 +31,6 @@ import { TtsModule } from './tts/tts.module';
     LessonsModule,
     VocabularyModule,
     SpacedRepetitionModule,
-    DeploymentModule,
     ImportModule,
     DailySessionModule,
     TtsModule,
