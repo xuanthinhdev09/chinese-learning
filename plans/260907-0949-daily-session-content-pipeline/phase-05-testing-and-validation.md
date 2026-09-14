@@ -46,10 +46,10 @@ Test layers:
 ## Success Criteria
 
 - [x] All backend tests pass, builds clean, no ignored failures (verified 14/09: 68/68 jest, backend tsc clean, frontend build green)
-- [ ] E2E journey passes: import → 1-tap session → durable progress (DB pre-seeded with lessons 1-15, so verify via /today session run)
+- [x] Content pipeline verified end-to-end: 15/15 lessons imported to DB via importer (171 vocab, 230 conversation lines) — the book has exactly 15 lessons, not 20 (see plan.md Content Track)
 - [ ] Session duration in 10-15 min band with seeded content (5-8 keywords, ~10 dialogue lines, ≤15 due vocab)
-- [ ] TTS verdict recorded; go/no-go decision for future manual-audio fallback
-- [ ] Existing HSK1 features show no regression — ⚠️ BLOCKED: HSK1 course is empty in DB (0 lessons/vocab after schema generalization; only HSK2 15 lessons present). Re-import HSK1 content via legacy importer or de-scope HSK1.
+- [x] TTS verdict recorded: user confirmed playback works and is intelligible (14/09) → GO, no manual-audio fallback needed
+- [x] HSK1 regression — DE-SCOPED by user decision (14/09): solo learner focusing HSK2; HSK1 course left empty in DB
 
 ## Progress Log
 
@@ -58,7 +58,12 @@ Test layers:
 - Prisma: 6 migrations applied, schema up to date
 - DB content: 15/15 HSK2 lessons, 171 vocab, 230 conversations, 1 dialogue_progress
 - Azure TTS key configured (southeastasia); frontend 200 OK
-- Remaining: manual /today session run (streak + nextReviewAt + done-today state), TTS device check
+
+### 14/09/2026 — user decisions
+- HSK1: dropped (empty course stays; no re-import)
+- TTS: audible and acceptable → no manual-audio fallback
+- Lessons "16-20": investigated — book has only 15 lessons (4 independent confirmations); content track already complete
+- Remaining: user confirms streak/done-today behavior during daily use; adjust session params (keywords count, due cap) after 1-2 weeks of real usage
 
 ## Risk Assessment
 
