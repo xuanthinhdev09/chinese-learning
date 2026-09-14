@@ -118,9 +118,10 @@ chinese-learning/
 
 - [x] Phase 1: Infrastructure Setup ✅ COMPLETED
 - [x] Phase 2: Authentication Module ✅ COMPLETED
-- [ ] Phase 3: Content Structure (HSK + Lessons)
-- [ ] Phase 4: Progress Tracking
-- [ ] Phase 5: Polish & Deploy
+- [x] Phase 3: Content Structure (HSK + Lessons) ✅ COMPLETED — HSK2 custom course (15 lessons, 171 vocab, 230 conversation lines); HSK1 course empty, needs re-import
+- [x] Phase 4: Progress Tracking ✅ COMPLETED — SM-2 vocabulary review + dialogue spaced repetition (1/3/7/14d) + streak
+- [x] Daily Session "Học hôm nay" ✅ COMPLETED — one-tap session at `/today`, TTS (Azure Neural + Web Speech fallback)
+- [ ] Phase 5: Polish & Deploy — remaining: manual E2E run, TTS device check, lessons 16-20 import, prod deploy
 
 ## License
 

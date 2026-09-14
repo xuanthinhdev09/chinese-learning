@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Frontend Today Session Page"
-status: pending
+status: done
 priority: P1
 effort: "3h"
 dependencies: ["3"]

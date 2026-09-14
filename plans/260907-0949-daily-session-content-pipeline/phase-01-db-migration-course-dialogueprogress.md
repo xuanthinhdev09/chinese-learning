@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "DB Migration Course + DialogueProgress"
-status: pending
+status: done
 priority: P1
 effort: "2h"
 dependencies: []

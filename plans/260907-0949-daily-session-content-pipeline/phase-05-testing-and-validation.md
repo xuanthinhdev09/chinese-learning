@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Testing and Validation"
-status: pending
+status: in-progress
 priority: P1
 effort: "2h"
 dependencies: ["1", "2", "3", "4"]
@@ -45,11 +45,20 @@ Test layers:
 
 ## Success Criteria
 
-- [ ] All backend tests pass, builds clean, no ignored failures
-- [ ] E2E journey passes: import → 1-tap session → durable progress
+- [x] All backend tests pass, builds clean, no ignored failures (verified 14/09: 68/68 jest, backend tsc clean, frontend build green)
+- [ ] E2E journey passes: import → 1-tap session → durable progress (DB pre-seeded with lessons 1-15, so verify via /today session run)
 - [ ] Session duration in 10-15 min band with seeded content (5-8 keywords, ~10 dialogue lines, ≤15 due vocab)
 - [ ] TTS verdict recorded; go/no-go decision for future manual-audio fallback
-- [ ] Existing HSK1 features show no regression
+- [ ] Existing HSK1 features show no regression — ⚠️ BLOCKED: HSK1 course is empty in DB (0 lessons/vocab after schema generalization; only HSK2 15 lessons present). Re-import HSK1 content via legacy importer or de-scope HSK1.
+
+## Progress Log
+
+### 14/09/2026 — automated verification
+- Backend containers up with new code (GET /daily-session → 401 guard, POST /tts/synthesize → 401, GET /audio/:key → 400, GET /hsk → 200 with 2 courses)
+- Prisma: 6 migrations applied, schema up to date
+- DB content: 15/15 HSK2 lessons, 171 vocab, 230 conversations, 1 dialogue_progress
+- Azure TTS key configured (southeastasia); frontend 200 OK
+- Remaining: manual /today session run (streak + nextReviewAt + done-today state), TTS device check
 
 ## Risk Assessment
 
