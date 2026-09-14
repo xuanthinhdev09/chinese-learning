@@ -21,6 +21,8 @@ interface VocabularyState {
   // Data
   vocabularies: Vocabulary[];
   currentLevel: number | null;
+  /** null = toàn bộ từ của level; set = chỉ từ của một bài */
+  currentLessonId: string | null;
   currentIndex: number;
 
   // UI State
@@ -42,12 +44,16 @@ interface VocabularyState {
   progressError: string | null;
 
   // Actions
-  loadByHSKLevel: (level: number) => Promise<void>;
+  loadByHSKLevel: (level: number, lessonId?: string | null) => Promise<void>;
   nextCard: () => void;
   previousCard: () => void;
   flipCard: () => void;
   setStudyMode: (mode: StudyMode) => void;
-  startQuiz: (level: number, preference?: LanguagePreference) => Promise<void>;
+  startQuiz: (
+    level: number,
+    preference?: LanguagePreference,
+    lessonId?: string | null
+  ) => Promise<void>;
   setLanguagePreference: (pref: LanguagePreference) => void;
   selectQuizOption: (optionId: string) => void;
   submitQuizAnswer: () => void;
@@ -108,6 +114,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   // Initial state
   vocabularies: [],
   currentLevel: null,
+  currentLessonId: null,
   currentIndex: 0,
   studyMode: 'flashcard',
   isFlipped: false,
@@ -125,14 +132,17 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   isSavingProgress: false,
   progressError: null,
 
-  // Load vocabulary by HSK level
-  loadByHSKLevel: async (level: number) => {
+  // Load vocabulary by HSK level, optionally scoped to one lesson
+  loadByHSKLevel: async (level: number, lessonId?: string | null) => {
     set({ isLoading: true, error: null, progressError: null });
     try {
-      const vocabularies = await vocabularyApi.getByHSKLevel(level);
+      const vocabularies = lessonId
+        ? await vocabularyApi.getByLesson(lessonId)
+        : await vocabularyApi.getByHSKLevel(level);
       set({
         vocabularies,
         currentLevel: level,
+        currentLessonId: lessonId ?? null,
         currentIndex: 0,
         isFlipped: false,
         isLoading: false,
@@ -165,6 +175,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
       set({
         vocabularies,
         currentLevel: null,
+        currentLessonId: null,
         currentIndex: 0,
         isFlipped: false,
         isLoading: false,
@@ -221,15 +232,22 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   // Quiz
-  startQuiz: async (level: number, preference: LanguagePreference = 'vietnamese') => {
+  startQuiz: async (
+    level: number,
+    preference: LanguagePreference = 'vietnamese',
+    lessonId?: string | null
+  ) => {
     set({ isLoading: true, error: null, languagePreference: preference });
     try {
-      const vocabularies = await vocabularyApi.getByHSKLevel(level);
+      const vocabularies = lessonId
+        ? await vocabularyApi.getByLesson(lessonId)
+        : await vocabularyApi.getByHSKLevel(level);
       const options = createQuizOptions(vocabularies[0], vocabularies, preference);
 
       set({
         vocabularies,
         currentLevel: level,
+        currentLessonId: lessonId ?? null,
         currentIndex: 0,
         studyMode: 'quiz',
         quiz: {
