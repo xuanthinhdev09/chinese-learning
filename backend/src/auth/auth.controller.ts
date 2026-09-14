@@ -19,6 +19,17 @@ import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { Public } from './decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 
+/**
+ * Cookie Secure flag: COOKIE_SECURE env overrides explicitly ("false" only
+ * for a temporary HTTP-only deployment — tokens travel unencrypted there);
+ * otherwise secure whenever running in production.
+ */
+function cookieSecure(): boolean {
+  if (process.env.COOKIE_SECURE === 'true') return true;
+  if (process.env.COOKIE_SECURE === 'false') return false;
+  return process.env.NODE_ENV === 'production';
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -59,7 +70,7 @@ export class AuthController {
     // Access token cookie (15 min)
     response.cookie('accessToken', result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: cookieSecure(),
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000, // 15 minutes
       path: '/',
@@ -68,7 +79,7 @@ export class AuthController {
     // Refresh token cookie (7 days)
     response.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: cookieSecure(),
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
@@ -98,7 +109,7 @@ export class AuthController {
     // Update access token cookie
     response.cookie('accessToken', result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: cookieSecure(),
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000, // 15 minutes
       path: '/',
@@ -130,14 +141,14 @@ export class AuthController {
     // Clear httpOnly cookies
     response.clearCookie('accessToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: cookieSecure(),
       sameSite: 'strict',
       path: '/',
     });
 
     response.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: cookieSecure(),
       sameSite: 'strict',
       path: '/',
     });

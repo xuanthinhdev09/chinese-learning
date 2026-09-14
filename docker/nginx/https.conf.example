@@ -1,20 +1,36 @@
-# TEMPORARY HTTP-only configuration — active until the domain certificate
-# is set up. Login only works because the backend runs with COOKIE_SECURE=false
-# (see docker/.env and docs/deployment-guide.md "Chạy HTTP tạm").
+# HTTPS configuration — ACTIVE once the domain certificate is in place.
+# Switch over:  cp https.conf.example default.conf
+# (before that, default.conf is the temporary HTTP-only variant)
 #
-# When the domain is ready, switch to HTTPS:
-#   cp https.conf.example default.conf && docker compose -f docker/docker-compose.prod.yml up -d --build nginx
-# and remove COOKIE_SECURE=false from docker/.env.
-
+# ACME HTTP-01 challenge must stay reachable over plain HTTP before
+# certificates exist; everything else moves to HTTPS.
 server {
     listen 80;
     server_name _;
 
-    # Keep serving ACME HTTP-01 challenges so certbot can issue the
-    # certificate without any config swap (see docs/deployment-guide.md).
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name _;
+
+    # Certificates obtained via certbot (see docs/deployment-guide.md),
+    # mounted read-only from ./nginx/ssl by docker-compose.prod.yml
+    ssl_certificate /etc/nginx/ssl/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
 
     # Frontend static files (SPA fallback)
     location / {
@@ -53,10 +69,11 @@ server {
         access_log off;
     }
 
-    # Security headers (no HSTS here — HSTS only makes sense over HTTPS)
+    # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
     # Gzip compression

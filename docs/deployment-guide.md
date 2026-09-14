@@ -9,6 +9,19 @@ Nguồn cấu hình: `docker/docker-compose.prod.yml`, `docker/nginx/default.con
 - Domain đã trỏ A record về IP của VPS
 - Repo được clone vào VPS (vd `~/chinese-learning`)
 
+## Chạy HTTP tạm (chưa có domain/cert) — TRẠNG THÁI HIỆN TẠI
+
+Cho đến khi có domain, server chạy thuần HTTP (`docker/nginx/default.conf` là bản
+HTTP-only; bản HTTPS giữ sẵn trong `https.conf.example`). Vì cookie **Secure** bị
+trình duyệt vứt bỏ trên HTTP, backend cần `COOKIE_SECURE=false` trong `docker/.env`:
+
+```bash
+grep -q COOKIE_SECURE docker/.env || echo "COOKIE_SECURE=false" >> docker/.env
+```
+
+> ⚠️ Chỉ tạm thời: trên HTTP, mật khẩu và token đi dây không mã hóa.
+> Có domain + cert ngay bước 1 bên dưới thì **xóa dòng `COOKIE_SECURE=false`**.
+
 ## Bước 0 — Mở firewall
 
 ```bash
@@ -33,6 +46,16 @@ mkdir -p docker/nginx/ssl
 sudo cp /etc/letsencrypt/live/<domain>/fullchain.pem docker/nginx/ssl/
 sudo cp /etc/letsencrypt/live/<domain>/privkey.pem docker/nginx/ssl/
 sudo chown $USER docker/nginx/ssl/*.pem
+```
+
+Chuyển sang HTTPS (từ chế độ HTTP tạm):
+
+```bash
+cd ~/chinese-learning
+sed -i '/^COOKIE_SECURE=false/d' docker/.env   # bật lại cookie Secure
+cp docker/nginx/https.conf.example docker/nginx/default.conf
+docker compose -f docker/docker-compose.prod.yml up -d --build nginx
+curl -k https://<domain>/health
 ```
 
 ## Bước 2 — Cấu hình environment
@@ -125,6 +148,6 @@ Migrations tự chạy lại khi backend start (`prisma migrate deploy`).
 | Triệu chứng | Nguyên nhân / cách xử lý |
 |---|---|
 | Nginx không start, lỗi ssl certificate | Chưa copy cert vào `docker/nginx/ssl` — làm Bước 1 |
-| Login xong bị văng ra | Truy cập bằng HTTP hoặc cert lệch domain — phải vào qua `https://<domain>` đúng cert |
+| Login xong bị văng ra | HTTPS đang bật nhưng vẫn truy cập HTTP (hoặc ngược lại, `COOKIE_SECURE=false` khi đã có HTTPS) — đồng bộ: HTTP tạm thì giữ `COOKIE_SECURE=false`, HTTPS thì xóa dòng đó |
 | TTS mất giọng Azure | Volume `tts_cache` lỗi ghi — check `docker logs chinese_learning_backend_prod`; app tự fallback Web Speech |
 | Quên mật khẩu DB/JWT | Sửa `docker/.env` rồi `docker compose up -d` lại (JWT_SECRET đổi → phải đăng nhập lại) |
