@@ -17,8 +17,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    # No host port mapping: only the backend network needs Postgres.
-    # Use `docker exec` for manual DB access.
+    # Loopback-only mapping: lets SSH tunnels (`ssh -L 5432:127.0.0.1:5432`)
+    # reach Postgres without exposing it to the internet. Backend connects
+    # via the internal network as before.
+    ports:
+      - "127.0.0.1:5432:5432"
 
   backend:
     build:

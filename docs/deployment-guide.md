@@ -143,6 +143,17 @@ docker compose -f docker/docker-compose.prod.yml up -d --build
 
 Migrations tự chạy lại khi backend start (`prisma migrate deploy`).
 
+## Kết nối DB từ máy local (SSH tunnel)
+
+Postgres trên VPS chỉ mở trên loopback (`127.0.0.1:5432:5432` trong compose) —
+không lộ ra internet. Để dùng DBeaver/pgAdmin/psql từ máy local:
+
+```bash
+ssh -L 5432:127.0.0.1:5432 user@<vps>
+```
+
+Rồi connect tới `localhost:5432`, user/password xem trong `docker/.env` trên VPS.
+
 ## Sự cố thường gặp
 
 | Triệu chứng | Nguyên nhân / cách xử lý |
