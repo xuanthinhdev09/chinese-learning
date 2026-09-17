@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { usePersistentToggle } from '../../hooks/use-persistent-toggle';
 import { DialogueLine } from '../../api/daily-session';
+import { cn } from '../../utils/cn';
 import { LyricsPanel } from './lyrics-panel';
 import { LyricsLayerToggles } from './lyrics-layer-toggles';
 import { SpeedControl } from './speed-control';
@@ -112,6 +113,13 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
     setIndex(0);
   };
 
+  // Chọn đoạn bất kỳ từ danh sách phát — hủy audio đang chạy, đứng dòng đầu
+  const selectGroup = (groupIdx: number) => {
+    stop();
+    setGroupIndex(groupIdx);
+    setIndex(0);
+  };
+
   return (
     <div className="mx-auto max-w-lg p-4 sm:max-w-2xl sm:p-6 lg:grid lg:max-w-6xl lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-8">
       {/* Cột trái (desktop, sticky): thông tin phiên + điều khiển; mobile: xếp trên */}
@@ -167,6 +175,42 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
               onTogglePinyin={toggleShowPinyin}
               onToggleVietnamese={toggleShowVietnamese}
             />
+          </div>
+        )}
+
+        {/* Danh sách phát 课文: chọn đoạn bất kỳ để đọc/phát riêng */}
+        {groups.length > 1 && (
+          <div className="mb-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+              Danh sách phát
+            </p>
+            <div className="space-y-1">
+              {groups.map((group, groupIdx) => {
+                const first = group[0];
+                const active = groupIdx === safeGroupIndex;
+                return (
+                  <button
+                    key={groupIdx}
+                    type="button"
+                    onClick={() => selectGroup(groupIdx)}
+                    className={cn(
+                      'flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left transition-colors',
+                      active
+                        ? 'border-primary bg-primary-light/40'
+                        : 'border-border hover:bg-background-alt',
+                    )}
+                  >
+                    <span className="truncate text-sm text-foreground">
+                      <span className="chinese-text">{first.dialogueTitleHanzi ?? `Đoạn ${groupIdx + 1}`}</span>
+                      {first.dialogueTitleVi && (
+                        <span className="text-muted"> · {first.dialogueTitleVi}</span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-xs text-muted">{group.length} câu</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </aside>
