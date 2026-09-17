@@ -40,22 +40,34 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
   const renderLine = (line: DialogueLine, lineIndex: number) => {
     const isActive = lineIndex === index;
     const isPast = lineIndex < index;
+    // Header nhóm 课文: in khi dialogueOrder đổi so với dòng trước (dữ liệu
+    // legacy không có nhóm → không header). Nội dung gắn với vị trí dòng,
+    // không đổi theo active → height panel ổn định khi chuyển câu.
+    const showGroupHeader =
+      line.dialogueOrder !== null &&
+      (lineIndex === 0 || lines[lineIndex - 1].dialogueOrder !== line.dialogueOrder);
     return (
-      <button
-        key={line.id}
-        type="button"
-        ref={isActive ? activeLineRef : undefined}
-        aria-current={isActive ? 'true' : undefined}
-        onClick={() => onSelectLine(lineIndex)}
-        className={cn(
-          // border giữ transparent để height không nhảy khi active đổi trạng thái
-          'w-full rounded-xl border border-transparent px-4 py-4 text-center transition-all duration-300',
-          isActive ? 'bg-primary-light/40' : 'cursor-pointer hover:bg-background-alt',
+      <div key={line.id}>
+        {showGroupHeader && (
+          <p className="mb-2 mt-4 flex items-baseline justify-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted first:mt-0">
+            <span className="chinese-text normal-case">Đoạn {line.dialogueOrder} · {line.dialogueTitleHanzi}</span>
+            {line.dialogueTitleVi && <span className="font-normal normal-case">({line.dialogueTitleVi})</span>}
+          </p>
         )}
-      >
-        {isActive && line.speaker && (
-          <span className="mb-2 block text-xs uppercase tracking-wide text-muted">{line.speaker}</span>
-        )}
+        <button
+          type="button"
+          ref={isActive ? activeLineRef : undefined}
+          aria-current={isActive ? 'true' : undefined}
+          onClick={() => onSelectLine(lineIndex)}
+          className={cn(
+            // border giữ transparent để height không nhảy khi active đổi trạng thái
+            'w-full rounded-xl border border-transparent px-4 py-4 text-center transition-all duration-300',
+            isActive ? 'bg-primary-light/40' : 'cursor-pointer hover:bg-background-alt',
+          )}
+        >
+          {isActive && line.speaker && (
+            <span className="mb-2 block text-xs uppercase tracking-wide text-muted">{line.speaker}</span>
+          )}
         <span
           className={cn(
             'chinese-text block break-words font-bold leading-snug transition-colors',
@@ -85,7 +97,8 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
             {line.vietnamese}
           </span>
         )}
-      </button>
+        </button>
+      </div>
     );
   };
 

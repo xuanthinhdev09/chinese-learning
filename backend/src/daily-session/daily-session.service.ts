@@ -28,6 +28,9 @@ function toLineDto(conversation: Conversation): DialogueLineDto {
     hanzi: conversation.hanzi,
     pinyin: conversation.pinyin,
     vietnamese: conversation.vietnamese,
+    dialogueOrder: conversation.dialogueOrder,
+    dialogueTitleHanzi: conversation.dialogueTitleHanzi,
+    dialogueTitleVi: conversation.dialogueTitleVi,
   };
 }
 
@@ -53,7 +56,7 @@ export class DailySessionService {
         where: { userId, nextReviewAt: { lte: now } },
         orderBy: { nextReviewAt: 'asc' },
         include: {
-          lesson: { include: { conversations: { orderBy: { order: 'asc' } } } },
+          lesson: { include: { conversations: { orderBy: [{ dialogueOrder: 'asc' }, { order: 'asc' }] } } },
         },
       }),
       activeCourseId
@@ -218,7 +221,7 @@ export class DailySessionService {
         userProgress: { none: { userId, isCompleted: true } },
       },
       orderBy: { order: 'asc' },
-      include: { conversations: { orderBy: { order: 'asc' } } },
+      include: { conversations: { orderBy: [{ dialogueOrder: 'asc' }, { order: 'asc' }] } },
     });
   }
 

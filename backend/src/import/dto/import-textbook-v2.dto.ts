@@ -36,6 +36,10 @@ export interface TextbookV2ConversationItemDto {
   hanzi: string;
   pinyin: string;
   vietnamese: string;
+  /** 课文 group within the lesson (book prints 3-4 titled dialogues) */
+  dialogue_order?: number;
+  dialogue_title_hanzi?: string;
+  dialogue_title_vi?: string;
 }
 
 export interface TextbookV2LessonItemDto {

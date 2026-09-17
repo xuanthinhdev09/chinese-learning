@@ -68,6 +68,9 @@ export class JsonV2Mapper {
       hanzi: conv.hanzi,
       pinyin: conv.pinyin,
       vietnamese: conv.vietnamese,
+      dialogueOrder: conv.dialogue_order ?? null,
+      dialogueTitleHanzi: conv.dialogue_title_hanzi || null,
+      dialogueTitleVi: conv.dialogue_title_vi || null,
     };
   }
 }

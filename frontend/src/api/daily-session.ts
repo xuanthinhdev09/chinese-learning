@@ -7,6 +7,10 @@ export interface DialogueLine {
   hanzi: string;
   pinyin: string;
   vietnamese: string;
+  /** 课文 group within the lesson (3-4 titled dialogues per lesson); null on legacy data */
+  dialogueOrder: number | null;
+  dialogueTitleHanzi: string | null;
+  dialogueTitleVi: string | null;
 }
 
 export interface VocabItem {

@@ -109,6 +109,10 @@ model Conversation {
   updatedAt      DateTime            @updatedAt
 
   speaker                String?
+  // 课文 grouping (book prints 3-4 titled dialogues per lesson, e.g. 01-1 在学校)
+  dialogueOrder          Int?
+  dialogueTitleHanzi     String?
+  dialogueTitleVi        String?
   lesson                 Lesson              @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   conversationVocabularies ConversationVocabulary[]
 
