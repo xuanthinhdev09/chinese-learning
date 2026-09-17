@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { usePersistentToggle } from '../../hooks/use-persistent-toggle';
 import { DialogueLine } from '../../api/daily-session';
@@ -24,6 +24,7 @@ interface DialogueReaderProps {
  */
 export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: DialogueReaderProps) {
   const [index, setIndex] = useState(0);
+  const [groupIndex, setGroupIndex] = useState(0);
   const [speechRate, setSpeechRate] = useState(1);
   const { playLines, stop, pause, resume, setSpeed, isBusy, isPaused } = useTtsAudio();
   // Toggle layer chữ: BẬT = hiện trên MỌI dòng (chuyển câu không chèn/xóa
@@ -31,17 +32,44 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
   const [showPinyin, toggleShowPinyin] = usePersistentToggle('today-lyrics-pinyin');
   const [showVietnamese, toggleShowVietnamese] = usePersistentToggle('today-lyrics-vietnamese');
 
+  // Chia phiên luyện theo 课文 (3-4 đoạn/bài): mỗi đoạn là một lượt đọc/phát
+  // riêng — hết đoạn tự sang đoạn kế, chỉ đoạn cuối mới chấm Trôi/Chưa.
+  // Dữ liệu legacy không có dialogueOrder → gộp thành 1 nhóm như cũ.
+  const groups = useMemo(() => {
+    const result: DialogueLine[][] = [];
+    for (const line of lines) {
+      const last = result[result.length - 1];
+      const sameGroup =
+        last !== undefined &&
+        line.dialogueOrder !== null &&
+        last[0].dialogueOrder === line.dialogueOrder;
+      if (sameGroup) {
+        last.push(line);
+      } else {
+        result.push([line]);
+      }
+    }
+    return result;
+  }, [lines]);
+  const safeGroupIndex = Math.min(groupIndex, groups.length - 1);
+  const groupLines = groups[safeGroupIndex] ?? [];
+  const isLastGroup = safeGroupIndex === groups.length - 1;
+  const linesBeforeGroup = groups
+    .slice(0, safeGroupIndex)
+    .reduce((sum, group) => sum + group.length, 0);
+
   // Panel có thể render lại với hội thoại khác (do-due-dialogue kế tiếp tại
   // cùng vị trí component) — reset về câu đầu để tránh "Câu N/M" sai.
   useEffect(() => {
     setIndex(0);
+    setGroupIndex(0);
   }, [title]);
 
   // Per-line playlist: the highlight advances EXACTLY when each line's
-  // audio starts — no time estimation involved.
+  // audio starts — no time estimation involved. Phạm vi phát: đoạn hiện tại.
   const handlePlayAll = () => {
     playLines(
-      lines.map((item) => ({ speaker: item.speaker, text: item.hanzi })),
+      groupLines.map((item) => ({ speaker: item.speaker, text: item.hanzi })),
       { speed: speechRate },
       (lineIndex) => setIndex(lineIndex),
     );
@@ -55,7 +83,7 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
     stop();
     setIndex(lineIndex);
     playLines(
-      lines.slice(lineIndex).map((item) => ({ speaker: item.speaker, text: item.hanzi })),
+      groupLines.slice(lineIndex).map((item) => ({ speaker: item.speaker, text: item.hanzi })),
       { speed: speechRate },
       (offset) => setIndex(lineIndex + offset),
     );
@@ -72,10 +100,16 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
     );
   }
 
-  const isLast = index === lines.length - 1;
+  const isLast = isLastGroup && index === groupLines.length - 1;
 
   const go = (delta: number) => {
-    setIndex((current) => Math.min(Math.max(current + delta, 0), lines.length - 1));
+    setIndex((current) => Math.min(Math.max(current + delta, 0), groupLines.length - 1));
+  };
+
+  const goToNextGroup = () => {
+    stop();
+    setGroupIndex((current) => Math.min(current + 1, groups.length - 1));
+    setIndex(0);
   };
 
   return (
@@ -85,7 +119,9 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
         {sessionHeader && <div className="mb-4 lg:mb-6">{sessionHeader}</div>}
         <h2 className="truncate text-lg font-semibold text-foreground">{title}</h2>
         <p className="mb-4 text-sm text-muted">
-          Câu {index + 1}/{lines.length} • {mode === 'new' ? 'Bài mới — đọc theo' : 'Ôn tập'}
+          Câu {linesBeforeGroup + index + 1}/{lines.length}
+          {groups.length > 1 && ` • Đoạn ${safeGroupIndex + 1}/${groups.length}`} •{' '}
+          {mode === 'new' ? 'Bài mới — đọc theo' : 'Ôn tập'}
         </p>
 
         {lines.length > 1 && (
@@ -135,10 +171,10 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
         )}
       </aside>
 
-      {/* Cột phải: panel lyrics + điều hướng */}
+      {/* Cột phải: panel lyrics (đoạn hiện tại) + điều hướng */}
       <div>
         <LyricsPanel
-          lines={lines}
+          lines={groupLines}
           index={index}
           onSelectLine={handleSelectLine}
           showPinyin={showPinyin}
@@ -160,7 +196,15 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
           >
             ← Trước
           </button>
-          {!isLast ? (
+          {!isLast && !isLastGroup && index === groupLines.length - 1 ? (
+            <button
+              onClick={goToNextGroup}
+              className="flex-1 px-4 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all"
+              title="Hết đoạn — chuyển sang đoạn kế tiếp"
+            >
+              Đoạn tiếp →
+            </button>
+          ) : !isLast ? (
             <button
               onClick={() => go(1)}
               className="flex-1 px-4 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all"
