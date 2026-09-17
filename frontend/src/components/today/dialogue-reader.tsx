@@ -20,7 +20,7 @@ interface DialogueReaderProps {
 /**
  * Shadowing hội thoại theo style trình phát lời bài hát: toàn bộ dialogue
  * nằm trong MỘT panel tự trượt (LyricsPanel) — câu active to + đổi màu,
- * panel trượt căn giữa theo audio. Tap dòng = phát từ dòng đó.
+ * panel trượt căn giữa theo audio. Tap dòng = nhảy tới dòng đó (không tự phát).
  * Desktop (lg+): info phiên + điều khiển ở cột trái sticky, panel bên phải.
  */
 export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: DialogueReaderProps) {
@@ -67,27 +67,22 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
   }, [title]);
 
   // Per-line playlist: the highlight advances EXACTLY when each line's
-  // audio starts — no time estimation involved. Phạm vi phát: đoạn hiện tại.
+  // audio starts — no time estimation involved. Phát từ câu ĐANG ACTIVE tới
+  // hết đoạn (slice từ index), callback trả offset nên cộng lại bằng lineIndex.
   const handlePlayAll = () => {
     playLines(
-      groupLines.map((item) => ({ speaker: item.speaker, text: item.hanzi })),
+      groupLines.slice(index).map((item) => ({ speaker: item.speaker, text: item.hanzi })),
       { speed: speechRate },
-      (lineIndex) => setIndex(lineIndex),
+      (offset) => setIndex(index + offset),
     );
   };
 
-  // Tap dòng bất kỳ: phát từ dòng đó rồi tự chạy tiếp — slice playlist từ
-  // vị trí tap, callback trả offset tương đối nên cộng lại bằng lineIndex.
-  // stop() trước để hủy sequence phát đang chạy (nếu có) — nếu không,
-  // tap lúc đang fetch cold-cache sẽ bị sequence cũ "cướp" playback.
+  // Tap dòng bất kỳ: CHỈ nhảy highlight tới dòng đó, KHÔNG tự phát audio.
+  // stop() trước để hủy sequence đang chạy (nếu có) — nếu không, highlight
+  // sẽ bị playback đang chạy ghi đè. Phát chỉ khi bấm nút Play.
   const handleSelectLine = (lineIndex: number) => {
     stop();
     setIndex(lineIndex);
-    playLines(
-      groupLines.slice(lineIndex).map((item) => ({ speaker: item.speaker, text: item.hanzi })),
-      { speed: speechRate },
-      (offset) => setIndex(lineIndex + offset),
-    );
   };
 
   if (lines.length === 0) {
@@ -152,12 +147,12 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
                   ? isPaused
                     ? 'Phát tiếp từ vị trí đang dừng'
                     : 'Tạm dừng'
-                  : 'Nghe cả bài hội thoại với giọng theo nhân vật'
+                  : 'Nghe hội thoại từ câu đang chọn'
               }
             >
               <span>{isBusy && !isPaused ? '⏸' : '▶'}</span>
               <span className="text-sm font-medium">
-                {isBusy ? (isPaused ? 'Tiếp tục' : 'Tạm dừng') : 'Play cả bài'}
+                {isBusy ? (isPaused ? 'Tiếp tục' : 'Tạm dừng') : 'Phát'}
               </span>
             </button>
 
