@@ -101,9 +101,11 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
     try {
       await onRate(current, correct ? 4 : 0);
       // brief feedback pause so the user sees correct/wrong coloring
+      // (buttons stay disabled via `picked` until advance() clears it)
       setTimeout(advance, 700);
     } catch {
       setError('Lưu không thành công — thử lại');
+    } finally {
       setSaving(false);
     }
   };
@@ -154,9 +156,10 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
           )
         ) : (
           <div className="grid gap-2">
-            {options.map((option) => (
+            {options.map((option, optionIndex) => (
               <button
-                key={option}
+                // index prefix keeps keys unique when two options share the same meaning text
+                key={`${optionIndex}-${option}`}
                 onClick={() => handlePick(option)}
                 disabled={Boolean(picked) || saving}
                 className={cn(
