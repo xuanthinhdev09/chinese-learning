@@ -146,18 +146,46 @@ Migrations tự chạy lại khi backend start (`prisma migrate deploy`).
 ## Kết nối DB từ máy local (SSH tunnel)
 
 Postgres trên VPS chỉ mở trên loopback (`127.0.0.1:5432:5432` trong compose) —
-không lộ ra internet. Để dùng DBeaver/pgAdmin/psql từ máy local:
+không lộ ra internet. Vẫn connect được như "qua IP" nhờ SSH tunnel; chọn 1 trong 3 cách:
+
+### Cách 1 — DBeaver built-in tunnel (khuyên dùng, cấu hình 1 lần)
+
+Tunnel tự mở/tự đóng theo mỗi lần connect, không cần terminal, không đụng độ port.
+
+1. Chuột phải connection → **Edit Connection** → tab **SSH**
+2. Tick **Use SSH Tunnel**, điền:
+   - Host/IP: `<ip-vps>`, Port: `22`
+   - User Name: `<ssh-user-tren-vps>`
+   - Authentication Method: `Public Key` (chỉ tới private key) hoặc `Password`
+3. Quay lại tab **General**: Host `127.0.0.1`, Port `5432`, DB `chinese_learning`
+   (user/password DB xem trong `docker/.env` trên VPS) → **Test Connection** → OK
+
+### Cách 2 — Lệnh tay (khi cần psql hoặc tool khác)
 
 ```bash
-ssh -L 5432:127.0.0.1:5432 user@<vps>
+ssh -N -L 5433:127.0.0.1:5432 user@<vps>
 ```
 
-Rồi connect tới `localhost:5432`, user/password xem trong `docker/.env` trên VPS.
+Rồi connect tới `localhost:5433`. **Đừng dùng 5432 local** — nếu máy đang chạy dev
+postgres (Docker) thì port 5432 đã bị chiếm, tunnel sẽ lỗi `Address already in use`.
+
+### Cách 3 — Tunnel luôn bật trên Windows (Scheduled Task)
+
+Script `scripts/ssh-tunnel-live-db.ps1` giữ tunnel `localhost:5433 → VPS:5432` và
+tự nối lại khi đứt mạng/wake. Đăng ký chạy lúc đăng nhập (chạy 1 lần trong PowerShell):
+
+```powershell
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\My Work\chinese-learning\chinese-learning\scripts\ssh-tunnel-live-db.ps1"'
+$trigger = New-ScheduledTaskTrigger -AtLogOn
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Seconds 0)
+Register-ScheduledTask -TaskName 'SSH Tunnel - Live DB chinese-learning' -Action $action -Trigger $trigger -Settings $settings -Force
+```
 
 ## Sự cố thường gặp
 
 | Triệu chứng | Nguyên nhân / cách xử lý |
 |---|---|
+| Tunnel lỗi `Address already in use` khi bind 5432 | Dev postgres local (Docker) đang chiếm 5432 — dùng port khác, vd `ssh -N -L 5433:127.0.0.1:5432 ...` |
 | Nginx không start, lỗi ssl certificate | Chưa copy cert vào `docker/nginx/ssl` — làm Bước 1 |
 | Login xong bị văng ra | HTTPS đang bật nhưng vẫn truy cập HTTP (hoặc ngược lại, `COOKIE_SECURE=false` khi đã có HTTPS) — đồng bộ: HTTP tạm thì giữ `COOKIE_SECURE=false`, HTTPS thì xóa dòng đó |
 | TTS mất giọng Azure | Volume `tts_cache` lỗi ghi — check `docker logs chinese_learning_backend_prod`; app tự fallback Web Speech |

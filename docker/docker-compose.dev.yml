@@ -61,6 +61,9 @@ services:
       - "5173:5173"
     environment:
       VITE_API_URL: http://localhost:3000
+      # Polling file watcher — host edits are invisible to inotify through the
+      # Windows->Docker bind mount, so HMR needs polling to pick them up.
+      VITE_WATCH_POLLING: "true"
     depends_on:
       - backend
     volumes:

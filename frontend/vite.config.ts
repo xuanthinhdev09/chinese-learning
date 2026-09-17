@@ -12,6 +12,12 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    // Vite running inside Docker (bind mount from Windows host) cannot see
+    // host file-change events without polling — enable it via compose env.
+    watch: {
+      usePolling: process.env.VITE_WATCH_POLLING === 'true',
+      interval: 500,
+    },
     proxy: {
       '/api': {
         target: process.env.VITE_API_URL || 'http://localhost:3000',
