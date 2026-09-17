@@ -48,7 +48,7 @@ function durationToMs(duration: string): number {
  * the JWT is signed with) so the cookie never outlives the token it holds.
  */
 function refreshCookieMaxAge(): number {
-  return durationToMs(process.env.REFRESH_TOKEN_EXPIRES_IN || '1d');
+  return durationToMs(process.env.REFRESH_TOKEN_EXPIRES_IN || '7d');
 }
 
 @Controller('auth')

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { apiClient } from '../lib/api-client';
 
 interface User {
   id: string;
@@ -44,6 +45,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email, password) => {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
@@ -79,6 +81,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Auto-login after registration
     const loginResponse = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
@@ -101,6 +104,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { accessToken } = get();
       await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
+        credentials: 'include',
         headers: accessToken ? {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -122,20 +126,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return;
       }
 
-      const { accessToken } = get();
-      const token = accessToken || storedToken;
-
-      const response = await fetch(`${API_URL}/users/me`, {
-        headers: token ? {
-          'Authorization': `Bearer ${token}`,
-        } : {},
-      });
+      // Dùng apiClient (không phải fetch thô) để khi access token 15p hết hạn
+      // gặp 401, nó tự POST /auth/refresh (qua refresh cookie) rồi retry —
+      // session sống tới khi refresh token (7 ngày) hết hạn, thay vì bị đá
+      // về login ngay sau 15 phút như trước.
+      const response = await apiClient.get('/users/me');
 
       if (response.ok) {
         const user = await response.json();
-        set({ user, accessToken: token, isAuthenticated: true, isLoading: false });
+        // localStorage có thể đã được refresh cập nhật token mới
+        set({ user, accessToken: localStorage.getItem('accessToken'), isAuthenticated: true, isLoading: false });
       } else {
-        // Token invalid, clear everything
+        // Refresh cũng thất bại → session thực sự hết hạn
         set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
         localStorage.removeItem('accessToken');
       }

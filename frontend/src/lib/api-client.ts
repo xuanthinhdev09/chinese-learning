@@ -10,8 +10,20 @@ let refreshInflight: Promise<boolean> | null = null;
 function tryRefresh(): Promise<boolean> {
   refreshInflight ??= (async () => {
     try {
-      const response = await fetch(`${API_URL}/auth/refresh`, { method: 'POST' });
-      return response.ok;
+      const response = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        // Gửi refreshToken httpOnly cookie — kể cả cross-origin (dev Vite
+        // :5173 → backend :3000). CORS backend đã bật credentials.
+        credentials: 'include',
+      });
+      if (!response.ok) return false;
+      const data = await response.json();
+      // Refresh trả access token mới — cập nhật localStorage để lần retry
+      // (và các request sau) gửi token còn hạn qua Authorization header.
+      if (data.accessToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+      }
+      return true;
     } catch {
       return false;
     } finally {

@@ -205,7 +205,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN', '1d'),
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN', '7d'),
       },
     );
 
