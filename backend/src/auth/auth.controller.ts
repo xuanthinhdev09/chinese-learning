@@ -18,6 +18,11 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { Public } from './decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
+import {
+  durationToMs,
+  DEFAULT_ACCESS_TOKEN_TTL,
+  DEFAULT_REFRESH_TOKEN_TTL,
+} from './token-lifetimes';
 
 /**
  * Cookie Secure flag: COOKIE_SECURE env overrides explicitly ("false" only
@@ -30,25 +35,18 @@ function cookieSecure(): boolean {
   return process.env.NODE_ENV === 'production';
 }
 
-/** Parse jwt-style durations ("30s", "15m", "7d") into milliseconds. */
-function durationToMs(duration: string): number {
-  const match = /^(\d+)([smhd])$/.exec(duration.trim());
-  if (!match) return 24 * 60 * 60 * 1000;
-  const unitMs: Record<string, number> = {
-    s: 1000,
-    m: 60 * 1000,
-    h: 60 * 60 * 1000,
-    d: 24 * 60 * 60 * 1000,
-  };
-  return Number(match[1]) * unitMs[match[2]];
+/**
+ * Both cookie lifetimes mirror the env values the JWTs are signed with, so a
+ * cookie never outlives the token it holds.
+ */
+function accessCookieMaxAge(): number {
+  return durationToMs(process.env.JWT_EXPIRES_IN || DEFAULT_ACCESS_TOKEN_TTL);
 }
 
-/**
- * Refresh cookie lifetime mirrors REFRESH_TOKEN_EXPIRES_IN (the same value
- * the JWT is signed with) so the cookie never outlives the token it holds.
- */
 function refreshCookieMaxAge(): number {
-  return durationToMs(process.env.REFRESH_TOKEN_EXPIRES_IN || '7d');
+  return durationToMs(
+    process.env.REFRESH_TOKEN_EXPIRES_IN || DEFAULT_REFRESH_TOKEN_TTL,
+  );
 }
 
 @Controller('auth')
@@ -88,12 +86,12 @@ export class AuthController {
     const result = await this.authService.login(loginDto);
 
     // Set httpOnly cookies for tokens
-    // Access token cookie (15 min)
+    // Access token cookie (duration follows JWT_EXPIRES_IN)
     response.cookie('accessToken', result.accessToken, {
       httpOnly: true,
       secure: cookieSecure(),
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: accessCookieMaxAge(),
       path: '/',
     });
 
@@ -114,7 +112,8 @@ export class AuthController {
    * POST /auth/refresh
    * - Uses refresh token from cookie
    * - Returns new access token
-   * - Updates access token cookie
+   * - Updates both cookies: the rotated refresh token resets the session
+   *   lifetime, so an active user stays logged in indefinitely
    */
   @Public()
   @UseGuards(RefreshJwtGuard)
@@ -132,11 +131,21 @@ export class AuthController {
       httpOnly: true,
       secure: cookieSecure(),
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: accessCookieMaxAge(),
       path: '/',
     });
 
-    return result;
+    // Rotated refresh token, with its lifetime counted from now
+    response.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: cookieSecure(),
+      sameSite: 'strict',
+      maxAge: refreshCookieMaxAge(),
+      path: '/',
+    });
+
+    // The refresh token travels in the httpOnly cookie only, never in the body
+    return { accessToken: result.accessToken };
   }
 
   /**

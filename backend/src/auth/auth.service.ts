@@ -7,7 +7,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  durationToMs,
+  DEFAULT_ACCESS_TOKEN_TTL,
+  DEFAULT_REFRESH_TOKEN_TTL,
+  REFRESH_TOKEN_ROTATION_GRACE_MS,
+} from './token-lifetimes';
+import { refreshTokenSecret } from './token-secrets';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -103,9 +111,8 @@ export class AuthService {
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email);
 
-    // Store refresh token in database
-    const refreshTokenExpiresAt = new Date();
-    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
+    // Store refresh token in database; the row expires with the JWT itself
+    const refreshTokenExpiresAt = new Date(Date.now() + this.refreshTtlMs());
 
     await this.prisma.refreshToken.create({
       data: {
@@ -128,10 +135,13 @@ export class AuthService {
   }
 
   /**
-   * Refresh access token using refresh token
-   * - Verifies refresh token from database
-   * - Generates new access token
-   * - Optionally rotates refresh token
+   * Exchange a refresh token for a new access token.
+   *
+   * The refresh token is rotated on every call and its replacement carries a
+   * full lifetime, so a user who keeps using the app is never logged out —
+   * the session slides forward instead of dying a fixed time after login.
+   * The presented token stays usable for a short grace window so concurrent
+   * tabs racing the same refresh do not knock each other out.
    */
   async refreshTokens(refreshToken: string) {
     // Verify refresh token exists and is valid
@@ -153,19 +163,39 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token expired');
     }
 
-    // Generate new access token
-    const accessToken = this.jwtService.sign(
-      {
-        sub: storedToken.user.id,
-        email: storedToken.user.email,
-      },
-      {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
-      },
+    const tokens = await this.generateTokens(
+      storedToken.user.id,
+      storedToken.user.email,
     );
 
-    return { accessToken };
+    const now = Date.now();
+    const graceExpiresAt = new Date(now + REFRESH_TOKEN_ROTATION_GRACE_MS);
+
+    await this.prisma.$transaction([
+      this.prisma.refreshToken.create({
+        data: {
+          token: tokens.refreshToken,
+          userId: storedToken.userId,
+          expiresAt: new Date(now + this.refreshTtlMs()),
+        },
+      }),
+      // Shorten the replaced token to the grace window. The expiry guard
+      // keeps this from ever extending a token already closer to expiry
+      // than the window itself.
+      this.prisma.refreshToken.updateMany({
+        where: { id: storedToken.id, expiresAt: { gt: graceExpiresAt } },
+        data: { expiresAt: graceExpiresAt },
+      }),
+      // Rotation leaves short-lived rows behind; drop this user's dead ones.
+      this.prisma.refreshToken.deleteMany({
+        where: { userId: storedToken.userId, expiresAt: { lt: new Date(now) } },
+      }),
+    ]);
+
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   /**
@@ -183,6 +213,16 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
+  /** How long a refresh token — and its database row — stays valid. */
+  private refreshTtlMs(): number {
+    return durationToMs(
+      this.configService.get<string>(
+        'REFRESH_TOKEN_EXPIRES_IN',
+        DEFAULT_REFRESH_TOKEN_TTL,
+      ),
+    );
+  }
+
   /**
    * Generate JWT tokens for a user
    */
@@ -194,7 +234,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
+        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', DEFAULT_ACCESS_TOKEN_TTL),
       },
     );
 
@@ -202,10 +242,16 @@ export class AuthService {
       {
         sub: userId,
         email,
+        // Unique per token: two refreshes in the same second would otherwise
+        // produce byte-identical JWTs and collide on the token unique index.
+        jti: randomUUID(),
       },
       {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN', '7d'),
+        secret: refreshTokenSecret(this.configService),
+        expiresIn: this.configService.get<string>(
+          'REFRESH_TOKEN_EXPIRES_IN',
+          DEFAULT_REFRESH_TOKEN_TTL,
+        ),
       },
     );
 

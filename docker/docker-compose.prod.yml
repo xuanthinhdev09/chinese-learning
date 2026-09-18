@@ -32,8 +32,9 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-chinese_admin}:${POSTGRES_PASSWORD:-chinese_pass}@postgres:5432/${POSTGRES_DB:-chinese_learning}
       JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
-      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-7d}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-30d}
       PORT: 3000
       NODE_ENV: production
       # Set to "false" ONLY for a temporary HTTP-only deployment (no domain

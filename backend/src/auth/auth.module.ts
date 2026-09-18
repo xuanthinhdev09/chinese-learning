@@ -6,9 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { PrismaModule } from '../prisma/prisma.module';
+import { DEFAULT_ACCESS_TOKEN_TTL } from './token-lifetimes';
 
 @Module({
   imports: [
@@ -19,7 +21,9 @@ import { PrismaModule } from '../prisma/prisma.module';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '15m',
+          expiresIn:
+            configService.get<string>('JWT_EXPIRES_IN') ||
+            DEFAULT_ACCESS_TOKEN_TTL,
         },
       }),
       inject: [ConfigService],
@@ -33,6 +37,7 @@ import { PrismaModule } from '../prisma/prisma.module';
   providers: [
     AuthService,
     JwtStrategy,
+    JwtRefreshStrategy,
     JwtAuthGuard,
     RefreshJwtGuard,
   ],

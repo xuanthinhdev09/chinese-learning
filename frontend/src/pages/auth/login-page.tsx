@@ -75,11 +75,7 @@ export default function LoginPage() {
               error={error && !password ? 'Vui lòng nhập mật khẩu' : ''}
             />
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-border text-primary focus:ring-primary" />
-                <span className="text-muted">Ghi nhớ đăng nhập</span>
-              </label>
+            <div className="flex justify-end text-sm">
               <Link to="/forgot-password" className="text-primary hover:underline">
                 Quên mật khẩu?
               </Link>
