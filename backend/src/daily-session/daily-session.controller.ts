@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus, UseGuards } f
 import { DailySessionService } from './daily-session.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { CompleteSessionDto, CompleteSessionResultDto, DailySessionResponseDto, DialogueReviewResultDto, RecordDialogueReviewDto } from './dto/daily-session.dto';
+import { CompleteSessionDto, CompleteSessionResultDto, CurrentLessonDto, DailySessionResponseDto, DialogueReviewResultDto, RecordDialogueReviewDto } from './dto/daily-session.dto';
 
 @Controller('daily-session')
 @UseGuards(JwtAuthGuard)
@@ -18,6 +18,15 @@ export class DailySessionController {
     @Query('courseId') courseId?: string
   ): Promise<DailySessionResponseDto> {
     return this.dailySessionService.getDailySession(user.userId, courseId || undefined);
+  }
+
+  /**
+   * GET /daily-session/current-lesson — first uncompleted lesson of the
+   * active course, lightweight (no conversation payloads)
+   */
+  @Get('current-lesson')
+  async getCurrentLesson(@CurrentUser() user: any): Promise<CurrentLessonDto> {
+    return this.dailySessionService.getCurrentLesson(user.userId);
   }
 
   /**

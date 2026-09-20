@@ -181,3 +181,47 @@ describe('DailySessionService — session completion', () => {
     );
   });
 });
+
+describe('DailySessionService — current lesson lookup', () => {
+  const emptyLesson = { lessonId: null, lessonTitle: null, order: null, courseId: null };
+
+  it('returns the first uncompleted lesson of the active course', async () => {
+    const prisma = buildPrismaMock();
+    prisma.course.findFirst.mockResolvedValue({ id: 'c1' });
+    prisma.lesson.findFirst
+      // first call: resolveActiveCourseId (selects courseId only)
+      .mockResolvedValueOnce({ courseId: 'c1' })
+      // second call: the open lesson lookup
+      .mockResolvedValueOnce({ id: 'l2', title: 'Bài 2', order: 2, courseId: 'c1' });
+    const { service } = buildService(prisma);
+
+    const result = await service.getCurrentLesson('u1');
+
+    expect(result).toEqual({ lessonId: 'l2', lessonTitle: 'Bài 2', order: 2, courseId: 'c1' });
+    expect(prisma.lesson.findFirst).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({ id: true }),
+      })
+    );
+  });
+
+  it('returns nulls when every lesson is completed', async () => {
+    const prisma = buildPrismaMock();
+    prisma.course.findFirst.mockResolvedValue({ id: 'c1' });
+    prisma.lesson.findFirst
+      .mockResolvedValueOnce({ courseId: 'c1' })
+      .mockResolvedValueOnce(null);
+    const { service } = buildService(prisma);
+
+    expect(await service.getCurrentLesson('u1')).toEqual(emptyLesson);
+  });
+
+  it('returns nulls when there is no active course', async () => {
+    const prisma = buildPrismaMock();
+    const { service } = buildService(prisma);
+
+    expect(await service.getCurrentLesson('u1')).toEqual(emptyLesson);
+    // only the resolveActiveCourseId lookup ran — no lesson query afterwards
+    expect(prisma.lesson.findFirst).toHaveBeenCalledTimes(1);
+  });
+});

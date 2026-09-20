@@ -45,6 +45,14 @@ export interface NextLessonDto {
   vocabulary: Vocabulary[];
 }
 
+/** Lightweight next-lesson lookup (no conversation payloads) for study-page pre-selection */
+export interface CurrentLessonDto {
+  lessonId: string | null;
+  lessonTitle: string | null;
+  order: number | null;
+  courseId: string | null;
+}
+
 export interface DailySessionResponseDto {
   /** Dialogues due for spaced review (stage 0-3), across all courses */
   dueDialogues: DueDialogueDto[];

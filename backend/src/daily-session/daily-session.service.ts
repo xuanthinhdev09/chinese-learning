@@ -5,6 +5,7 @@ import { SpacedRepetitionService } from '../spaced-repetition/spaced-repetition.
 import {
   CompleteSessionDto,
   CompleteSessionResultDto,
+  CurrentLessonDto,
   DailySessionResponseDto,
   DialogueLineDto,
   DialogueReviewResultDto,
@@ -107,6 +108,40 @@ export class DailySessionService {
       dueVocabularyTotal: dueVocabularies.total,
       streak,
       completedToday: reviewedToday !== null,
+    };
+  }
+
+  /**
+   * Lightweight current-lesson lookup (no conversation payloads): the first
+   * uncompleted lesson of the active course — powers study-page pre-selection
+   */
+  async getCurrentLesson(userId: string): Promise<CurrentLessonDto> {
+    const empty: CurrentLessonDto = {
+      lessonId: null,
+      lessonTitle: null,
+      order: null,
+      courseId: null,
+    };
+
+    const courseId = await this.resolveActiveCourseId();
+    if (!courseId) {
+      return empty;
+    }
+
+    const lesson = await this.prisma.lesson.findFirst({
+      where: this.firstOpenLessonWhere(userId, courseId),
+      orderBy: { order: 'asc' },
+      select: { id: true, title: true, order: true, courseId: true },
+    });
+    if (!lesson) {
+      return empty;
+    }
+
+    return {
+      lessonId: lesson.id,
+      lessonTitle: lesson.title,
+      order: lesson.order,
+      courseId: lesson.courseId,
     };
   }
 
@@ -216,13 +251,18 @@ export class DailySessionService {
 
   private async findNextLesson(userId: string, courseId: string): Promise<Lesson | null> {
     return this.prisma.lesson.findFirst({
-      where: {
-        courseId,
-        userProgress: { none: { userId, isCompleted: true } },
-      },
+      where: this.firstOpenLessonWhere(userId, courseId),
       orderBy: { order: 'asc' },
       include: { conversations: { orderBy: [{ dialogueOrder: 'asc' }, { order: 'asc' }] } },
     });
+  }
+
+  /** Shared where-clause: lessons of the course the user has not completed yet */
+  private firstOpenLessonWhere(userId: string, courseId: string) {
+    return {
+      courseId,
+      userProgress: { none: { userId, isCompleted: true } },
+    };
   }
 
   private addDays(date: Date, days: number): Date {

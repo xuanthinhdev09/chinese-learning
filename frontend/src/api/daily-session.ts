@@ -75,6 +75,20 @@ export interface CompleteSessionResult {
   streak: number;
 }
 
+/** Lightweight next-lesson lookup for study-page pre-selection; all fields null when every lesson is completed */
+export interface CurrentLesson {
+  lessonId: string | null;
+  lessonTitle: string | null;
+  order: number | null;
+  courseId: string | null;
+}
+
+export async function getCurrentLesson(): Promise<CurrentLesson> {
+  const response = await apiClient.get('/daily-session/current-lesson');
+  if (!response.ok) throw new Error('Failed to load current lesson');
+  return response.json();
+}
+
 export async function getDailySession(courseId?: string): Promise<DailySessionPlan> {
   const query = courseId ? `?courseId=${encodeURIComponent(courseId)}` : '';
   const response = await apiClient.get(`/daily-session${query}`);
