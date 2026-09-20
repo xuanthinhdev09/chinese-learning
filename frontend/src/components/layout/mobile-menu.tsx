@@ -41,7 +41,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       {/* Overlay */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 md:hidden',
+          'fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 md:hidden',
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         )}
         onClick={onClose}
@@ -51,7 +51,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       {/* Mobile Menu */}
       <div
         className={cn(
-          'fixed top-16 left-0 right-0 bottom-0 bg-gray-50 dark:bg-gray-900 z-40',
+          'fixed top-16 left-0 right-0 bottom-0 bg-gray-50 dark:bg-gray-900 z-50',
           'transform transition-transform duration-300 ease-in-out md:hidden',
           'overflow-y-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full'
