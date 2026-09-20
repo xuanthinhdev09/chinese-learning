@@ -2,10 +2,9 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { usePersistentToggle } from '../../hooks/use-persistent-toggle';
 import { DialogueLine } from '../../api/daily-session';
-import { cn } from '../../utils/cn';
+import { DialogueActions, PlaybackControls } from './dialogue-controls';
+import { GroupSelect } from './group-select';
 import { LyricsPanel } from './lyrics-panel';
-import { LyricsLayerToggles } from './lyrics-layer-toggles';
-import { SpeedControl } from './speed-control';
 
 interface DialogueReaderProps {
   title: string;
@@ -21,6 +20,12 @@ interface DialogueReaderProps {
  * Shadowing hội thoại theo style trình phát lời bài hát: toàn bộ dialogue
  * nằm trong MỘT panel tự trượt (LyricsPanel) — câu active to + đổi màu,
  * panel trượt căn giữa theo audio. Tap dòng = nhảy tới dòng đó (không tự phát).
+ *
+ * Mobile (<lg): khung vừa viewport (header + info trên, panel lyrics co giãn
+ * giữa, bar thao tác nằm dưới cùng TRONG FLOW) — mọi nút thao tác luôn trong
+ * tầm tay và không bao giờ đè lên nội dung hội thoại vì trang không cuộn,
+ * panel tự cuộn nội bộ phía trên bar.
+ *
  * Desktop (lg+): info phiên + điều khiển ở cột trái sticky, panel bên phải.
  */
 export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: DialogueReaderProps) {
@@ -77,6 +82,19 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
     );
   };
 
+  // Phát/tạm dừng/tiếp tục — một nút duy nhất, trạng thái do isBusy/isPaused quyết định
+  const handlePlayPause = () => {
+    if (isBusy) {
+      if (isPaused) {
+        resume();
+      } else {
+        pause();
+      }
+    } else {
+      handlePlayAll();
+    }
+  };
+
   // Tap dòng bất kỳ: CHỈ nhảy highlight tới dòng đó, KHÔNG tự phát audio.
   // stop() trước để hủy sequence đang chạy (nếu có) — nếu không, highlight
   // sẽ bị playback đang chạy ghi đè. Phát chỉ khi bấm nút Play.
@@ -97,10 +115,10 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
   }
 
   const isLast = isLastGroup && index === groupLines.length - 1;
-
-  const go = (delta: number) => {
-    setIndex((current) => Math.min(Math.max(current + delta, 0), groupLines.length - 1));
-  };
+  const showNextGroup = !isLast && !isLastGroup && index === groupLines.length - 1;
+  // Hành động cuối lượt (Đoạn tiếp / chấm điểm) chỉ hiện khi hết đoạn hoặc hết bài;
+  // giữa đoạn thì bar chỉ còn nút phát — nhảy dòng bằng tap trên panel.
+  const showActions = showNextGroup || isLast;
 
   const goToNextGroup = () => {
     stop();
@@ -115,56 +133,129 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
     setIndex(0);
   };
 
+  const progressText = (
+    <>
+      Câu {linesBeforeGroup + index + 1}/{lines.length}
+      {groups.length > 1 && ` • Đoạn ${safeGroupIndex + 1}/${groups.length}`} •{' '}
+      {mode === 'new' ? 'Bài mới — đọc theo' : 'Ôn tập'}
+    </>
+  );
+
+  // Danh sách phát 课文: chọn đoạn bất kỳ để đọc/phát riêng
+  const playlistBlock =
+    groups.length > 1 ? (
+      <div className="mb-3">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+          Danh sách phát
+        </p>
+        <div className="space-y-1">
+          {groups.map((group, groupIdx) => {
+            const first = group[0];
+            const active = groupIdx === safeGroupIndex;
+            return (
+              <button
+                key={groupIdx}
+                type="button"
+                onClick={() => selectGroup(groupIdx)}
+                className={
+                  'flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left transition-colors ' +
+                  (active
+                    ? 'border-primary bg-primary-light/40'
+                    : 'border-border hover:bg-background-alt')
+                }
+              >
+                <span className="truncate text-sm text-foreground">
+                  <span className="chinese-text">
+                    {first.dialogueTitleHanzi ?? `Đoạn ${groupIdx + 1}`}
+                  </span>
+                  {first.dialogueTitleVi && (
+                    <span className="text-muted"> · {first.dialogueTitleVi}</span>
+                  )}
+                </span>
+                <span className="shrink-0 text-xs text-muted">{group.length} câu</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    ) : null;
+
   return (
     <div className="mx-auto max-w-lg p-4 sm:max-w-2xl sm:p-6 lg:grid lg:max-w-6xl lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start lg:gap-8">
-      {/* Cột trái (desktop, sticky): thông tin phiên + điều khiển; mobile: xếp trên */}
-      <aside className="lg:sticky lg:top-24">
-        {sessionHeader && <div className="mb-4 lg:mb-6">{sessionHeader}</div>}
+      {/* ===== Mobile (<lg): khung vừa viewport, bar thao tác trong flow dưới cùng ===== */}
+      {/* Chiều cao = 100dvh - header(4rem) - main py-8(4rem) - p-4/p-6(2/3rem) */}
+      <div className="flex flex-col h-[calc(100dvh-10rem)] sm:h-[calc(100dvh-11rem)] lg:hidden">
+        {/* Info: header phiên + tiêu đề + tiến độ — playlist dạng select nằm ở bar dưới */}
+        <div className="shrink-0">
+          {sessionHeader && <div className="mb-2">{sessionHeader}</div>}
+          <h2 className="truncate text-lg font-semibold text-foreground">{title}</h2>
+          <p className="text-sm text-muted">{progressText}</p>
+        </div>
+
+        {/* Panel lyrics: chiếm phần còn lại — tự cuộn nội bộ, KHÔNG bị bar đè */}
+        <div className="min-h-0 flex-1">
+          <LyricsPanel
+            className="h-full sm:h-full"
+            lines={groupLines}
+            index={index}
+            onSelectLine={handleSelectLine}
+            showPinyin={showPinyin}
+            showVietnamese={showVietnamese}
+          />
+        </div>
+
+        {/* Bar thao tác: trong flow (không fixed/sticky) → không đè nội dung.
+            Chọn đoạn + phát + tốc độ + layer chữ ngang hàng một hàng. */}
+        <div className="shrink-0 mt-2 space-y-2 pb-[env(safe-area-inset-bottom)]">
+          {lines.length > 1 && (
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {groups.length > 1 && (
+                <GroupSelect groups={groups} activeIndex={safeGroupIndex} onSelect={selectGroup} />
+              )}
+              <PlaybackControls
+                isBusy={isBusy}
+                isPaused={isPaused}
+                onPlayPause={handlePlayPause}
+                speed={speechRate}
+                onSpeedChange={(value) => {
+                  setSpeechRate(value);
+                  setSpeed(value);
+                }}
+                showPinyin={showPinyin}
+                showVietnamese={showVietnamese}
+                onTogglePinyin={toggleShowPinyin}
+                onToggleVietnamese={toggleShowVietnamese}
+              />
+            </div>
+          )}
+          {showActions && (
+            <DialogueActions
+              showNextGroup={showNextGroup}
+              mode={mode}
+              onNextGroup={goToNextGroup}
+              onDone={onDone}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* ===== Desktop (lg+): cột trái sticky — info + điều khiển ===== */}
+      <aside className="hidden lg:sticky lg:top-24 lg:block">
+        {sessionHeader && <div className="mb-6">{sessionHeader}</div>}
         <h2 className="truncate text-lg font-semibold text-foreground">{title}</h2>
-        <p className="mb-4 text-sm text-muted">
-          Câu {linesBeforeGroup + index + 1}/{lines.length}
-          {groups.length > 1 && ` • Đoạn ${safeGroupIndex + 1}/${groups.length}`} •{' '}
-          {mode === 'new' ? 'Bài mới — đọc theo' : 'Ôn tập'}
-        </p>
+        <p className="mb-4 text-sm text-muted">{progressText}</p>
 
         {lines.length > 1 && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => {
-                if (isBusy) {
-                  if (isPaused) {
-                    resume();
-                  } else {
-                    pause();
-                  }
-                } else {
-                  handlePlayAll();
-                }
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background-alt active:scale-95 transition-all lg:w-full lg:justify-center"
-              title={
-                isBusy
-                  ? isPaused
-                    ? 'Phát tiếp từ vị trí đang dừng'
-                    : 'Tạm dừng'
-                  : 'Nghe hội thoại từ câu đang chọn'
-              }
-            >
-              <span>{isBusy && !isPaused ? '⏸' : '▶'}</span>
-              <span className="text-sm font-medium">
-                {isBusy ? (isPaused ? 'Tiếp tục' : 'Tạm dừng') : 'Phát'}
-              </span>
-            </button>
-
-            <SpeedControl
-              value={speechRate}
-              onChange={(value) => {
+            <PlaybackControls
+              isBusy={isBusy}
+              isPaused={isPaused}
+              onPlayPause={handlePlayPause}
+              speed={speechRate}
+              onSpeedChange={(value) => {
                 setSpeechRate(value);
                 setSpeed(value);
               }}
-            />
-
-            <LyricsLayerToggles
               showPinyin={showPinyin}
               showVietnamese={showVietnamese}
               onTogglePinyin={toggleShowPinyin}
@@ -173,45 +264,11 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
           </div>
         )}
 
-        {/* Danh sách phát 课文: chọn đoạn bất kỳ để đọc/phát riêng */}
-        {groups.length > 1 && (
-          <div className="mb-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-              Danh sách phát
-            </p>
-            <div className="space-y-1">
-              {groups.map((group, groupIdx) => {
-                const first = group[0];
-                const active = groupIdx === safeGroupIndex;
-                return (
-                  <button
-                    key={groupIdx}
-                    type="button"
-                    onClick={() => selectGroup(groupIdx)}
-                    className={cn(
-                      'flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left transition-colors',
-                      active
-                        ? 'border-primary bg-primary-light/40'
-                        : 'border-border hover:bg-background-alt',
-                    )}
-                  >
-                    <span className="truncate text-sm text-foreground">
-                      <span className="chinese-text">{first.dialogueTitleHanzi ?? `Đoạn ${groupIdx + 1}`}</span>
-                      {first.dialogueTitleVi && (
-                        <span className="text-muted"> · {first.dialogueTitleVi}</span>
-                      )}
-                    </span>
-                    <span className="shrink-0 text-xs text-muted">{group.length} câu</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        {playlistBlock}
       </aside>
 
-      {/* Cột phải: panel lyrics (đoạn hiện tại) + điều hướng */}
-      <div>
+      {/* ===== Desktop (lg+): cột phải — panel lyrics + điều hướng ===== */}
+      <div className="hidden lg:block">
         <LyricsPanel
           lines={groupLines}
           index={index}
@@ -226,60 +283,16 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
           </p>
         )}
 
-        {/* Line navigation */}
-        <div className="flex justify-between gap-3 mt-6">
-          <button
-            onClick={() => go(-1)}
-            disabled={index === 0}
-            className="flex-1 px-4 py-3 rounded-lg border border-border text-foreground hover:bg-background-alt disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            ← Trước
-          </button>
-          {!isLast && !isLastGroup && index === groupLines.length - 1 ? (
-            <button
-              onClick={goToNextGroup}
-              className="flex-1 px-4 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all"
-              title="Hết đoạn — chuyển sang đoạn kế tiếp"
-            >
-              Đoạn tiếp →
-            </button>
-          ) : !isLast ? (
-            <button
-              onClick={() => go(1)}
-              className="flex-1 px-4 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all"
-            >
-              Tiếp →
-            </button>
-          ) : (
-            <div className="flex-1 flex gap-2">
-              {mode === 'new' ? (
-                <>
-                  <button
-                    onClick={() => onDone(true)}
-                    className="flex-1 px-3 py-3 rounded-lg bg-accent text-white hover:bg-green-600 active:scale-95 transition-all font-semibold"
-                    title="Đọc trôi chảy"
-                  >
-                    Trôi ✓
-                  </button>
-                  <button
-                    onClick={() => onDone(false)}
-                    className="flex-1 px-3 py-3 rounded-lg bg-warning text-white hover:bg-amber-600 active:scale-95 transition-all font-semibold"
-                    title="Cần luyện lại"
-                  >
-                    Chưa ↻
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => onDone(true)}
-                  className="flex-1 px-3 py-3 rounded-lg bg-accent text-white hover:bg-green-600 active:scale-95 transition-all font-semibold"
-                >
-                  Đã ôn ✓
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+        {showActions && (
+          <div className="mt-6">
+            <DialogueActions
+              showNextGroup={showNextGroup}
+              mode={mode}
+              onNextGroup={goToNextGroup}
+              onDone={onDone}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

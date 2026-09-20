@@ -11,6 +11,8 @@ interface LyricsPanelProps {
   showPinyin: boolean;
   /** Nghĩa Việt hiện trên MỌI dòng — cùng lý do. */
   showVietnamese: boolean;
+  /** Ghi đè chiều cao container (mặc định 55vh/60vh) — mobile frame truyền "h-full sm:h-full" để panel co giãn theo flex. */
+  className?: string;
 }
 
 /**
@@ -20,7 +22,7 @@ interface LyricsPanelProps {
  * giật panel khi chuyển câu. Padding các dòng đồng nhất, khác biệt giữa
  * active/inactive chỉ còn cỡ chữ + màu + nền (đều transition được).
  */
-export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietnamese }: LyricsPanelProps) {
+export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietnamese, className }: LyricsPanelProps) {
   // Re-attach on index change so the NEW active line scrolls into view
   // (ref callback identity must change, same trick as the old sidebar list).
   const activeLineRef = useCallback(
@@ -105,7 +107,13 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
   return (
     // Padding dọc trong scroll content để dòng đầu/cuối cũng căn giữa được;
     // fade mask trên/dưới tạo cảm giác "lời bài hát" trôi qua.
-    <div className="h-[55vh] overflow-y-auto sm:h-[60vh] [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]">
+    // className (nếu có) ghi đè chiều cao qua twMerge.
+    <div
+      className={cn(
+        'h-[55vh] overflow-y-auto sm:h-[60vh] [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]',
+        className,
+      )}
+    >
       <div className="space-y-1 py-[20vh]">{lines.map(renderLine)}</div>
     </div>
   );
