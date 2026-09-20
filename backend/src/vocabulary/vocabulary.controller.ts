@@ -1,24 +1,33 @@
-import { Controller, Get, Post, Param, Body, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { VocabularyService, ImportVocabularyItem } from './vocabulary.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
+// Nội dung từ vựng yêu cầu đăng nhập + bị chặn theo tiến độ học tuần tự;
+// statistics chỉ là số liệu tổng hợp nên giữ public
+@UseGuards(JwtAuthGuard)
 @Controller('vocabulary')
 export class VocabularyController {
   constructor(private readonly vocabularyService: VocabularyService) {}
 
-  @Public()
   @Get('lesson/:lessonId')
   @HttpCode(HttpStatus.OK)
-  async findByLesson(@Param('lessonId') lessonId: string) {
-    return this.vocabularyService.findByLesson(lessonId);
+  async findByLesson(
+    @Param('lessonId') lessonId: string,
+    @CurrentUser() user: { userId: string }
+  ) {
+    return this.vocabularyService.findByLesson(lessonId, user.userId);
   }
 
-  @Public()
   @Get('hsk-level/:level')
   @HttpCode(HttpStatus.OK)
-  async findByHSKLevel(@Param('level') level: string) {
-    const levelNum = parseInt(level);
-    return this.vocabularyService.findByHSKLevel(levelNum);
+  async findByHSKLevel(
+    @Param('level') level: string,
+    @CurrentUser() user: { userId: string }
+  ) {
+    // Phạm vi "tất cả từ" bị cap theo tiến độ của user ngay trên server
+    return this.vocabularyService.findByHSKLevel(parseInt(level), user.userId);
   }
 
   @Public()

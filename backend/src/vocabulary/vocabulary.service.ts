@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface HSK30CsvRow {
@@ -32,7 +32,32 @@ export interface ImportVocabularyItem {
 export class VocabularyService {
   constructor(private prisma: PrismaService) {}
 
-  async findByLesson(lessonId: string) {
+  /**
+   * Ranh giới mở khóa học tuần tự của user trong 1 course:
+   * order của bài đầu chưa hoàn thành; null = đã hoàn thành hết (mở tất cả)
+   */
+  private async firstUncompletedOrder(userId: string, courseId: string): Promise<number | null> {
+    const firstOpen = await this.prisma.lesson.findFirst({
+      where: { courseId, userProgress: { none: { userId, isCompleted: true } } },
+      orderBy: { order: 'asc' },
+      select: { order: true },
+    });
+    return firstOpen ? firstOpen.order : null;
+  }
+
+  async findByLesson(lessonId: string, userId: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: lessonId },
+      select: { id: true, order: true, courseId: true },
+    });
+    if (!lesson) throw new NotFoundException('Lesson not found');
+
+    // Chặn tuần tự phía server — UI khóa chip chỉ là hiển thị, nội dung phải chặn tại đây
+    const cap = await this.firstUncompletedOrder(userId, lesson.courseId);
+    if (cap !== null && lesson.order > cap) {
+      throw new ForbiddenException('Lesson is locked — complete previous lessons first');
+    }
+
     const vocabularies = await this.prisma.vocabulary.findMany({
       where: { lessonId },
       orderBy: { id: 'asc' },
@@ -41,9 +66,22 @@ export class VocabularyService {
     return vocabularies;
   }
 
-  async findByHSKLevel(hskLevel: number) {
+  /**
+   * Phạm vi "tất cả từ" luôn bị chặn theo tiến độ của user (order <= bài đang học) —
+   * cap tính server-side, không tin tham số gửi lên từ client
+   */
+  async findByHSKLevel(hskLevel: number, userId: string) {
+    const course = await this.prisma.course.findFirst({
+      where: { level: hskLevel },
+      select: { id: true },
+    });
+    const cap = course ? await this.firstUncompletedOrder(userId, course.id) : null;
+
     const vocabularies = await this.prisma.vocabulary.findMany({
-      where: { hskLevel },
+      where: {
+        hskLevel,
+        ...(cap !== null && { lesson: { order: { lte: cap } } }),
+      },
       orderBy: { hskCode: 'asc' },
     });
 
@@ -139,11 +177,11 @@ export class VocabularyService {
     const [totalCount, byLevel] = await Promise.all([
       this.prisma.vocabulary.count(),
       this.prisma.$queryRaw`
-        SELECT hskLevel, COUNT(*) as count
+        SELECT "hskLevel", COUNT(*)::int as count
         FROM vocabularies
-        WHERE hskLevel IS NOT NULL
-        GROUP BY hskLevel
-        ORDER BY hskLevel
+        WHERE "hskLevel" IS NOT NULL
+        GROUP BY "hskLevel"
+        ORDER BY "hskLevel"
       `,
     ]);
 
