@@ -2,28 +2,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Header } from './header/header';
 import { MobileMenu } from './mobile-menu';
-import { Breadcrumbs } from './breadcrumbs/breadcrumbs';
+import { Breadcrumbs, getBreadcrumb } from './breadcrumbs/breadcrumbs';
 import { cn } from '../../utils/cn';
 
 export function ProtectedLayout() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hasBreadcrumbs, setHasBreadcrumbs] = useState(false);
-
-  // Check if breadcrumbs should be shown for current route
-  useEffect(() => {
-    const pathname = location.pathname;
-    const showBreadcrumbs =
-      pathname !== '/dashboard' &&
-      pathname !== '/' &&
-      // Check if route has a parent path (not direct child of dashboard)
-      (pathname.startsWith('/hsk/') ||
-       pathname.startsWith('/lessons/') ||
-       pathname.startsWith('/vocabulary/') ||
-       pathname.includes('/'));
-
-    setHasBreadcrumbs(showBreadcrumbs);
-  }, [location.pathname]);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -42,6 +26,9 @@ export function ProtectedLayout() {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
+
+  // Cùng nguồn chuẩn với thanh breadcrumb để padding khớp bar thật
+  const hasBreadcrumbs = getBreadcrumb(location.pathname) !== null;
 
   return (
     <div className="min-h-screen bg-background">

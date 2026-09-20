@@ -1,97 +1,56 @@
-import { useLocation, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../../utils/cn';
 
-// Route configuration for breadcrumbs
-interface BreadcrumbConfig {
-  path: string;
+export interface BreadcrumbConfig {
   label: string;
   icon?: string;
-}
-
-const breadcrumbMap: Record<string, BreadcrumbConfig> = {
-  '/dashboard': { path: '/dashboard', label: 'Dashboard', icon: '🏠' },
-  '/hsk': { path: '/hsk', label: 'HSK Levels', icon: '📚' },
-  '/vocabulary': { path: '/vocabulary', label: 'Vocabulary', icon: '📇' },
-  '/lessons': { path: '/lessons', label: 'Lessons', icon: '📖' },
-  '/profile': { path: '/profile', label: 'Profile', icon: '👤' },
-  '/import': { path: '/import', label: 'Import', icon: '📤' },
-};
-
-// Get parent paths for nested routes
-function getParentPath(pathname: string): string[] {
-  const paths: string[] = [];
-  const segments = pathname.split('/').filter(Boolean);
-
-  let currentPath = '';
-  for (const segment of segments) {
-    currentPath += `/${segment}`;
-
-    // Check if this is a dynamic route (contains parameter like :id)
-    if (segment.includes(':') || segment.match(/^\d+$/)) {
-      // For dynamic routes, use the parent path
-      const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-      if (parentPath && breadcrumbMap[parentPath]) {
-        paths.push(parentPath);
-      }
-    } else if (breadcrumbMap[currentPath]) {
-      paths.push(currentPath);
-    }
-  }
-
-  return paths;
-}
-
-// Get label for dynamic routes
-function getDynamicLabel(pathname: string): string {
-  const segments = pathname.split('/').filter(Boolean);
-
-  // HSK detail page: /hsk/:id
-  if (segments[0] === 'hsk' && segments.length === 2) {
-    return `HSK ${segments[1]}`;
-  }
-
-  // Lesson detail: /lessons/:lessonId
-  if (segments[0] === 'lessons' && segments.length === 2) {
-    return `Lesson ${segments[1]}`;
-  }
-
-  // Vocabulary sub-pages
-  if (segments[0] === 'vocabulary' && segments[1] === 'study') {
-    return 'Study';
-  }
-  if (segments[0] === 'vocabulary' && segments[1] === 'review') {
-    return 'Review';
-  }
-
-  return segments[segments.length - 1] || 'Home';
+  /** Đích liên kết của crumb; không set = crumb của trang hiện tại (không bấm được) */
+  to?: string;
 }
 
 /**
- * Fixed breadcrumbs bar below header
+ * Cấu hình breadcrumb theo tiền tố route — tối đa 2 cấp: Home + 1 crumb.
  *
- * Features:
- * - Fixed position below header (top-16)
- * - Full width with backdrop blur
- * - Integrated with header design
- * - Card-style breadcrumb items
- * - Dark mode support
+ * Route không nằm trong danh sách → không hiện breadcrumb (trang cấp cao nhất,
+ * h1 của trang đã tự định danh — cùng quy ước với /dashboard).
+ *
+ * Chỉ trỏ link tới route có thật trong App.tsx: /vocabulary và /lessons KHÔNG
+ * phải route — trỏ vào đó sẽ rơi vào catch-all và bị đá về dashboard.
+ * Trang detail (/hsk/:id, /lessons/:lessonId) quay về danh sách HSK vì lesson
+ * luôn thuộc một course HSK.
+ */
+const crumbByPrefix: Array<{ prefix: string } & BreadcrumbConfig> = [
+  { prefix: '/vocabulary/study', label: 'Từ vựng', icon: '📇' },
+  { prefix: '/vocabulary/review', label: 'Ôn tập', icon: '🔁' },
+  { prefix: '/hsk/', label: 'HSK Levels', icon: '📚', to: '/hsk' },
+  { prefix: '/lessons/', label: 'HSK Levels', icon: '📚', to: '/hsk' },
+];
+
+/** Crumb cho pathname, hoặc null nếu trang không có breadcrumb. Nguồn chuẩn duy nhất — ProtectedLayout cũng dùng để tính padding. */
+export function getBreadcrumb(pathname: string): BreadcrumbConfig | null {
+  return crumbByPrefix.find((c) => pathname.startsWith(c.prefix)) ?? null;
+}
+
+const linkChipClass = cn(
+  'flex items-center gap-1.5',
+  'text-muted hover:text-foreground',
+  'transition-all duration-150',
+  'hover:scale-105',
+  'px-2 py-1.5 rounded-lg',
+  'hover:bg-gray-100 dark:hover:bg-gray-700'
+);
+
+/**
+ * Breadcrumbs bar cố định dưới header (top-16)
+ *
+ * Tối đa 2 chip: Home + crumb của route. Crumb là link nếu route hiện tại là
+ * trang detail, còn với trang leaf (study/review) là chip highlight không bấm.
  */
 export function Breadcrumbs() {
-  const location = useLocation();
-  const { pathname } = location;
+  const { pathname } = useLocation();
+  const crumb = getBreadcrumb(pathname);
 
-  // Don't show breadcrumbs on dashboard (root protected route)
-  if (pathname === '/dashboard' || pathname === '/') {
-    return null;
-  }
-
-  const parentPaths = getParentPath(pathname);
-  const currentLabel = getDynamicLabel(pathname);
-
-  // If we only have dashboard as parent, don't show breadcrumbs for direct children
-  if (parentPaths.length === 1 && parentPaths[0] === '/dashboard') {
-    return null;
-  }
+  if (!crumb) return null;
 
   return (
     <nav
@@ -104,107 +63,53 @@ export function Breadcrumbs() {
       aria-label="Breadcrumb"
     >
       <div className="container-custom">
-        <div className="flex items-center justify-between">
-          <ol className="flex items-center gap-1.5 py-3 text-sm">
-            {/* Dashboard / Home link */}
-            <li>
-              <Link
-                to="/dashboard"
+        <ol className="flex items-center gap-1.5 py-3 text-sm">
+          {/* Home */}
+          <li>
+            <Link to="/dashboard" className={linkChipClass}>
+              <span className="text-base" aria-hidden="true">🏠</span>
+              <span className="font-medium">Home</span>
+            </Link>
+          </li>
+
+          {/* Separator */}
+          <li>
+            <span className="text-gray-300 dark:text-gray-600 px-0.5" aria-hidden="true">
+              /
+            </span>
+          </li>
+
+          {/* Crumb của route — link về section hoặc chip hiện tại */}
+          <li>
+            {crumb.to ? (
+              <Link to={crumb.to} className={linkChipClass}>
+                {crumb.icon && (
+                  <span className="text-base" aria-hidden="true">
+                    {crumb.icon}
+                  </span>
+                )}
+                <span className="font-medium">{crumb.label}</span>
+              </Link>
+            ) : (
+              <span
                 className={cn(
                   'flex items-center gap-1.5',
-                  'text-muted hover:text-foreground',
-                  'transition-all duration-150',
-                  'hover:scale-105',
-                  'px-2 py-1.5 rounded-lg',
-                  'hover:bg-gray-100 dark:hover:bg-gray-700',
+                  'px-2.5 py-1 rounded-md',
+                  'bg-primary/10 dark:bg-primary/20',
+                  'border-l-2 border-l-primary',
+                  'text-foreground font-semibold'
                 )}
               >
-                <span className="text-base" aria-hidden="true">🏠</span>
-                <span className="font-medium">Home</span>
-              </Link>
-            </li>
-
-            {/* Separator */}
-            {parentPaths.length > 0 && (
-              <li>
-                <span
-                  className="text-gray-300 dark:text-gray-600 px-0.5"
-                  aria-hidden="true"
-                >
-                  /
-                </span>
-              </li>
-            )}
-
-            {/* Parent paths */}
-            {parentPaths.map((path, index) => {
-              const config = breadcrumbMap[path];
-              if (!config || path === '/dashboard') return null;
-
-              const isLastParent = index === parentPaths.length - 1;
-
-              return (
-                <li key={path} className="flex items-center">
-                  <Link
-                    to={path}
-                    className={cn(
-                      'flex items-center gap-1.5',
-                      'text-muted hover:text-foreground',
-                      'transition-all duration-150',
-                      'hover:scale-105',
-                      'px-2 py-1.5 rounded-lg',
-                      'hover:bg-gray-100 dark:hover:bg-gray-700',
-                    )}
-                  >
-                    {config.icon && (
-                      <span className="text-base" aria-hidden="true">
-                        {config.icon}
-                      </span>
-                    )}
-                    <span className="font-medium">{config.label}</span>
-                  </Link>
-
-                  {/* Separator between parent items */}
-                  {!isLastParent && (
-                    <span
-                      className="text-gray-300 dark:text-gray-600 px-0.5 ml-0.5"
-                      aria-hidden="true"
-                    >
-                      /
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-
-            {/* Current page (non-link) */}
-            {parentPaths.length > 0 && (
-              <>
-                <li>
-                  <span
-                    className="text-gray-300 dark:text-gray-600 px-0.5"
-                    aria-hidden="true"
-                  >
-                    /
+                {crumb.icon && (
+                  <span className="text-base" aria-hidden="true">
+                    {crumb.icon}
                   </span>
-                </li>
-                <li>
-                  <span
-                    className={cn(
-                      'flex items-center gap-1.5',
-                      'px-2.5 py-1 rounded-md',
-                      'bg-primary/10 dark:bg-primary/20',
-                      'border-l-2 border-l-primary',
-                      'text-foreground font-semibold text-sm',
-                    )}
-                  >
-                    {currentLabel}
-                  </span>
-                </li>
-              </>
+                )}
+                {crumb.label}
+              </span>
             )}
-          </ol>
-        </div>
+          </li>
+        </ol>
       </div>
     </nav>
   );
