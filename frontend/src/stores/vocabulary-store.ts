@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { vocabularyApi, Vocabulary } from '../api/vocabulary-api';
 import { getDisplayMeaning, LanguagePreference } from './language-preference-store';
 
-type StudyMode = 'flashcard' | 'quiz' | 'fill-blank' | 'pinyin-match';
+type StudyMode = 'flashcard' | 'quiz';
 
 interface QuizOption {
   id: string;
@@ -132,7 +132,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   isSavingProgress: false,
   progressError: null,
 
-  // Load vocabulary by HSK level, optionally scoped to one lesson
+  // Load vocabulary by HSK level (server caps at unlocked lessons), optionally one lesson
   loadByHSKLevel: async (level: number, lessonId?: string | null) => {
     set({ isLoading: true, error: null, progressError: null });
     try {
@@ -221,8 +221,8 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
 
   setStudyMode: (mode: StudyMode) => {
     set({ studyMode: mode });
-    // Reset quiz state when changing modes
-    if (mode !== 'quiz' && mode !== 'fill-blank' && mode !== 'pinyin-match') {
+    // Reset quiz state when leaving quiz mode
+    if (mode !== 'quiz') {
       set({
         quiz: { options: [], selectedOption: null, showResult: false, isCorrect: null },
         correctCount: 0,
@@ -237,7 +237,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
     preference: LanguagePreference = 'vietnamese',
     lessonId?: string | null
   ) => {
-    set({ isLoading: true, error: null, languagePreference: preference });
+    set({ isLoading: true, error: null, progressError: null, languagePreference: preference });
     try {
       const vocabularies = lessonId
         ? await vocabularyApi.getByLesson(lessonId)
@@ -280,16 +280,29 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   submitQuizAnswer: () => {
-    const { quiz, correctCount } = get();
+    const { quiz, correctCount, vocabularies, currentIndex } = get();
     if (!quiz.selectedOption) return;
 
     const selectedOption = quiz.options.find((opt) => opt.id === quiz.selectedOption);
     const isCorrect = selectedOption?.isCorrect || false;
+    const current = vocabularies[currentIndex];
 
     set({
       quiz: { ...quiz, showResult: true, isCorrect },
       correctCount: isCorrect ? correctCount + 1 : correctCount,
     });
+
+    // Ghi SM-2: đúng = Easy (5), sai = 1 (rơi vào nhánh fail như Again) — fire-and-forget, không chặn UI
+    if (current) {
+      vocabularyApi
+        .recordProgress({ vocabularyId: current.id, quality: isCorrect ? 5 : 1 })
+        .catch((error) => {
+          set({
+            progressError:
+              error instanceof Error ? error.message : 'Failed to save progress',
+          });
+        });
+    }
   },
 
   nextQuizQuestion: () => {

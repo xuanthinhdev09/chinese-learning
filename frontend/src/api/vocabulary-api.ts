@@ -135,6 +135,7 @@ export const vocabularyApi = {
   },
 
   async getByHSKLevel(level: number): Promise<Vocabulary[]> {
+    // Phạm vi "tất cả từ" do server cap theo tiến độ user (học tuần tự)
     const response = await apiClient.get(`/vocabulary/hsk-level/${level}`);
 
     if (!response.ok) {

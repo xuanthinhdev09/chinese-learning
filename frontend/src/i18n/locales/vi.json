@@ -36,7 +36,7 @@
     "today": "Hôm nay",
     "vocabulary": "Từ vựng",
     "review": "Ôn tập",
-    "hskLevels": "HSK Levels",
+    "hskLevels": "Trình độ HSK",
     "home": "Trang chủ",
     "profile": "Hồ sơ",
     "logout": "Đăng xuất",
@@ -102,7 +102,7 @@
     "dueToday": "từ cần ôn hôm nay"
   },
   "hsk": {
-    "title": "HSK Levels",
+    "title": "Trình độ HSK",
     "subtitle": "Chọn trình độ để bắt đầu học",
     "loadError": "Không thể tải dữ liệu HSK",
     "levelLoadError": "Không thể tải thông tin HSK level",
@@ -172,7 +172,7 @@
     "lyrics": {
       "groupHeader": "Đoạn {{order}} · {{title}}",
       "meaningToggle": "Nghĩa Việt",
-      "pinyinToggle": "Pinyin",
+      "pinyinToggle": "Phiên âm",
       "togglePinyinTitle": "Hiện/ẩn pinyin trên mọi dòng",
       "toggleVietnameseTitle": "Hiện/ẩn nghĩa tiếng Việt trên mọi dòng"
     },
@@ -223,38 +223,36 @@
       "tip4": "Tập trung vào từ \"Hard\" và \"Again\""
     },
     "study": {
-      "title": "HSK Vocabulary Study",
-      "subtitle": "Learn Chinese vocabulary with multiple study modes",
+      "title": "Học từ vựng HSK",
+      "subtitle": "Học từ vựng tiếng Trung qua nhiều chế độ ôn tập",
       "scopeLabel": "Phạm vi ôn tập",
       "allWords": "Tất cả từ",
       "lessonChip": "Bài {{order}} · {{count}} từ",
       "scopeSelected": "Đã chọn bài {{order}} — bấm chế độ bên dưới để bắt đầu",
       "scopeSelectedUnknown": "Đã chọn một bài — bấm chế độ bên dưới để bắt đầu",
       "scopeAllSelected": "Đang chọn tất cả từ — chọn một bài để ôn riêng",
+      "scopeUnlockedRange": "Tất cả từ đã mở khóa (bài 1–{{order}}) — chọn một bài để ôn riêng",
+      "lessonLocked": "Học tuần tự — hoàn thành các bài trước để mở khóa",
+      "pickLessonToggle": "Chọn bài học",
+      "summaryLesson": "Đang chọn: Bài {{order}} · {{title}}",
+      "summaryAllUnlocked": "Tất cả từ đã mở khóa (bài 1–{{order}})",
+      "summaryAll": "Tất cả từ vựng",
       "noLessonsData": "Chưa có dữ liệu bài học cho trình độ này.",
       "lessonFallback": "Bài học",
       "allVocabTitle": "Tất cả từ vựng ({{count}} từ)",
+      "dueTitle": "Từ đến hạn ({{count}} từ)",
+      "dueScope": "Ôn tập đến hạn",
       "changeLesson": "← Đổi bài",
       "dismiss": "Ẩn",
       "loading": "Đang tải từ vựng..."
     },
     "modes": {
-      "flashcard": "Flashcards",
-      "quiz": "Quiz Meaning",
-      "fillBlank": "Fill Blank",
-      "pinyinMatch": "Pinyin Match"
+      "flashcard": "Thẻ ghi nhớ",
+      "quiz": "Trắc nghiệm nghĩa"
     },
     "modeDesc": {
       "flashcard": "Ôn tập với thẻ từ",
-      "quiz": "Chọn nghĩa đúng",
-      "fillBlank": "Điền vào chỗ trống",
-      "pinyinMatch": "Chọn Pinyin đúng"
-    },
-    "contentLang": {
-      "vietnamese": "Tiếng Việt",
-      "english": "English",
-      "both": "Cả hai",
-      "title": "Đổi ngôn ngữ hiển thị nghĩa"
+      "quiz": "Chọn nghĩa đúng"
     },
     "stats": {
       "loadError": "Không thể tải thống kê",
@@ -271,10 +269,10 @@
       "allDoneHint": "Học từ mới để tiếp tục"
     },
     "rating": {
-      "again": "Again",
-      "hard": "Hard",
-      "good": "Good",
-      "easy": "Easy"
+      "again": "Ôn lại",
+      "hard": "Khó",
+      "good": "Tốt",
+      "easy": "Dễ"
     },
     "ratingDesc": {
       "again": "Ôn lại sau 10 phút",
@@ -295,9 +293,9 @@
       "speak": "Phát âm",
       "clickToFlip": "Click để lật thẻ",
       "vietnameseLabel": "Nghĩa tiếng Việt",
-      "englishLabel": "English",
-      "meaningLabel": "Meaning",
-      "exampleLabel": "Example",
+      "englishLabel": "Tiếng Anh",
+      "meaningLabel": "Nghĩa",
+      "exampleLabel": "Ví dụ",
       "howWell": "Bạn nhớ từ này thế nào?",
       "prev": "← Trước",
       "next": "Tiếp →",
@@ -308,27 +306,14 @@
       "scoreLine": "{{correct}} / {{total}} đúng",
       "retry": "Làm lại",
       "back": "Quay lại",
-      "notLoaded": "No quiz loaded",
+      "notLoaded": "Chưa có dữ liệu quiz",
       "scoreLabel": "Điểm",
       "question": "Nghĩa của từ này là gì?",
-      "seeResults": "Xem kết quả",
-      "next": "Câu tiếp theo",
       "correct": "✓ Chính xác! {{hanzi}} nghĩa là \"{{meaning}}\"",
       "wrong": "✗ Đáp án đúng là \"{{answer}}\""
     },
     "common": {
-      "submit": "Gửi câu trả lời",
-      "nextArrow": "Câu tiếp theo →",
-      "wrongAnswer": "✗ Đáp án đúng là \"{{answer}}\" - {{hanzi}} ({{meaning}})"
-    },
-    "fillBlank": {
-      "title": "Điền vào chỗ trống",
-      "correct": "✓ Chính xác! \"{{hanzi}}\" nghĩa là \"{{meaning}}\""
-    },
-    "pinyinMatch": {
-      "title": "Chọn Pinyin đúng",
-      "question": "Pinyin của từ này là gì?",
-      "correct": "✓ Chính xác! {{hanzi}} đọc là \"{{pinyin}}\" - {{meaning}}"
+      "submit": "Gửi câu trả lời"
     },
     "list": {
       "empty": "Chưa có từ vựng"

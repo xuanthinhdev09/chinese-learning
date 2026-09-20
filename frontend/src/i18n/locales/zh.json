@@ -231,30 +231,28 @@
       "scopeSelected": "已选择第 {{order}} 课 — 点击下方模式开始",
       "scopeSelectedUnknown": "已选择某一课 — 点击下方模式开始",
       "scopeAllSelected": "当前为全部词语 — 选择一课可单独复习",
+      "scopeUnlockedRange": "已解锁的全部词语（第 1–{{order}} 课）— 选择一课可单独复习",
+      "lessonLocked": "循序渐进 — 完成前面的课程后解锁",
+      "pickLessonToggle": "选择课程",
+      "summaryLesson": "已选择：第 {{order}} 课 · {{title}}",
+      "summaryAllUnlocked": "已解锁的全部词语（第 1–{{order}} 课）",
+      "summaryAll": "全部词语",
       "noLessonsData": "该等级还没有课程数据。",
       "lessonFallback": "课程",
       "allVocabTitle": "全部生词（{{count}} 个）",
+      "dueTitle": "到期单词（{{count}} 个）",
+      "dueScope": "到期复习",
       "changeLesson": "← 更换课程",
       "dismiss": "隐藏",
       "loading": "正在加载生词..."
     },
     "modes": {
       "flashcard": "抽认卡",
-      "quiz": "意思测验",
-      "fillBlank": "填空",
-      "pinyinMatch": "拼音匹配"
+      "quiz": "意思测验"
     },
     "modeDesc": {
       "flashcard": "用卡片复习",
-      "quiz": "选择正确的意思",
-      "fillBlank": "填入空缺处",
-      "pinyinMatch": "选择正确的拼音"
-    },
-    "contentLang": {
-      "vietnamese": "越南语",
-      "english": "英语",
-      "both": "两者都显示",
-      "title": "切换释义显示语言"
+      "quiz": "选择正确的意思"
     },
     "stats": {
       "loadError": "无法加载统计数据",
@@ -311,24 +309,11 @@
       "notLoaded": "未加载测验",
       "scoreLabel": "得分",
       "question": "这个词的意思是什么？",
-      "seeResults": "查看结果",
-      "next": "下一题",
       "correct": "✓ 正确！{{hanzi}} 的意思是“{{meaning}}”",
       "wrong": "✗ 正确答案是“{{answer}}”"
     },
     "common": {
-      "submit": "提交答案",
-      "nextArrow": "下一题 →",
-      "wrongAnswer": "✗ 正确答案是“{{answer}}” - {{hanzi}}（{{meaning}}）"
-    },
-    "fillBlank": {
-      "title": "填空",
-      "correct": "✓ 正确！“{{hanzi}}”的意思是“{{meaning}}”"
-    },
-    "pinyinMatch": {
-      "title": "选择正确的拼音",
-      "question": "这个词的拼音是什么？",
-      "correct": "✓ 正确！{{hanzi}} 读作“{{pinyin}}” - {{meaning}}"
+      "submit": "提交答案"
     },
     "list": {
       "empty": "暂无生词"

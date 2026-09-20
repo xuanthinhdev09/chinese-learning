@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { useLanguagePreference, getDisplayMeaning } from '../../stores/language-preference-store';
+import { translateApiError } from '../../utils/translate-api-error';
 
 export function QuizCard() {
   const { t } = useTranslation();
@@ -11,6 +13,7 @@ export function QuizCard() {
     quiz,
     correctCount,
     quizCompleted,
+    progressError,
     selectQuizOption,
     submitQuizAnswer,
     nextQuizQuestion,
@@ -20,6 +23,14 @@ export function QuizCard() {
   const current = vocabularies[currentIndex];
   const progress = vocabularies.length > 0 ? `${currentIndex + 1}/${vocabularies.length}` : '0/0';
   const score = vocabularies.length > 0 ? Math.round((correctCount / vocabularies.length) * 100) : 0;
+
+  // Nộp bài xong tự chuyển câu tiếp sau ~1s — đủ đọc feedback, không cần click thêm.
+  // Đặt trước mọi early-return (Rules of Hooks); timer bị clear khi showResult đổi nên không advance 2 lần
+  useEffect(() => {
+    if (!quiz.showResult) return;
+    const timer = setTimeout(() => nextQuizQuestion(), 1000);
+    return () => clearTimeout(timer);
+  }, [quiz.showResult, nextQuizQuestion]);
 
   // Get meaning based on language preference
   const getCurrentMeaning = () => {
@@ -57,6 +68,8 @@ export function QuizCard() {
 
   // Shuffle options including correct answer
   const generateOptions = () => {
+    if (!current) return []; // render đầu tiên sau khi bấm Quiz có thể chạy trước khi dữ liệu tải xong
+
     const wrongOptions = generateWrongOptions();
     const correctOption = {
       id: current.id,
@@ -68,11 +81,6 @@ export function QuizCard() {
       .sort(() => Math.random() - 0.5)
       .map((opt, idx) => ({ ...opt, id: `option-${idx}` }));
   };
-
-  // Use generated options or fallback to quiz state
-  const displayOptions = quiz.options.length > 0
-    ? quiz.options
-    : generateOptions();
 
   // Quiz completed screen
   if (quizCompleted) {
@@ -120,6 +128,9 @@ export function QuizCard() {
       </div>
     );
   }
+
+  // Use generated options or fallback to quiz state — đặt sau guard !current
+  const displayOptions = quiz.options.length > 0 ? quiz.options : generateOptions();
 
   return (
     <div className="max-w-md mx-auto p-6">
@@ -218,21 +229,14 @@ export function QuizCard() {
           })}
         </div>
 
-        {/* Submit / Next button */}
-        {!quiz.showResult ? (
+        {/* Submit — nộp xong tự chuyển câu tiếp sau ~1s, không cần nút Next */}
+        {!quiz.showResult && (
           <button
             onClick={submitQuizAnswer}
             disabled={!quiz.selectedOption}
             className="w-full mt-6 px-4 py-3 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
           >
             {t('vocabulary.common.submit')}
-          </button>
-        ) : (
-          <button
-            onClick={nextQuizQuestion}
-            className="w-full mt-6 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            {currentIndex >= vocabularies.length - 1 ? t('vocabulary.quiz.seeResults') : t('vocabulary.quiz.next')}
           </button>
         )}
 
@@ -249,6 +253,11 @@ export function QuizCard() {
               </p>
             )}
           </div>
+        )}
+
+        {/* Progress save error (SM-2) — không chặn làm bài */}
+        {progressError && (
+          <p className="mt-2 text-sm text-red-500 text-center">{translateApiError(progressError, t)}</p>
         )}
       </div>
     </div>

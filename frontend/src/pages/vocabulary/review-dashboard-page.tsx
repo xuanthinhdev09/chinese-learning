@@ -12,8 +12,7 @@ export function ReviewDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { getProgressStats, loadDueVocabularies, setStudyMode } =
-    useVocabularyStore();
+  const { getProgressStats } = useVocabularyStore();
 
   useEffect(() => {
     loadStats();
@@ -32,17 +31,9 @@ export function ReviewDashboardPage() {
     }
   };
 
-  const handleStartReview = async () => {
-    try {
-      // Switch to flashcard mode
-      setStudyMode('flashcard');
-      // Load due vocabularies
-      await loadDueVocabularies(20);
-      // Navigate to study page
-      navigate('/vocabulary/study');
-    } catch (err) {
-      setError(translateApiError(err, t));
-    }
+  const handleStartReview = () => {
+    // Một đường load duy nhất: study page tự load due qua URL param (tránh double-fetch)
+    navigate('/vocabulary/study?mode=flashcard&due=1');
   };
 
   const handleStartNew = async () => {

@@ -237,31 +237,30 @@
       "scopeSelected": "Lesson {{order}} selected — pick a mode below to start",
       "scopeSelectedUnknown": "A lesson is selected — pick a mode below to start",
       "scopeAllSelected": "All words selected — pick a lesson to study it alone",
+      "scopeUnlockedRange": "All unlocked words (lessons 1–{{order}}) — pick a lesson to study it alone",
+      "lessonLocked": "Sequential learning — finish the previous lessons to unlock",
+      "pickLessonToggle": "Choose a lesson",
+      "summaryLesson": "Selected: Lesson {{order}} · {{title}}",
+      "summaryAllUnlocked": "All unlocked words (lessons 1–{{order}})",
+      "summaryAll": "All words",
       "noLessonsData": "No lesson data for this level yet.",
       "lessonFallback": "Lesson",
       "allVocabTitle_one": "All vocabulary ({{count}} word)",
       "allVocabTitle_other": "All vocabulary ({{count}} words)",
+      "dueTitle_one": "Due word ({{count}})",
+      "dueTitle_other": "Due words ({{count}})",
+      "dueScope": "Due review",
       "changeLesson": "← Change lesson",
       "dismiss": "Hide",
       "loading": "Loading vocabulary..."
     },
     "modes": {
       "flashcard": "Flashcards",
-      "quiz": "Quiz Meaning",
-      "fillBlank": "Fill Blank",
-      "pinyinMatch": "Pinyin Match"
+      "quiz": "Quiz Meaning"
     },
     "modeDesc": {
       "flashcard": "Review with flashcards",
-      "quiz": "Pick the correct meaning",
-      "fillBlank": "Fill in the blank",
-      "pinyinMatch": "Pick the correct pinyin"
-    },
-    "contentLang": {
-      "vietnamese": "Vietnamese",
-      "english": "English",
-      "both": "Both",
-      "title": "Change meaning language"
+      "quiz": "Pick the correct meaning"
     },
     "stats": {
       "loadError": "Unable to load statistics",
@@ -320,24 +319,11 @@
       "notLoaded": "No quiz loaded",
       "scoreLabel": "Score",
       "question": "What does this word mean?",
-      "seeResults": "See results",
-      "next": "Next question",
       "correct": "✓ Correct! {{hanzi}} means \"{{meaning}}\"",
       "wrong": "✗ The correct answer is \"{{answer}}\""
     },
     "common": {
-      "submit": "Submit answer",
-      "nextArrow": "Next question →",
-      "wrongAnswer": "✗ The correct answer is \"{{answer}}\" - {{hanzi}} ({{meaning}})"
-    },
-    "fillBlank": {
-      "title": "Fill in the blank",
-      "correct": "✓ Correct! \"{{hanzi}}\" means \"{{meaning}}\""
-    },
-    "pinyinMatch": {
-      "title": "Pick the correct pinyin",
-      "question": "What is the pinyin of this word?",
-      "correct": "✓ Correct! {{hanzi}} is read \"{{pinyin}}\" - {{meaning}}"
+      "submit": "Submit answer"
     },
     "list": {
       "empty": "No vocabulary yet"
