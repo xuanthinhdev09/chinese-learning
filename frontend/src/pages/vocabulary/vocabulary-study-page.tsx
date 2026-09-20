@@ -82,6 +82,9 @@ export function VocabularyStudyPage() {
     };
   }, [selectedLevel, hskLevels]);
 
+  /** Level chưa có bài học nào (lessonCount = 0) — chỉ hiển thị, không chọn học được */
+  const hasLessonContent = (hsk: { lessonCount: number }) => hsk.lessonCount > 0;
+
   const studyModes = [
     { id: 'flashcard', name: 'Flashcards', emoji: '📇', description: 'Ôn tập với thẻ từ', color: 'bg-blue-500' },
     { id: 'quiz', name: 'Quiz Meaning', emoji: '🎯', description: 'Chọn nghĩa đúng', color: 'bg-green-500' },
@@ -205,27 +208,40 @@ export function VocabularyStudyPage() {
             <div
               key={hsk.level}
               onClick={() => {
+                if (!hasLessonContent(hsk)) return;
                 setSelectedLevel(hsk.level);
                 setSelectedLessonId(null);
               }}
-              className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 cursor-pointer transition-all hover:shadow-xl ${
-                selectedLevel === hsk.level ? 'ring-2 ring-blue-500' : ''
+              className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-all ${
+                hasLessonContent(hsk)
+                  ? `cursor-pointer hover:shadow-xl ${
+                      selectedLevel === hsk.level ? 'ring-2 ring-blue-500' : ''
+                    }`
+                  : 'opacity-60 cursor-not-allowed'
               }`}
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {hsk.name}
                 </h2>
-                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm">
-                  {hsk.lessonCount} bài học
-                </span>
+                {hasLessonContent(hsk) ? (
+                  <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm">
+                    {hsk.lessonCount} bài học
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full text-sm">
+                    Chưa có nội dung
+                  </span>
+                )}
               </div>
 
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {hsk.description}
-              </p>
+              {hsk.description && (
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  {hsk.description}
+                </p>
+              )}
 
-              {selectedLevel === hsk.level && (
+              {hasLessonContent(hsk) && selectedLevel === hsk.level && (
                 <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                     Phạm vi ôn tập
@@ -270,22 +286,28 @@ export function VocabularyStudyPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
-                {studyModes.map((mode) => (
-                  <button
-                    key={mode.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStartStudying(mode.id, hsk.level);
-                    }}
-                    disabled={isLoading}
-                    className={`px-4 py-3 ${mode.color} text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-1`}
-                  >
-                    <span className="text-2xl">{mode.emoji}</span>
-                    <span className="text-sm font-semibold">{mode.name}</span>
-                  </button>
-                ))}
-              </div>
+              {hasLessonContent(hsk) ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {studyModes.map((mode) => (
+                    <button
+                      key={mode.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartStudying(mode.id, hsk.level);
+                      }}
+                      disabled={isLoading}
+                      className={`px-4 py-3 ${mode.color} text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-1`}
+                    >
+                      <span className="text-2xl">{mode.emoji}</span>
+                      <span className="text-sm font-semibold">{mode.name}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Chưa có dữ liệu bài học cho trình độ này.
+                </p>
+              )}
             </div>
           ))}
         </div>

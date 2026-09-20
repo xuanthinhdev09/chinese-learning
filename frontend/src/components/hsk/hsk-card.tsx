@@ -23,8 +23,12 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
   const navigate = useNavigate();
   const colors = hskColors[hsk.level as keyof typeof hskColors] || hskColors[1];
 
+  // Level chưa import nội dung (0 bài học) — hiển thị mờ, không vào được
+  const isEmpty = hsk.lessonCount === 0;
+  const isInactive = locked || isEmpty;
+
   const handleClick = () => {
-    if (!locked) {
+    if (!isInactive) {
       navigate(`/hsk/${hsk.id}`);
     }
   };
@@ -34,7 +38,7 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
       onClick={handleClick}
       className={cn(
         'card-interactive relative overflow-hidden group',
-        locked && 'opacity-60 cursor-not-allowed hover:shadow-sm hover:translate-y-0',
+        isInactive && 'opacity-60 cursor-not-allowed hover:shadow-sm hover:translate-y-0',
         className
       )}
     >
@@ -62,10 +66,10 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
             <span className="text-white text-2xl font-bold font-display">{hsk.level}</span>
           </div>
           <Badge
-            variant={locked ? 'muted' : 'accent'}
+            variant={isInactive ? 'muted' : 'accent'}
             className="text-xs"
           >
-            {hsk.lessonCount} bài học
+            {isEmpty ? 'Chưa có nội dung' : `${hsk.lessonCount} bài học`}
           </Badge>
         </div>
 
@@ -89,7 +93,7 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
         )}
 
         {/* Start/Continue button */}
-        {!locked && (
+        {!isInactive && (
           <div className="mt-4 pt-4">
             <span className={cn(
               'inline-flex items-center text-sm font-medium group-hover:translate-x-1 transition-transform',
