@@ -14,8 +14,8 @@ out/
 .env.production
 .env.development
 
-# Payment gateway test credentials (Insomnia/environment exports)
-dtsspay-create-order.*.json
+# Payment gateway test credentials (guide md + Insomnia/environment exports)
+dtsspay-create-order*
 
 # IDE
 .vscode/
