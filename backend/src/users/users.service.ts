@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { AVATAR_EMOJIS } from './constants/avatar-emojis';
 
 @Injectable()
 export class UsersService {
@@ -84,16 +87,63 @@ export class UsersService {
       }
     }
 
-    // Update user
-    const updatedUser = await this.prisma.user.update({
-      where: { id },
-      data: {
-        ...(data.username && { username: data.username }),
-        ...(data.avatar !== undefined && { avatar: data.avatar }),
-      },
+    // Avatar must be one of the preset emojis (frontend mirrors this list)
+    if (data.avatar !== undefined && !AVATAR_EMOJIS.includes(data.avatar)) {
+      throw new BadRequestException('Invalid avatar selection');
+    }
+
+    // Update user. A concurrent PATCH with the same new username can pass
+    // the uniqueness pre-check above (TOCTOU) and hit the DB unique
+    // constraint here — map that to the same 400 instead of a 500.
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: {
+          ...(data.username && { username: data.username }),
+          ...(data.avatar !== undefined && { avatar: data.avatar }),
+        },
+      });
+
+      return this.excludePasswordHash(updatedUser);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BadRequestException('Username already taken');
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Change password: verify current password, then rehash.
+   * Keeps existing sessions (refresh tokens untouched) — the current
+   * session stays alive after a password change.
+   */
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const currentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.passwordHash,
+    );
+
+    if (!currentPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
     });
 
-    return this.excludePasswordHash(updatedUser);
+    return { message: 'Password changed successfully' };
   }
 
   /**

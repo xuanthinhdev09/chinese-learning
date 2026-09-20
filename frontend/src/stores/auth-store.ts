@@ -14,6 +14,9 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   setUser: (user: User | null) => void;
+  // Merge profile edits (username/avatar) into the current user so every
+  // consumer of the store (header, mobile menu, profile page) syncs at once.
+  updateUser: (partial: Partial<User>) => void;
   setToken: (token: string | null) => void;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
@@ -31,6 +34,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
 
   setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
+
+  updateUser: (partial) =>
+    set((state) => ({
+      user: state.user ? { ...state.user, ...partial } : state.user,
+    })),
 
   setToken: (token) => {
     set({ accessToken: token });

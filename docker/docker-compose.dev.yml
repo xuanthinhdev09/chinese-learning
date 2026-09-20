@@ -37,6 +37,10 @@ services:
       REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-30d}
       PORT: 3000
       NODE_ENV: development
+      # NOTE: nest --watch cannot see host file edits through the
+      # Windows->Docker bind mount (inotify + tsc polling both blind).
+      # After editing backend code: docker restart chinese_learning_backend
+      # (frontend is fine — Vite uses VITE_WATCH_POLLING).
       # Azure Neural TTS (optional — empty = TTS off, frontend falls back)
       AZURE_SPEECH_KEY: ${AZURE_SPEECH_KEY:-}
       AZURE_SPEECH_REGION: ${AZURE_SPEECH_REGION:-}
