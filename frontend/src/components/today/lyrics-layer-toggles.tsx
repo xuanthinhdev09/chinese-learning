@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 
 interface LyricsLayerTogglesProps {
@@ -17,6 +18,7 @@ export function LyricsLayerToggles({
   onTogglePinyin,
   onToggleVietnamese,
 }: LyricsLayerTogglesProps) {
+  const { t } = useTranslation();
   const buttonClass = (enabled: boolean) =>
     cn(
       'rounded border px-2 py-1 text-xs transition-colors',
@@ -30,16 +32,16 @@ export function LyricsLayerToggles({
       <button
         onClick={onTogglePinyin}
         className={buttonClass(showPinyin)}
-        title="Hiện/ẩn pinyin trên mọi dòng"
+        title={t('today.lyrics.togglePinyinTitle')}
       >
-        Pinyin
+        {t('today.lyrics.pinyinToggle')}
       </button>
       <button
         onClick={onToggleVietnamese}
         className={buttonClass(showVietnamese)}
-        title="Hiện/ẩn nghĩa tiếng Việt trên mọi dòng"
+        title={t('today.lyrics.toggleVietnameseTitle')}
       >
-        Nghĩa Việt
+        {t('today.lyrics.meaningToggle')}
       </button>
     </>
   );

@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 
 const SPEED_OPTIONS = [
-  { value: 0.75, label: '0.75x', desc: 'Chậm — dễ nghe' },
-  { value: 0.8, label: '0.8x', desc: 'Hơi chậm' },
-  { value: 1, label: '1x', desc: 'Bình thường' },
-  { value: 1.25, label: '1.25x', desc: 'Nhanh — luyện phản xạ' },
+  { value: 0.75, label: '0.75x', descKey: 'today.speed.slow' },
+  { value: 0.8, label: '0.8x', descKey: 'today.speed.slightlySlow' },
+  { value: 1, label: '1x', descKey: 'today.speed.normal' },
+  { value: 1.25, label: '1.25x', descKey: 'today.speed.fast' },
 ];
 
 interface SpeedControlProps {
@@ -16,6 +17,7 @@ interface SpeedControlProps {
 
 /** Dropdown tốc độ đọc TTS cho hội thoại (0.75x–1.25x, mặc định 1x). */
 export function SpeedControl({ value, onChange, disabled = false }: SpeedControlProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -24,7 +26,7 @@ export function SpeedControl({ value, onChange, disabled = false }: SpeedControl
         onClick={() => setOpen(!open)}
         disabled={disabled}
         className="px-2 py-1 text-xs bg-primary-light text-primary-dark rounded hover:bg-primary hover:text-white transition-colors disabled:opacity-50"
-        title="Tốc độ đọc"
+        title={t('today.speed.title')}
       >
         {value}x
       </button>
@@ -32,7 +34,7 @@ export function SpeedControl({ value, onChange, disabled = false }: SpeedControl
       {open && (
         <div className="absolute left-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-border z-10 animate-fade-in">
           <div className="p-2">
-            <p className="text-xs text-muted mb-2 text-center">Tốc độ đọc</p>
+            <p className="text-xs text-muted mb-2 text-center">{t('today.speed.title')}</p>
             {SPEED_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -46,7 +48,7 @@ export function SpeedControl({ value, onChange, disabled = false }: SpeedControl
                 )}
               >
                 <span className="font-semibold">{option.label}</span>
-                <span className="text-xs opacity-75 ml-2">{option.desc}</span>
+                <span className="text-xs opacity-75 ml-2">{t(option.descKey)}</span>
               </button>
             ))}
           </div>

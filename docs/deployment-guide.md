@@ -143,6 +143,11 @@ docker compose -f docker/docker-compose.prod.yml up -d --build
 
 Migrations tự chạy lại khi backend start (`prisma migrate deploy`).
 
+Frontend bundle gồm sẵn các locale files `frontend/src/i18n/locales/{vi,en,zh}.json`
+(ngôn ngữ UI VI/EN/ZH) — không cần env hay cấu hình thêm trên VPS. Nếu có sửa locale
+JSON trước khi deploy, chạy `node scripts/check-i18n-parity.mjs` từ thư mục `frontend/`
+để bảo đảm en/zh khớp bộ keys với `vi.json`.
+
 ## Kết nối DB từ máy local (SSH tunnel)
 
 Postgres trên VPS chỉ mở trên loopback (`127.0.0.1:5432:5432` trong compose) —

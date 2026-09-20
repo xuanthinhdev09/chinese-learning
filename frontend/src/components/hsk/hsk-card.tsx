@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { HskLevel } from '../../api/hsk-api';
 import { cn } from '../../utils/cn';
 import { Progress, Badge } from '../ui';
@@ -21,6 +22,7 @@ const hskColors = {
 
 export default function HskCard({ hsk, progress = 0, locked = false, className = '' }: HskCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const colors = hskColors[hsk.level as keyof typeof hskColors] || hskColors[1];
 
   // Level chưa import nội dung (0 bài học) — hiển thị mờ, không vào được
@@ -69,7 +71,7 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
             variant={isInactive ? 'muted' : 'accent'}
             className="text-xs"
           >
-            {isEmpty ? 'Chưa có nội dung' : `${hsk.lessonCount} bài học`}
+            {isEmpty ? t('hsk.noContent') : t('hsk.lessonCount', { count: hsk.lessonCount })}
           </Badge>
         </div>
 
@@ -85,8 +87,8 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
         {progress > 0 && (
           <div className="mt-4 pt-4 border-t border-border">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className={cn('font-medium', colors.text)}>{progress}% hoàn thành</span>
-              <span className="text-muted">{Math.round((hsk.lessonCount * progress) / 100)}/{hsk.lessonCount} bài</span>
+              <span className={cn('font-medium', colors.text)}>{t('hsk.percentComplete', { percent: progress })}</span>
+              <span className="text-muted">{t('hsk.lessonsDone', { done: Math.round((hsk.lessonCount * progress) / 100), total: hsk.lessonCount })}</span>
             </div>
             <Progress value={progress} color={hsk.level <= 2 ? 'primary' : 'warning'} size="sm" />
           </div>
@@ -99,7 +101,7 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
               'inline-flex items-center text-sm font-medium group-hover:translate-x-1 transition-transform',
               colors.text
             )}>
-              {progress > 0 ? 'Tiếp tục học →' : 'Bắt đầu học →'}
+              {progress > 0 ? t('hsk.continue') : t('hsk.start')}
             </span>
           </div>
         )}

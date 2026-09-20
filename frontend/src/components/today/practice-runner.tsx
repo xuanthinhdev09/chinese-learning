@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
 
@@ -19,10 +20,10 @@ interface PracticeRunnerProps {
 }
 
 const RATING_OPTIONS = [
-  { value: 0, label: 'Again', emoji: '⏰', color: 'bg-destructive hover:bg-red-700' },
-  { value: 3, label: 'Hard', emoji: '💪', color: 'bg-warning hover:bg-amber-600' },
-  { value: 4, label: 'Good', emoji: '👍', color: 'bg-accent hover:bg-green-600' },
-  { value: 5, label: 'Easy', emoji: '⭐', color: 'bg-primary hover:bg-primary-dark' },
+  { value: 0, labelKey: 'today.practice.again', emoji: '⏰', color: 'bg-destructive hover:bg-red-700' },
+  { value: 3, labelKey: 'today.practice.hard', emoji: '💪', color: 'bg-warning hover:bg-amber-600' },
+  { value: 4, labelKey: 'today.practice.good', emoji: '👍', color: 'bg-accent hover:bg-green-600' },
+  { value: 5, labelKey: 'today.practice.easy', emoji: '⭐', color: 'bg-primary hover:bg-primary-dark' },
 ];
 
 function shuffle<T>(array: T[]): T[] {
@@ -39,6 +40,7 @@ function shuffle<T>(array: T[]): T[] {
  * Quiz mode: pick the meaning out of 4 options (correct = Good, wrong = Again).
  */
 export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeRunnerProps) {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
@@ -61,9 +63,9 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
   if (!current) {
     return (
       <div className="card p-8 text-center max-w-lg mx-auto">
-        <p className="text-muted mb-4">Không có mục nào để luyện.</p>
+        <p className="text-muted mb-4">{t('today.practice.empty')}</p>
         <button onClick={onDone} className="px-6 py-2 rounded-lg bg-primary text-white">
-          Tiếp tục →
+          {t('today.practice.continue')}
         </button>
       </div>
     );
@@ -87,7 +89,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
       await onRate(current, quality);
       advance();
     } catch {
-      setError('Lưu không thành công — thử lại');
+      setError(t('today.practice.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -104,7 +106,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
       // (buttons stay disabled via `picked` until advance() clears it)
       setTimeout(advance, 700);
     } catch {
-      setError('Lưu không thành công — thử lại');
+      setError(t('today.practice.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -130,7 +132,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
             'float-right p-2 rounded-lg transition-all',
             isSpeaking ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200 active:scale-95'
           )}
-          title="Phát âm"
+          title={t('today.practice.speak')}
         >
           <span className={cn(isSpeaking && 'animate-pulse')}>{isSpeaking ? '🔊' : '🔈'}</span>
         </button>
@@ -151,7 +153,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
               onClick={() => setRevealed(true)}
               className="px-8 py-3 rounded-lg bg-primary-light text-primary-dark hover:bg-primary hover:text-white transition-colors"
             >
-              👆 Lật xem nghĩa
+              {t('today.practice.reveal')}
             </button>
           )
         ) : (
@@ -182,7 +184,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
         <p className="text-sm text-destructive text-center mt-4 animate-shake">
           {error}{' '}
           <button onClick={() => handleRate(mode === 'quiz' ? (picked === current.meaning ? 4 : 0) : 4)} className="underline">
-            retry
+            {t('common.retry')}
           </button>
         </p>
       )}
@@ -201,7 +203,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
               )}
             >
               <span className="block text-xl mb-1">{option.emoji}</span>
-              <span className="text-xs font-semibold">{option.label}</span>
+              <span className="text-xs font-semibold">{t(option.labelKey)}</span>
             </button>
           ))}
         </div>

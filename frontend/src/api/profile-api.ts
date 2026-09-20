@@ -44,7 +44,7 @@ export async function getProfileStats(): Promise<ProfileStats> {
   const response = await apiClient.get('/users/me/stats');
   if (!response.ok) {
     throw new Error(
-      await extractErrorMessage(response, 'Không tải được thống kê')
+      await extractErrorMessage(response, 'Failed to load stats')
     );
   }
   return response.json();
@@ -56,7 +56,7 @@ export async function updateProfile(
   const response = await apiClient.patch('/users/me', data);
   if (!response.ok) {
     throw new Error(
-      await extractErrorMessage(response, 'Cập nhật profile thất bại')
+      await extractErrorMessage(response, 'Failed to update profile')
     );
   }
   return response.json();
@@ -69,7 +69,7 @@ export async function changePassword(body: {
   const response = await apiClient.patch('/users/me/password', body);
   if (!response.ok) {
     throw new Error(
-      await extractErrorMessage(response, 'Đổi mật khẩu thất bại')
+      await extractErrorMessage(response, 'Failed to change password')
     );
   }
   return response.json();

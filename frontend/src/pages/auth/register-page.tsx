@@ -1,29 +1,45 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth-store';
+import { translateApiError } from '../../utils/translate-api-error';
 import { Button, Input } from '../../components/ui';
+
+/** What kind of error is currently shown — string comparison against
+ * translated text would break once messages become translatable. */
+type ErrorKind = '' | 'mismatch' | 'tooShort' | 'api';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { register } = useAuthStore();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [errorKind, setErrorKind] = useState<ErrorKind>('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const showApiError = (err: unknown, fallbackKey: string) => {
+    setErrorKind('api');
+    setError(translateApiError(err, t) || t(fallbackKey));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setErrorKind('');
 
     if (password !== confirmPassword) {
-      setError('Mật khẩu không khớp!');
+      setErrorKind('mismatch');
+      setError(t('auth.register.mismatch'));
       return;
     }
 
     if (password.length < 8) {
-      setError('Mật khẩu phải có ít nhất 8 ký tự!');
+      setErrorKind('tooShort');
+      setError(t('auth.register.passwordTooShort'));
       return;
     }
 
@@ -33,7 +49,7 @@ export default function RegisterPage() {
       await register(email, username, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng ký thất bại');
+      showApiError(err, 'auth.register.failed');
     } finally {
       setIsLoading(false);
     }
@@ -48,12 +64,12 @@ export default function RegisterPage() {
             <span className="text-white font-bold text-4xl chinese-text">中</span>
           </div>
           <h1 className="text-3xl font-bold text-foreground font-display">Chinese Learning</h1>
-          <p className="mt-2 text-sm text-muted">Tạo tài khoản mới để bắt đầu học</p>
+          <p className="mt-2 text-sm text-muted">{t('auth.register.subtitle')}</p>
         </div>
 
         {/* Register Card */}
         <div className="card-elevated p-8 animate-slide-up">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Đăng ký</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-6">{t('auth.register.title')}</h2>
 
           {/* Error message */}
           {error && (
@@ -69,53 +85,53 @@ export default function RegisterPage() {
             <Input
               id="username"
               type="text"
-              label="Tên người dùng"
+              label={t('auth.register.username')}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
               minLength={3}
               maxLength={20}
               placeholder="username"
-              error={error && !username ? 'Vui lòng nhập tên người dùng' : ''}
+              error={error && !username ? t('auth.register.usernameRequired') : ''}
             />
 
             <Input
               id="email"
               type="email"
-              label="Email"
+              label={t('auth.email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="email@example.com"
-              error={error && !email ? 'Vui lòng nhập email' : ''}
+              error={error && !email ? t('auth.register.emailRequired') : ''}
             />
 
             <Input
               id="password"
               type="password"
-              label="Mật khẩu"
+              label={t('auth.password')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              placeholder="Tối thiểu 8 ký tự"
-              error={error && !password ? 'Vui lòng nhập mật khẩu' : ''}
+              placeholder={t('auth.register.passwordPlaceholder')}
+              error={error && !password ? t('auth.register.passwordRequired') : ''}
             />
 
             <Input
               id="confirmPassword"
               type="password"
-              label="Xác nhận mật khẩu"
+              label={t('auth.register.confirmPassword')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={8}
-              placeholder="Nhập lại mật khẩu"
+              placeholder={t('auth.register.confirmPlaceholder')}
               error={
                 error && !confirmPassword
-                  ? 'Vui lòng xác nhận mật khẩu'
-                  : password !== confirmPassword && error !== 'Mật khẩu phải có ít nhất 8 ký tự!'
-                  ? 'Mật khẩu không khớp'
+                  ? t('auth.register.confirmRequired')
+                  : errorKind !== 'tooShort' && error && password !== confirmPassword
+                  ? t('auth.register.mismatchShort')
                   : ''
               }
             />
@@ -128,14 +144,13 @@ export default function RegisterPage() {
                 className="mt-1 rounded border-border text-primary focus:ring-primary"
               />
               <label className="text-sm text-muted">
-                Tôi đồng ý với{' '}
-                <Link to="/terms" className="text-primary hover:underline">
-                  Điều khoản dịch vụ
-                </Link>{' '}
-                và{' '}
-                <Link to="/privacy" className="text-primary hover:underline">
-                  Chính sách bảo mật
-                </Link>
+                <Trans
+                  i18nKey="auth.register.termsAgreement"
+                  components={[
+                    <Link to="/terms" className="text-primary hover:underline" />,
+                    <Link to="/privacy" className="text-primary hover:underline" />,
+                  ]}
+                />
               </label>
             </div>
 
@@ -147,7 +162,7 @@ export default function RegisterPage() {
               fullWidth
               className="mt-6"
             >
-              {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
+              {isLoading ? t('auth.register.submitting') : t('auth.register.submit')}
             </Button>
           </form>
 
@@ -157,18 +172,18 @@ export default function RegisterPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-muted">hoặc</span>
+              <span className="bg-white px-2 text-muted">{t('auth.or')}</span>
             </div>
           </div>
 
           {/* Login link */}
           <div className="text-center">
-            <span className="text-sm text-muted">Đã có tài khoản? </span>
+            <span className="text-sm text-muted">{t('auth.register.hasAccount')} </span>
             <Link
               to="/login"
               className="text-sm text-primary font-medium hover:underline ml-1"
             >
-              Đăng nhập
+              {t('auth.register.loginLink')}
             </Link>
           </div>
         </div>
@@ -176,7 +191,7 @@ export default function RegisterPage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-xs text-muted">
-            Bắt đầu hành trình học tiếng Trung của bạn ngay hôm nay
+            {t('auth.register.footer')}
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Vocabulary } from '../../api/vocabulary-api';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
@@ -17,6 +18,7 @@ export default function VocabularyCard({
   onSpeak,
   className = ''
 }: VocabularyCardProps) {
+  const { t } = useTranslation();
   const { play, isBusy: isSpeaking } = useTtsAudio();
   const [hasSpoken, setHasSpoken] = useState(false);
 
@@ -85,7 +87,7 @@ export default function VocabularyCard({
               {isSpeaking ? '🔊' : '🔈'}
             </span>
             <span>
-              {isSpeaking ? 'Đang phát...' : hasSpoken ? 'Nghe lại' : 'Nghe phát âm'}
+              {isSpeaking ? t('vocabulary.card.speaking') : hasSpoken ? t('vocabulary.card.listenAgain') : t('vocabulary.card.listen')}
             </span>
           </button>
         </div>

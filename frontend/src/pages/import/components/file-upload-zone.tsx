@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFileUpload } from '../hooks/use-file-upload';
 
 interface FileUploadZoneProps {
@@ -14,6 +15,7 @@ export function FileUploadZone({
   onFileSelect,
   onFileRemove,
 }: FileUploadZoneProps) {
+  const { t } = useTranslation();
   const { file, error, isDragging, setFile, setDragging } =
     useFileUpload();
 
@@ -63,10 +65,10 @@ export function FileUploadZone({
 
   const validateFile = (file: File): string | null => {
     if (!file.name.endsWith('.json')) {
-      return 'Only JSON files are allowed';
+      return t('import.onlyJson');
     }
     if (file.size > 10 * 1024 * 1024) {
-      return 'File size must be less than 10MB';
+      return t('import.fileTooLarge');
     }
     return null;
   };
@@ -114,7 +116,7 @@ export function FileUploadZone({
             />
           </svg>
           <p className="text-gray-600 text-center">
-            {isDragging ? 'Drop file here' : 'Drag & drop JSON file or click to browse'}
+            {isDragging ? t('import.dropHere') : t('import.dragDrop')}
           </p>
           <input
             type="file"
@@ -130,7 +132,7 @@ export function FileUploadZone({
               disabled ? 'pointer-events-none' : ''
             }`}
           >
-            Browse files
+            {t('import.browse')}
           </label>
         </div>
       ) : (
@@ -151,7 +153,7 @@ export function FileUploadZone({
               disabled={disabled}
               className="text-red-600 hover:text-red-700 disabled:opacity-50"
             >
-              Remove
+              {t('import.remove')}
             </button>
           </div>
         </div>

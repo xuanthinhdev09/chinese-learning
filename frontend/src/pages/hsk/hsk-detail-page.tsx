@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { hskApi } from '../../api/hsk-api';
 import LessonCard from '../../components/lessons/lesson-card';
 
 export default function HskDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
 
   const { data: hskLevel, isLoading, error } = useQuery({
@@ -29,7 +31,7 @@ export default function HskDetailPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-          <p className="text-red-700">Không thể tải thông tin HSK level</p>
+          <p className="text-red-700">{t('hsk.levelLoadError')}</p>
         </div>
       </div>
     );
@@ -49,13 +51,13 @@ export default function HskDetailPage() {
         {/* Lessons */}
         <div className="mb-4">
           <h2 className="text-xl font-semibold text-gray-900">
-            Bài học ({hskLevel.lessons.length})
+            {t('hsk.lessons', { count: hskLevel.lessons.length })}
           </h2>
         </div>
 
         {hskLevel.lessons.length === 0 ? (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
-            <p className="text-blue-700">Chưa có bài học cho trình độ này</p>
+            <p className="text-blue-700">{t('hsk.noLessons')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

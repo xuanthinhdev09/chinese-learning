@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { usePersistentToggle } from '../../hooks/use-persistent-toggle';
 import { DialogueLine } from '../../api/daily-session';
@@ -29,6 +30,7 @@ interface DialogueReaderProps {
  * Desktop (lg+): info phiên + điều khiển ở cột trái sticky, panel bên phải.
  */
 export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: DialogueReaderProps) {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [groupIndex, setGroupIndex] = useState(0);
   const [speechRate, setSpeechRate] = useState(1);
@@ -106,9 +108,9 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
   if (lines.length === 0) {
     return (
       <div className="card p-8 text-center">
-        <p className="text-muted">Bài học chưa có hội thoại.</p>
+        <p className="text-muted">{t('today.dialogue.empty')}</p>
         <button onClick={() => onDone(true)} className="btn-secondary mt-4 px-6 py-2 rounded-lg">
-          Bỏ qua →
+          {t('today.dialogue.skip')}
         </button>
       </div>
     );
@@ -135,9 +137,11 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
 
   const progressText = (
     <>
-      Câu {linesBeforeGroup + index + 1}/{lines.length}
-      {groups.length > 1 && ` • Đoạn ${safeGroupIndex + 1}/${groups.length}`} •{' '}
-      {mode === 'new' ? 'Bài mới — đọc theo' : 'Ôn tập'}
+      {t('today.dialogue.lineProgress', { current: linesBeforeGroup + index + 1, total: lines.length })}
+      {groups.length > 1 && (
+        <> • {t('today.dialogue.groupProgress', { current: safeGroupIndex + 1, total: groups.length })}</>
+      )} •{' '}
+      {mode === 'new' ? t('today.dialogue.modeNew') : t('today.dialogue.modeReview')}
     </>
   );
 
@@ -146,7 +150,7 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
     groups.length > 1 ? (
       <div className="mb-3">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-          Danh sách phát
+          {t('today.dialogue.playlist')}
         </p>
         <div className="space-y-1">
           {groups.map((group, groupIdx) => {
@@ -166,13 +170,15 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
               >
                 <span className="truncate text-sm text-foreground">
                   <span className="chinese-text">
-                    {first.dialogueTitleHanzi ?? `Đoạn ${groupIdx + 1}`}
+                    {first.dialogueTitleHanzi ?? t('today.group.fallback', { index: groupIdx + 1 })}
                   </span>
                   {first.dialogueTitleVi && (
                     <span className="text-muted"> · {first.dialogueTitleVi}</span>
                   )}
                 </span>
-                <span className="shrink-0 text-xs text-muted">{group.length} câu</span>
+                <span className="shrink-0 text-xs text-muted">
+                  {t('today.group.lineCount', { count: group.length })}
+                </span>
               </button>
             );
           })}
@@ -279,7 +285,7 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
 
         {isBusy && (
           <p className="mt-3 text-center text-sm text-muted animate-pulse">
-            {isPaused ? 'Tạm dừng — bấm Tiếp tục để phát lại' : 'Đang phát…'}
+            {t(isPaused ? 'today.dialogue.pausedStatus' : 'today.dialogue.playingStatus')}
           </p>
         )}
 

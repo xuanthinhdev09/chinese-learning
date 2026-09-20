@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { hskApi } from '../../api/hsk-api';
 import HskCard from '../../components/hsk/hsk-card';
 
 export default function HskListPage() {
+  const { t } = useTranslation();
   const { data: hskLevels, isLoading, error } = useQuery({
     queryKey: ['hsk-levels'],
     queryFn: () => hskApi.getLevels(),
@@ -11,8 +13,8 @@ export default function HskListPage() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">HSK Levels</h1>
-        <p className="mt-2 text-gray-600">Chọn trình độ để bắt đầu học</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('hsk.title')}</h1>
+        <p className="mt-2 text-gray-600">{t('hsk.subtitle')}</p>
       </div>
 
         {isLoading && (
@@ -25,7 +27,7 @@ export default function HskListPage() {
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-            <p className="text-red-700">Không thể tải dữ liệu HSK</p>
+            <p className="text-red-700">{t('hsk.loadError')}</p>
           </div>
         )}
 

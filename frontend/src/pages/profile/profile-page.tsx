@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/auth-store';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ProfileStatsGrid } from './profile-stats-grid';
 import { ProfileEditForm } from './profile-edit-form';
 import { ChangePasswordForm } from './change-password-form';
@@ -12,6 +13,7 @@ import { ChangePasswordForm } from './change-password-form';
 export default function ProfilePage() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
 
   const handleLogout = async () => {
@@ -39,7 +41,7 @@ export default function ProfilePage() {
                 onClick={() => setIsEditing(true)}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
               >
-                Chỉnh sửa profile
+                {t('profile.edit')}
               </button>
             </>
           )}
@@ -58,7 +60,7 @@ export default function ProfilePage() {
           onClick={handleLogout}
           className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition"
         >
-          Đăng xuất
+          {t('nav.logout')}
         </button>
       </div>
     </>

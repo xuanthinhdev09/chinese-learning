@@ -78,7 +78,7 @@ export interface CompleteSessionResult {
 export async function getDailySession(courseId?: string): Promise<DailySessionPlan> {
   const query = courseId ? `?courseId=${encodeURIComponent(courseId)}` : '';
   const response = await apiClient.get(`/daily-session${query}`);
-  if (!response.ok) throw new Error('Không tải được kế hoạch học tập');
+  if (!response.ok) throw new Error('Failed to load study plan');
   return response.json();
 }
 
@@ -87,12 +87,12 @@ export async function reviewDialogue(
   passed: boolean
 ): Promise<DialogueReviewResult> {
   const response = await apiClient.post('/daily-session/dialogue-review', { lessonId, passed });
-  if (!response.ok) throw new Error('Không lưu được kết quả ôn hội thoại');
+  if (!response.ok) throw new Error('Failed to save dialogue review');
   return response.json();
 }
 
 export async function completeSession(lessonId: string): Promise<CompleteSessionResult> {
   const response = await apiClient.post('/daily-session/complete', { lessonId });
-  if (!response.ok) throw new Error('Không ghi nhận hoàn thành phiên học');
+  if (!response.ok) throw new Error('Failed to record session completion');
   return response.json();
 }

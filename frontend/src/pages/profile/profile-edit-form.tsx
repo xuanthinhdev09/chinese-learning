@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/auth-store';
+import { useTranslation } from 'react-i18next';
 import { useUpdateProfileMutation } from './hooks/use-profile-hooks';
 import { AvatarEmojiPicker } from './avatar-emoji-picker';
+import { translateApiError } from '../../utils/translate-api-error';
 
 export interface ProfileEditFormProps {
   onCancel: () => void;
@@ -13,6 +15,7 @@ export interface ProfileEditFormProps {
  */
 export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
   const user = useAuthStore((s) => s.user);
+  const { t } = useTranslation();
   const updateProfileMutation = useUpdateProfileMutation();
 
   const [username, setUsername] = useState(user?.username ?? '');
@@ -24,7 +27,7 @@ export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
     setClientError('');
 
     if (username.trim().length < 3 || username.trim().length > 20) {
-      setClientError('Tên phải từ 3 đến 20 ký tự');
+      setClientError(t('profile.usernameLength'));
       return;
     }
 
@@ -42,7 +45,8 @@ export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
     updateProfileMutation.mutate(payload, { onSuccess: onCancel });
   };
 
-  const errorMessage = clientError || updateProfileMutation.error?.message;
+  const errorMessage = clientError
+    || (updateProfileMutation.error ? translateApiError(updateProfileMutation.error, t) : '');
 
   return (
     <form onSubmit={handleSubmit} className="text-left">
@@ -58,7 +62,7 @@ export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
           htmlFor="username"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Tên người dùng
+          {t('profile.username')}
         </label>
         <input
           id="username"
@@ -66,7 +70,7 @@ export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          placeholder="3-20 ký tự"
+          placeholder={t('profile.usernamePlaceholder')}
         />
       </div>
 
@@ -82,7 +86,7 @@ export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
           disabled={updateProfileMutation.isPending}
           className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
         >
-          {updateProfileMutation.isPending ? 'Đang lưu...' : 'Lưu'}
+          {updateProfileMutation.isPending ? t('profile.saving') : t('common.save')}
         </button>
         <button
           type="button"
@@ -90,7 +94,7 @@ export function ProfileEditForm({ onCancel }: ProfileEditFormProps) {
           disabled={updateProfileMutation.isPending}
           className="flex-1 bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-200 transition disabled:opacity-50"
         >
-          Hủy
+          {t('common.cancel')}
         </button>
       </div>
     </form>

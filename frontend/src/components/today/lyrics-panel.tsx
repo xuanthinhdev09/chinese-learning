@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DialogueLine } from '../../api/daily-session';
 import { cn } from '../../utils/cn';
 
@@ -23,6 +24,7 @@ interface LyricsPanelProps {
  * active/inactive chỉ còn cỡ chữ + màu + nền (đều transition được).
  */
 export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietnamese, className }: LyricsPanelProps) {
+  const { t } = useTranslation();
   // Re-attach on index change so the NEW active line scrolls into view
   // (ref callback identity must change, same trick as the old sidebar list).
   const activeLineRef = useCallback(
@@ -52,7 +54,9 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
       <div key={line.id}>
         {showGroupHeader && (
           <p className="mb-2 mt-4 flex items-baseline justify-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted first:mt-0">
-            <span className="chinese-text normal-case">Đoạn {line.dialogueOrder} · {line.dialogueTitleHanzi}</span>
+            <span className="chinese-text normal-case">
+              {t('today.lyrics.groupHeader', { order: line.dialogueOrder, title: line.dialogueTitleHanzi })}
+            </span>
             {line.dialogueTitleVi && <span className="font-normal normal-case">({line.dialogueTitleVi})</span>}
           </p>
         )}

@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../../utils/cn';
 
 export interface BreadcrumbConfig {
-  label: string;
+  /** i18n key cho nhãn crumb — dịch lúc render, không lưu text tĩnh */
+  labelKey: string;
   icon?: string;
   /** Đích liên kết của crumb; không set = crumb của trang hiện tại (không bấm được) */
   to?: string;
@@ -20,10 +22,10 @@ export interface BreadcrumbConfig {
  * luôn thuộc một course HSK.
  */
 const crumbByPrefix: Array<{ prefix: string } & BreadcrumbConfig> = [
-  { prefix: '/vocabulary/study', label: 'Từ vựng', icon: '📇' },
-  { prefix: '/vocabulary/review', label: 'Ôn tập', icon: '🔁' },
-  { prefix: '/hsk/', label: 'HSK Levels', icon: '📚', to: '/hsk' },
-  { prefix: '/lessons/', label: 'HSK Levels', icon: '📚', to: '/hsk' },
+  { prefix: '/vocabulary/study', labelKey: 'nav.vocabulary', icon: '📇' },
+  { prefix: '/vocabulary/review', labelKey: 'nav.review', icon: '🔁' },
+  { prefix: '/hsk/', labelKey: 'nav.hskLevels', icon: '📚', to: '/hsk' },
+  { prefix: '/lessons/', labelKey: 'nav.hskLevels', icon: '📚', to: '/hsk' },
 ];
 
 /** Crumb cho pathname, hoặc null nếu trang không có breadcrumb. Nguồn chuẩn duy nhất — ProtectedLayout cũng dùng để tính padding. */
@@ -48,6 +50,7 @@ const linkChipClass = cn(
  */
 export function Breadcrumbs() {
   const { pathname } = useLocation();
+  const { t } = useTranslation();
   const crumb = getBreadcrumb(pathname);
 
   if (!crumb) return null;
@@ -68,7 +71,7 @@ export function Breadcrumbs() {
           <li>
             <Link to="/dashboard" className={linkChipClass}>
               <span className="text-base" aria-hidden="true">🏠</span>
-              <span className="font-medium">Home</span>
+              <span className="font-medium">{t('nav.home')}</span>
             </Link>
           </li>
 
@@ -88,7 +91,7 @@ export function Breadcrumbs() {
                     {crumb.icon}
                   </span>
                 )}
-                <span className="font-medium">{crumb.label}</span>
+                <span className="font-medium">{t(crumb.labelKey)}</span>
               </Link>
             ) : (
               <span
@@ -105,7 +108,7 @@ export function Breadcrumbs() {
                     {crumb.icon}
                   </span>
                 )}
-                {crumb.label}
+                {t(crumb.labelKey)}
               </span>
             )}
           </li>

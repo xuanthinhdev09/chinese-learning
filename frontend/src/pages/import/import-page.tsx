@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileUploadZone } from './components/file-upload-zone';
 import { ImportProgress } from './components/import-progress';
 import { ValidationErrors } from './components/validation-errors';
@@ -36,8 +37,8 @@ interface ImportedLesson {
 
 interface ImportStep {
   id: number;
-  title: string;
-  description?: string;
+  titleKey: string;
+  descKey?: string;
 }
 
 interface StepValidation {
@@ -68,13 +69,15 @@ function getMapping(result: ImportResult): Record<string, string> | null {
   return null;
 }
 
+// Giá trị là key i18n — dịch lúc render (t()) để đổi ngôn ngữ giữa chừng vẫn đúng
 const STEPS: ImportStep[] = [
-  { id: 1, title: 'Import Lessons', description: 'Upload lessons JSON file' },
-  { id: 2, title: 'Import Vocabularies', description: 'Upload vocabularies JSON file' },
-  { id: 3, title: 'Import Conversations', description: 'Upload conversations JSON file' },
+  { id: 1, titleKey: 'import.steps.lessonsTitle', descKey: 'import.steps.lessonsDesc' },
+  { id: 2, titleKey: 'import.steps.vocabulariesTitle', descKey: 'import.steps.vocabulariesDesc' },
+  { id: 3, titleKey: 'import.steps.conversationsTitle', descKey: 'import.steps.conversationsDesc' },
 ];
 
 export default function ImportPage() {
+  const { t } = useTranslation();
   const {
     currentStep,
     lessons,
@@ -250,7 +253,7 @@ export default function ImportPage() {
       <Breadcrumbs />
       <div className="min-h-screen bg-gray-50 pt-32 pb-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Import HSK Data</h1>
+          <h1 className="text-3xl font-bold mb-8">{t('import.title')}</h1>
 
         {/* Step Indicator */}
         <StepIndicator currentStep={currentStep} />
@@ -296,14 +299,14 @@ export default function ImportPage() {
             disabled={currentStep === 1 || isImporting}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Previous Step
+            {t('import.previousStep')}
           </button>
           <button
             onClick={handleNext}
             disabled={currentStep === 3 || isImporting}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Next Step
+            {t('import.nextStep')}
           </button>
         </div>
       </div>
@@ -357,8 +360,8 @@ function StepIndicator({ currentStep }: StepIndicatorProps) {
 interface ImportStepProps {
   step: {
     id: number;
-    title: string;
-    description?: string;
+    titleKey: string;
+    descKey?: string;
     status: 'locked' | 'active' | 'completed';
   };
   isActive: boolean;
@@ -390,6 +393,7 @@ function ImportStep({
   importedLessons = [],
   loadingLessons = false,
 }: ImportStepProps) {
+  const { t } = useTranslation();
   const statusColors = {
     locked: 'border-gray-200 bg-gray-50',
     active: 'border-blue-500 bg-white',
@@ -420,23 +424,23 @@ function ImportStep({
     >
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold">
-          {statusIcons[step.status]} Step {step.id}: {step.title}
+          {statusIcons[step.status]} {t('import.stepTitle', { id: step.id, title: t(step.titleKey) })}
         </h3>
         {step.status === 'locked' && !isImporting && (
           <span className="text-sm text-gray-500">
-            Complete previous step first
+            {t('import.completePrevious')}
           </span>
         )}
       </div>
 
-      {step.description && (
-        <p className="text-sm text-gray-600 mt-2">{step.description}</p>
+      {step.descKey && (
+        <p className="text-sm text-gray-600 mt-2">{t(step.descKey)}</p>
       )}
 
       {isActive && !hasResult && (
         <div className="mt-4">
           <FileUploadZone
-            label={`Upload ${step.id === 1 ? 'Lessons' : step.id === 2 ? 'Vocabularies' : 'Conversations'} JSON file`}
+            label={t(step.id === 1 ? 'import.upload.lessons' : step.id === 2 ? 'import.upload.vocabularies' : 'import.upload.conversations')}
             disabled={isDisabled}
             onFileSelect={onFileSelect}
             onFileRemove={onFileRemove}
@@ -449,7 +453,7 @@ function ImportStep({
           )}
           {mutationError && (
             <div className="mt-2 text-sm text-red-600">
-              Error: {mutationError.message}
+              {t('import.errorPrefix', { message: mutationError.message })}
             </div>
           )}
           {isStepImporting && progress && (
@@ -466,7 +470,7 @@ function ImportStep({
               onClick={onImport}
               className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              Import {step.id === 1 ? 'Lessons' : step.id === 2 ? 'Vocabularies' : 'Conversations'}
+              {t(step.id === 1 ? 'import.button.lessons' : step.id === 2 ? 'import.button.vocabularies' : 'import.button.conversations')}
             </button>
           )}
         </div>
@@ -476,21 +480,21 @@ function ImportStep({
         <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-green-600 text-2xl">✓</span>
-            <h4 className="font-semibold text-green-800">Import Successful</h4>
+            <h4 className="font-semibold text-green-800">{t('import.success')}</h4>
           </div>
           <div className="text-sm text-green-700">
             <p>
-              Created: {getCreatedCount(result)}
+              {t('import.created', { count: getCreatedCount(result) })}
             </p>
             <p>
-              Skipped: {getSkippedCount(result)}
+              {t('import.skipped', { count: getSkippedCount(result) })}
             </p>
             {result.errors && result.errors.length > 0 && (
-              <p className="text-yellow-700">Errors: {result.errors.length}</p>
+              <p className="text-yellow-700">{t('import.errors', { count: result.errors.length })}</p>
             )}
             {getMapping(result) && (
               <button className="mt-2 text-blue-600 hover:text-blue-700 underline">
-                Download mapping file
+                {t('import.downloadMapping')}
               </button>
             )}
           </div>
@@ -501,10 +505,10 @@ function ImportStep({
       {step.id === 1 && hasResult && importedLessons.length > 0 && (
         <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h4 className="font-semibold text-blue-800 mb-3">
-            Imported Lessons (Use these slugs in vocabulary data)
+            {t('import.importedLessonsTitle')}
           </h4>
           {loadingLessons ? (
-            <p className="text-sm text-blue-600">Loading lessons...</p>
+            <p className="text-sm text-blue-600">{t('import.loadingLessons')}</p>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {importedLessons.map((lesson) => (
@@ -524,7 +528,7 @@ function ImportStep({
                       )}
                       <div className="flex gap-4 mt-2 text-xs text-gray-500">
                         <span>HSK {lesson.hskLevel.level}</span>
-                        <span>Vocab: {lesson.vocabularyCount}</span>
+                        <span>{t('import.vocabCount', { count: lesson.vocabularyCount })}</span>
                       </div>
                     </div>
                     <div className="bg-blue-100 px-2 py-1 rounded text-xs font-mono text-blue-700">

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 import { AVATAR_EMOJIS } from './avatar-emojis';
 
@@ -11,8 +12,10 @@ export interface AvatarEmojiPickerProps {
  * The selected emoji gets a highlight ring.
  */
 export function AvatarEmojiPicker({ value, onChange }: AvatarEmojiPickerProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="grid grid-cols-6 gap-2" role="radiogroup" aria-label="Chọn avatar">
+    <div className="grid grid-cols-6 gap-2" role="radiogroup" aria-label={t('profile.avatarPickerLabel')}>
       {AVATAR_EMOJIS.map((emoji) => (
         <button
           key={emoji}

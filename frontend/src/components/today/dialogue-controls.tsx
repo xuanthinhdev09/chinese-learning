@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { SpeedControl } from './speed-control';
 import { LyricsLayerToggles } from './lyrics-layer-toggles';
 
@@ -29,6 +30,7 @@ export function PlaybackControls({
   onTogglePinyin,
   onToggleVietnamese,
 }: PlaybackControlsProps) {
+  const { t } = useTranslation();
   return (
     <>
       <button
@@ -37,14 +39,14 @@ export function PlaybackControls({
         title={
           isBusy
             ? isPaused
-              ? 'Phát tiếp từ vị trí đang dừng'
-              : 'Tạm dừng'
-            : 'Nghe hội thoại từ câu đang chọn'
+              ? t('today.dialogue.resumeTitle')
+              : t('today.dialogue.pauseTitle')
+            : t('today.dialogue.playTitle')
         }
       >
         <span>{isBusy && !isPaused ? '⏸' : '▶'}</span>
         <span className="text-sm font-medium">
-          {isBusy ? (isPaused ? 'Tiếp tục' : 'Tạm dừng') : 'Phát'}
+          {isBusy ? (isPaused ? t('today.dialogue.resume') : t('today.dialogue.pause')) : t('today.dialogue.play')}
         </span>
       </button>
 
@@ -74,15 +76,16 @@ interface DialogueActionsProps {
  * lyrics và danh sách phát thay thế (bỏ nút Trước/Tếp theo yêu cầu).
  */
 export function DialogueActions({ showNextGroup, mode, onNextGroup, onDone }: DialogueActionsProps) {
+  const { t } = useTranslation();
   if (showNextGroup) {
     return (
       <div className="flex gap-3">
         <button
           onClick={onNextGroup}
           className="flex-1 px-4 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all"
-          title="Hết đoạn — chuyển sang đoạn kế tiếp"
+          title={t('today.dialogue.nextGroupTitle')}
         >
-          Đoạn tiếp →
+          {t('today.dialogue.nextGroup')}
         </button>
       </div>
     );
@@ -95,16 +98,16 @@ export function DialogueActions({ showNextGroup, mode, onNextGroup, onDone }: Di
           <button
             onClick={() => onDone(true)}
             className="flex-1 px-3 py-3 rounded-lg bg-accent text-white hover:bg-green-600 active:scale-95 transition-all font-semibold"
-            title="Đọc trôi chảy"
+            title={t('today.dialogue.passedTitle')}
           >
-            Trôi ✓
+            {t('today.dialogue.passed')}
           </button>
           <button
             onClick={() => onDone(false)}
             className="flex-1 px-3 py-3 rounded-lg bg-warning text-white hover:bg-amber-600 active:scale-95 transition-all font-semibold"
-            title="Cần luyện lại"
+            title={t('today.dialogue.failedTitle')}
           >
-            Chưa ↻
+            {t('today.dialogue.failed')}
           </button>
         </>
       ) : (
@@ -112,7 +115,7 @@ export function DialogueActions({ showNextGroup, mode, onNextGroup, onDone }: Di
           onClick={() => onDone(true)}
           className="flex-1 px-3 py-3 rounded-lg bg-accent text-white hover:bg-green-600 active:scale-95 transition-all font-semibold"
         >
-          Đã ôn ✓
+          {t('today.dialogue.reviewed')}
         </button>
       )}
     </div>

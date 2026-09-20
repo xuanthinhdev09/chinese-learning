@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ValidationError {
   row?: number;
@@ -18,6 +19,8 @@ export function ValidationErrors({
   onFix,
   onDismiss,
 }: ValidationErrorsProps) {
+  const { t } = useTranslation();
+
   if (errors.length === 0) return null;
 
   const groupedErrors = {
@@ -30,14 +33,14 @@ export function ValidationErrors({
     <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-semibold text-red-800">
-          Validation Errors ({errors.length})
+          {t('import.validationTitle', { count: errors.length })}
         </h4>
         {onDismiss && (
           <button
             onClick={onDismiss}
             className="text-red-600 hover:text-red-700 text-sm"
           >
-            Dismiss
+            {t('import.dismiss')}
           </button>
         )}
       </div>
@@ -45,7 +48,7 @@ export function ValidationErrors({
       {/* Structure Errors */}
       {groupedErrors.structure.length > 0 && (
         <ErrorGroup
-          title="Structure Errors"
+          title={t('import.structureErrors')}
           errors={groupedErrors.structure}
           icon="🏗️"
         />
@@ -53,13 +56,13 @@ export function ValidationErrors({
 
       {/* Data Errors */}
       {groupedErrors.data.length > 0 && (
-        <ErrorGroup title="Data Errors" errors={groupedErrors.data} icon="📊" />
+        <ErrorGroup title={t('import.dataErrors')} errors={groupedErrors.data} icon="📊" />
       )}
 
       {/* Constraint Errors */}
       {groupedErrors.constraint.length > 0 && (
         <ErrorGroup
-          title="Constraint Errors"
+          title={t('import.constraintErrors')}
           errors={groupedErrors.constraint}
           icon="🔗"
         />
@@ -71,13 +74,13 @@ export function ValidationErrors({
             onClick={onFix}
             className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
           >
-            Fix & Retry
+            {t('import.fixRetry')}
           </button>
           <button
             onClick={() => window.location.reload()}
             className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
           >
-            Reset
+            {t('import.reset')}
           </button>
         </div>
       )}
@@ -93,6 +96,7 @@ interface ErrorGroupProps {
 
 function ErrorGroup({ title, errors, icon }: ErrorGroupProps) {
   const [expanded, setExpanded] = useState(true);
+  const { t } = useTranslation();
 
   return (
     <div className="mb-3">
@@ -110,7 +114,7 @@ function ErrorGroup({ title, errors, icon }: ErrorGroupProps) {
         <ul className="mt-2 ml-6 space-y-1">
           {errors.map((error, index) => (
             <li key={index} className="text-sm text-red-600">
-              {error.row && <span className="font-medium">Row {error.row}: </span>}
+              {error.row && <span className="font-medium">{t('import.rowPrefix', { row: error.row })} </span>}
               {error.field && <span className="font-medium">{error.field} - </span>}
               {error.message}
             </li>

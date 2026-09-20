@@ -1,0 +1,452 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "confirm": "Confirm",
+    "language": "Language",
+    "emptyState": {
+      "noData": {
+        "title": "No data yet",
+        "description": "Nothing here yet. Check back later!"
+      },
+      "noResults": {
+        "title": "No results found",
+        "description": "We couldn't find what you're looking for."
+      },
+      "error": {
+        "title": "Something went wrong",
+        "description": "An error occurred while loading this content."
+      },
+      "noLessons": {
+        "title": "No lessons yet",
+        "description": "Lessons will appear here once they're added."
+      },
+      "noVocabulary": {
+        "title": "No vocabulary to study",
+        "description": "Start studying to see vocabulary here."
+      }
+    }
+  },
+  "nav": {
+    "today": "Today",
+    "vocabulary": "Vocabulary",
+    "review": "Review",
+    "hskLevels": "HSK Levels",
+    "home": "Home",
+    "profile": "Profile",
+    "logout": "Log out",
+    "login": "Log in",
+    "signUp": "Sign up",
+    "toggleMenu": "Toggle menu",
+    "welcomeBack": "Welcome back",
+    "viewProfile": "View your profile",
+    "closeMenu": "Close menu"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "or": "or",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "continueAgreement": "By continuing, you agree to the <0>Terms of Service</0> and <1>Privacy Policy</1>",
+    "login": {
+      "title": "Log in",
+      "tagline": "Learn Chinese effectively every day",
+      "emailRequired": "Please enter your email",
+      "passwordRequired": "Please enter your password",
+      "forgotPassword": "Forgot password?",
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up now",
+      "failed": "Login failed"
+    },
+    "register": {
+      "title": "Sign up",
+      "subtitle": "Create a new account to start learning",
+      "username": "Username",
+      "usernameRequired": "Please enter a username",
+      "emailRequired": "Please enter your email",
+      "passwordRequired": "Please enter a password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Re-enter your password",
+      "confirmRequired": "Please confirm your password",
+      "mismatch": "Passwords don't match!",
+      "mismatchShort": "Passwords don't match",
+      "passwordTooShort": "Password must be at least 8 characters!",
+      "termsAgreement": "I agree to the <0>Terms of Service</0> and <1>Privacy Policy</1>",
+      "submit": "Sign up",
+      "submitting": "Signing up...",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "failed": "Sign-up failed",
+      "footer": "Start your Chinese learning journey today"
+    }
+  },
+  "dashboard": {
+    "loading": "Loading dashboard...",
+    "greeting": "Hello, {{name}}! 👋",
+    "subtitle": "Continue your Chinese learning journey",
+    "doneToday": "✓ Done for today — keep the streak going!",
+    "quickStart": "10-15 minutes, one tap",
+    "heroTitle": "🎯 Study for today",
+    "streakDays_one": "🔥 {{count}} day",
+    "streakDays_other": "🔥 {{count}} days",
+    "start": "Start →",
+    "streakLabel": "days in a row",
+    "dueToday": "words due for review today"
+  },
+  "hsk": {
+    "title": "HSK Levels",
+    "subtitle": "Pick a level to start learning",
+    "loadError": "Unable to load HSK data",
+    "levelLoadError": "Unable to load HSK level info",
+    "noContent": "No content yet",
+    "lessonCount_one": "{{count}} lesson",
+    "lessonCount_other": "{{count}} lessons",
+    "percentComplete": "{{percent}}% complete",
+    "lessonsDone": "{{done}}/{{total}} lessons",
+    "continue": "Continue learning →",
+    "start": "Start learning →",
+    "lessons": "Lessons ({{count}})",
+    "noLessons": "No lessons for this level yet"
+  },
+  "lesson": {
+    "loadError": "Unable to load lesson info",
+    "breadcrumb": "Lessons",
+    "wordCount_one": "{{count}} word",
+    "wordCount_other": "{{count}} words",
+    "vocabulary": "Vocabulary"
+  },
+  "today": {
+    "loading": "Preparing today's session...",
+    "backHome": "Back to home",
+    "stepHeader": "Step {{current}}/{{total}}: {{label}}",
+    "emptyDone": "Already done today!",
+    "emptyDoneDesc": "Today's task is complete — the next review is already scheduled.",
+    "emptyNothing": "Nothing to review today",
+    "emptyNothingDesc": "No reviews are due yet. Come back later!",
+    "keywordCardsTitle": "Key words — flip the cards",
+    "keywordQuizTitle": "Key words — pick the meaning",
+    "vocabDueTitle": "Vocabulary due for review",
+    "vocabDueTitleWithCount": "Vocabulary due for review ({{current}}/{{total}})",
+    "segment": {
+      "dueDialogue": "Review dialogue",
+      "newDialogue": "New lesson",
+      "keywordCards": "Key words",
+      "keywordQuiz": "Keyword quiz",
+      "vocabCards": "Review vocabulary"
+    },
+    "dialogue": {
+      "empty": "This lesson has no dialogue yet.",
+      "failed": "Retry ↻",
+      "failedTitle": "Needs more practice",
+      "groupProgress": "Segment {{current}}/{{total}}",
+      "lineProgress": "Line {{current}}/{{total}}",
+      "modeNew": "New lesson — read along",
+      "modeReview": "Review",
+      "nextGroup": "Next segment →",
+      "nextGroupTitle": "Segment finished — move to the next one",
+      "passed": "Passed ✓",
+      "passedTitle": "Read fluently",
+      "pause": "Pause",
+      "pauseTitle": "Pause",
+      "play": "Play",
+      "playingStatus": "Playing…",
+      "pausedStatus": "Paused — press Resume to play again",
+      "playTitle": "Listen to the dialogue from the selected line",
+      "playlist": "Playlist",
+      "resume": "Resume",
+      "resumeTitle": "Continue playing from where it stopped",
+      "reviewed": "Reviewed ✓",
+      "skip": "Skip →"
+    },
+    "group": {
+      "fallback": "Segment {{index}}",
+      "lineCount_one": "{{count}} line",
+      "lineCount_other": "{{count}} lines",
+      "progress": "Segment {{current}}/{{total}}"
+    },
+    "lyrics": {
+      "groupHeader": "Segment {{order}} · {{title}}",
+      "meaningToggle": "Vietnamese",
+      "pinyinToggle": "Pinyin",
+      "togglePinyinTitle": "Show/hide pinyin on every line",
+      "toggleVietnameseTitle": "Show/hide Vietnamese meaning on every line"
+    },
+    "practice": {
+      "continue": "Continue →",
+      "empty": "Nothing to practice.",
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy",
+      "reveal": "👆 Tap to reveal",
+      "saveFailed": "Couldn't save — try again",
+      "speak": "Speak"
+    },
+    "speed": {
+      "title": "Reading speed",
+      "slow": "Slow — easy listening",
+      "slightlySlow": "Slightly slow",
+      "normal": "Normal",
+      "fast": "Fast — build reflexes"
+    },
+    "summary": {
+      "title": "Today's task complete!",
+      "completed_one": "You just finished {{count}} learning activity.",
+      "completed_other": "You just finished {{count}} learning activities.",
+      "streak": "days in a row",
+      "dialoguesReviewed": "dialogues reviewed",
+      "newLesson": "new lesson",
+      "wordsPracticed": "words practiced",
+      "seeYouTomorrow": "See you tomorrow — the review schedule updates automatically."
+    }
+  },
+  "vocabulary": {
+    "dashboard": {
+      "title": "Study dashboard",
+      "subtitle": "Track progress and review vocabulary",
+      "newWords": "Learn new words",
+      "newWordsDesc": "Start learning HSK vocabulary",
+      "viewLessons": "View lessons",
+      "viewLessonsDesc": "Browse the HSK lesson list",
+      "quiz": "Take a quiz",
+      "quizDesc": "Test your knowledge",
+      "refresh": "Refresh data",
+      "refreshDesc": "Update statistics",
+      "tipsTitle": "💡 Effective study tips",
+      "tip1": "Review words as soon as they're due (spaced repetition)",
+      "tip2": "Study every day to keep your streak 🔥",
+      "tip3": "Mix Flashcards and Quizzes for variety",
+      "tip4": "Focus on words rated \"Hard\" and \"Again\""
+    },
+    "study": {
+      "title": "HSK Vocabulary Study",
+      "subtitle": "Learn Chinese vocabulary with multiple study modes",
+      "scopeLabel": "Study scope",
+      "allWords": "All words",
+      "lessonChip_one": "Lesson {{order}} · {{count}} word",
+      "lessonChip_other": "Lesson {{order}} · {{count}} words",
+      "scopeSelected": "Lesson {{order}} selected — pick a mode below to start",
+      "scopeSelectedUnknown": "A lesson is selected — pick a mode below to start",
+      "scopeAllSelected": "All words selected — pick a lesson to study it alone",
+      "noLessonsData": "No lesson data for this level yet.",
+      "lessonFallback": "Lesson",
+      "allVocabTitle_one": "All vocabulary ({{count}} word)",
+      "allVocabTitle_other": "All vocabulary ({{count}} words)",
+      "changeLesson": "← Change lesson",
+      "dismiss": "Hide",
+      "loading": "Loading vocabulary..."
+    },
+    "modes": {
+      "flashcard": "Flashcards",
+      "quiz": "Quiz Meaning",
+      "fillBlank": "Fill Blank",
+      "pinyinMatch": "Pinyin Match"
+    },
+    "modeDesc": {
+      "flashcard": "Review with flashcards",
+      "quiz": "Pick the correct meaning",
+      "fillBlank": "Fill in the blank",
+      "pinyinMatch": "Pick the correct pinyin"
+    },
+    "contentLang": {
+      "vietnamese": "Vietnamese",
+      "english": "English",
+      "both": "Both",
+      "title": "Change meaning language"
+    },
+    "stats": {
+      "loadError": "Unable to load statistics",
+      "title": "Study progress",
+      "total": "Total words",
+      "new": "New",
+      "learning": "Learning",
+      "mastered": "Mastered",
+      "streakDays_one": "{{count}} day",
+      "streakDays_other": "{{count}} days",
+      "dueTodayLabel": "Due today",
+      "dueTodayCount_one": "{{count}} word",
+      "dueTodayCount_other": "{{count}} words",
+      "startReview": "Start review",
+      "allDone": "🎉 No words due today!",
+      "allDoneHint": "Learn new words to keep going"
+    },
+    "rating": {
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy"
+    },
+    "ratingDesc": {
+      "again": "Review again in 10 minutes",
+      "hard": "Needs effort",
+      "good": "Fairly remembered",
+      "easy": "Well remembered"
+    },
+    "speed": {
+      "title": "Reading speed",
+      "verySlow": "Very slow",
+      "slow": "Slow",
+      "normal": "Normal",
+      "original": "Original speed",
+      "fast": "Fast"
+    },
+    "flashcard": {
+      "progress": "Progress",
+      "speak": "Speak",
+      "clickToFlip": "Click to flip the card",
+      "vietnameseLabel": "Vietnamese meaning",
+      "englishLabel": "English",
+      "meaningLabel": "Meaning",
+      "exampleLabel": "Example",
+      "howWell": "How well do you know this word?",
+      "prev": "← Prev",
+      "next": "Next →",
+      "shortcutHint": "Shortcuts: <0>Space</0> flip card • <1>1-4</1> rate"
+    },
+    "quiz": {
+      "completed": "Quiz Completed! 🎉",
+      "scoreLine": "{{correct}} / {{total}} correct",
+      "retry": "Try again",
+      "back": "Back",
+      "notLoaded": "No quiz loaded",
+      "scoreLabel": "Score",
+      "question": "What does this word mean?",
+      "seeResults": "See results",
+      "next": "Next question",
+      "correct": "✓ Correct! {{hanzi}} means \"{{meaning}}\"",
+      "wrong": "✗ The correct answer is \"{{answer}}\""
+    },
+    "common": {
+      "submit": "Submit answer",
+      "nextArrow": "Next question →",
+      "wrongAnswer": "✗ The correct answer is \"{{answer}}\" - {{hanzi}} ({{meaning}})"
+    },
+    "fillBlank": {
+      "title": "Fill in the blank",
+      "correct": "✓ Correct! \"{{hanzi}}\" means \"{{meaning}}\""
+    },
+    "pinyinMatch": {
+      "title": "Pick the correct pinyin",
+      "question": "What is the pinyin of this word?",
+      "correct": "✓ Correct! {{hanzi}} is read \"{{pinyin}}\" - {{meaning}}"
+    },
+    "list": {
+      "empty": "No vocabulary yet"
+    },
+    "card": {
+      "speaking": "Playing...",
+      "listenAgain": "Listen again",
+      "listen": "Listen to pronunciation"
+    }
+  },
+  "profile": {
+    "edit": "Edit profile",
+    "username": "Username",
+    "usernamePlaceholder": "3-20 characters",
+    "usernameLength": "Name must be 3-20 characters",
+    "saving": "Saving...",
+    "passwordTitle": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "newPasswordTooShort": "New password must be at least 8 characters",
+    "passwordMismatch": "Password confirmation doesn't match",
+    "passwordChanged": "Password changed successfully",
+    "changing": "Changing...",
+    "avatarPickerLabel": "Pick an avatar",
+    "stats": {
+      "vocabLearned": "Words learned",
+      "lessonsCompleted": "Lessons completed",
+      "streak": "Study streak",
+      "activeDays": "Active days",
+      "loadError": "Couldn't load stats. Try reloading the page."
+    }
+  },
+  "errors": {
+    "invalidCredentials": "Incorrect email or password",
+    "emailRegistered": "Email already registered",
+    "usernameTaken": "Username already taken",
+    "invalidAvatar": "Invalid avatar selection",
+    "wrongPassword": "Current password is incorrect",
+    "userNotFound": "User not found",
+    "invalidEmail": "Invalid email",
+    "usernameTooShort": "Username must be at least 3 characters",
+    "usernameTooLong": "Username must be at most 20 characters",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "networkError": "Cannot reach the server — check your connection and try again",
+    "unknown": "Something went wrong, please try again",
+    "loadPlanFailed": "Couldn't load today's plan",
+    "saveDialogueReview": "Couldn't save the dialogue review",
+    "saveSessionCompletion": "Couldn't record the session completion",
+    "loadStats": "Couldn't load stats",
+    "updateProfileFailed": "Couldn't update profile",
+    "changePasswordFailed": "Couldn't change password"
+  },
+  "import": {
+    "title": "Import HSK Data",
+    "stepTitle": "Step {{id}}: {{title}}",
+    "completePrevious": "Complete the previous step to continue",
+    "previousStep": "Previous step",
+    "nextStep": "Next step",
+    "steps": {
+      "lessonsTitle": "Import Lessons",
+      "lessonsDesc": "Upload a JSON file containing the lesson list",
+      "vocabulariesTitle": "Import Vocabulary",
+      "vocabulariesDesc": "Upload a JSON file containing vocabulary for each lesson",
+      "conversationsTitle": "Import Dialogues",
+      "conversationsDesc": "Upload a JSON file containing dialogues for each lesson"
+    },
+    "upload": {
+      "lessons": "Lesson file (lessons.json)",
+      "vocabularies": "Vocabulary file (vocabularies.json)",
+      "conversations": "Dialogue file (conversations.json)"
+    },
+    "button": {
+      "lessons": "Import Lessons",
+      "vocabularies": "Import Vocabulary",
+      "conversations": "Import Dialogues"
+    },
+    "errorPrefix": "Error: {{message}}",
+    "success": "Import successful",
+    "created": "Created: {{count}}",
+    "skipped": "Skipped: {{count}}",
+    "errors": "Errors: {{count}}",
+    "downloadMapping": "Download sample mapping file",
+    "importedLessonsTitle": "Imported lessons",
+    "loadingLessons": "Loading lesson list...",
+    "vocabCount": "Vocabulary: {{count}}",
+    "onlyJson": "Only JSON files are allowed",
+    "fileTooLarge": "File must be smaller than 10MB",
+    "dropHere": "Drop the file here",
+    "dragDrop": "Drag and drop a JSON file here, or",
+    "browse": "Browse",
+    "remove": "Remove",
+    "createdLabel": "Created",
+    "skippedLabel": "Skipped",
+    "errorsLabel": "Errors",
+    "processing": "Processing...",
+    "validationTitle": "Validation errors ({{count}})",
+    "dismiss": "Dismiss",
+    "structureErrors": "Structure errors",
+    "dataErrors": "Data errors",
+    "constraintErrors": "Constraint errors",
+    "fixRetry": "Fix & retry",
+    "reset": "Reset",
+    "rowPrefix": "Row {{row}}: ",
+    "gate": {
+      "title": "Data import area",
+      "description": "This page is for the owner only. Enter the password to continue.",
+      "wrongPassword": "Incorrect password",
+      "unlock": "Unlock"
+    }
+  }
+}

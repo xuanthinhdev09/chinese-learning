@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   DailySessionPlan,
   DueDialogue,
@@ -11,6 +12,7 @@ import { vocabularyApi } from '../../api/vocabulary-api';
 import { DialogueReader } from '../../components/today/dialogue-reader';
 import { PracticeItem, PracticeRunner } from '../../components/today/practice-runner';
 import { SessionSummary } from '../../components/today/session-summary';
+import { translateApiError } from '../../utils/translate-api-error';
 
 type Step =
   | { kind: 'due-dialogue'; data: DueDialogue }
@@ -19,12 +21,13 @@ type Step =
   | { kind: 'keyword-quiz' }
   | { kind: 'vocab-cards' };
 
-const STEP_LABELS: Record<Step['kind'], string> = {
-  'due-dialogue': 'Ôn hội thoại',
-  'new-dialogue': 'Bài mới',
-  'keyword-cards': 'Từ khóa chính',
-  'keyword-quiz': 'Kiểm tra từ khóa',
-  'vocab-cards': 'Ôn từ vựng',
+// Giá trị là key i18n — dịch lúc render (t()) để đổi ngôn ngữ giữa chừng vẫn đúng
+const STEP_LABEL_KEYS: Record<Step['kind'], string> = {
+  'due-dialogue': 'today.segment.dueDialogue',
+  'new-dialogue': 'today.segment.newDialogue',
+  'keyword-cards': 'today.segment.keywordCards',
+  'keyword-quiz': 'today.segment.keywordQuiz',
+  'vocab-cards': 'today.segment.vocabCards',
 };
 
 function toPracticeItems(items: Array<{ id: string; hanzi: string; pinyin: string; meaning: string }>): PracticeItem[] {
@@ -40,6 +43,7 @@ function toPracticeItems(items: Array<{ id: string; hanzi: string; pinyin: strin
  */
 export function TodaySessionPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [phase, setPhase] = useState<'loading' | 'empty' | 'active' | 'summary' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<DailySessionPlan | null>(null);
@@ -74,7 +78,7 @@ export function TodaySessionPage() {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'Có lỗi xảy ra');
+          setError(e instanceof Error ? translateApiError(e, t) : t('errors.unknown'));
           setPhase('error');
         }
       });
@@ -124,7 +128,7 @@ export function TodaySessionPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3 animate-pulse">🎯</div>
-          <p className="text-muted">Đang soạn bài học hôm nay...</p>
+          <p className="text-muted">{t('today.loading')}</p>
         </div>
       </div>
     );
@@ -140,7 +144,7 @@ export function TodaySessionPage() {
             onClick={() => window.location.reload()}
             className="px-6 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors"
           >
-            Thử lại
+            {t('common.retry')}
           </button>
         </div>
       </div>
@@ -153,18 +157,18 @@ export function TodaySessionPage() {
         <div className="card p-8 text-center">
           <div className="text-6xl mb-4">🌿</div>
           <h2 className="text-xl font-bold text-foreground mb-2">
-            {plan?.completedToday ? 'Đã học hôm nay rồi!' : 'Không có gì để ôn hôm nay'}
+            {plan?.completedToday ? t('today.emptyDone') : t('today.emptyNothing')}
           </h2>
           <p className="text-muted mb-6">
             {plan?.completedToday
-              ? 'Nhiệm vụ hôm nay hoàn thành — lịch ôn tiếp theo đã được lên.'
-              : 'Lịch ôn tập chưa đến hạn. Quay lại sau nhé!'}
+              ? t('today.emptyDoneDesc')
+              : t('today.emptyNothingDesc')}
           </p>
           <button
             onClick={() => navigate('/dashboard')}
             className="px-6 py-3 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors"
           >
-            Về trang chủ
+            {t('today.backHome')}
           </button>
         </div>
       </div>
@@ -190,7 +194,7 @@ export function TodaySessionPage() {
   const sessionHeader = (
     <div className="flex items-center justify-between gap-3 px-1">
       <p className="text-sm font-medium text-muted">
-        Bước {stepIndex + 1}/{steps.length}: {STEP_LABELS[step.kind]}
+        {t('today.stepHeader', { current: stepIndex + 1, total: steps.length, label: t(STEP_LABEL_KEYS[step.kind]) })}
       </p>
       <span className="text-sm font-semibold text-foreground">🔥 {plan?.streak ?? 0}</span>
     </div>
@@ -225,7 +229,7 @@ export function TodaySessionPage() {
 
       {step.kind === 'keyword-cards' && nextLesson && (
         <PracticeRunner
-          title="Từ khóa chính — lật thẻ"
+          title={t('today.keywordCardsTitle')}
           items={toPracticeItems(nextLesson.keywords)}
           mode="flashcard"
           onRate={async (item, quality) => {
@@ -238,7 +242,7 @@ export function TodaySessionPage() {
 
       {step.kind === 'keyword-quiz' && nextLesson && (
         <PracticeRunner
-          title="Từ khóa chính — chọn nghĩa"
+          title={t('today.keywordQuizTitle')}
           items={toPracticeItems(nextLesson.keywords)}
           mode="quiz"
           onRate={recordVocabQuality}
@@ -248,7 +252,11 @@ export function TodaySessionPage() {
 
       {step.kind === 'vocab-cards' && plan && (
         <PracticeRunner
-          title={`Từ vựng đến hạn ôn${plan.dueVocabularyTotal > plan.dueVocabulary.length ? ` (${plan.dueVocabulary.length}/${plan.dueVocabularyTotal})` : ''}`}
+          title={
+            plan.dueVocabularyTotal > plan.dueVocabulary.length
+              ? t('today.vocabDueTitleWithCount', { current: plan.dueVocabulary.length, total: plan.dueVocabularyTotal })
+              : t('today.vocabDueTitle')
+          }
           items={toPracticeItems(plan.dueVocabulary)}
           mode="flashcard"
           onRate={async (item, quality) => {

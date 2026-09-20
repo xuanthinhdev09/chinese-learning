@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth-store';
+import { translateApiError } from '../../utils/translate-api-error';
 import { Button, Input } from '../../components/ui';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +23,7 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
+      setError(translateApiError(err, t) || t('auth.login.failed'));
     } finally {
       setIsLoading(false);
     }
@@ -35,12 +38,12 @@ export default function LoginPage() {
             <span className="text-white font-bold text-4xl chinese-text">中</span>
           </div>
           <h1 className="text-3xl font-bold text-foreground font-display">Chinese Learning</h1>
-          <p className="mt-2 text-sm text-muted">Học tiếng Trung hiệu quả mỗi ngày</p>
+          <p className="mt-2 text-sm text-muted">{t('auth.login.tagline')}</p>
         </div>
 
         {/* Login Card */}
         <div className="card-elevated p-8 animate-slide-up">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Đăng nhập</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-6">{t('auth.login.title')}</h2>
 
           {/* Error message */}
           {error && (
@@ -56,28 +59,28 @@ export default function LoginPage() {
             <Input
               id="email"
               type="email"
-              label="Email"
+              label={t('auth.email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="email@example.com"
-              error={error && !email ? 'Vui lòng nhập email' : ''}
+              error={error && !email ? t('auth.login.emailRequired') : ''}
             />
 
             <Input
               id="password"
               type="password"
-              label="Mật khẩu"
+              label={t('auth.password')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
-              error={error && !password ? 'Vui lòng nhập mật khẩu' : ''}
+              error={error && !password ? t('auth.login.passwordRequired') : ''}
             />
 
             <div className="flex justify-end text-sm">
               <Link to="/forgot-password" className="text-primary hover:underline">
-                Quên mật khẩu?
+                {t('auth.login.forgotPassword')}
               </Link>
             </div>
 
@@ -89,7 +92,7 @@ export default function LoginPage() {
               fullWidth
               className="mt-6"
             >
-              {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {isLoading ? t('auth.login.submitting') : t('auth.login.submit')}
             </Button>
           </form>
 
@@ -99,18 +102,18 @@ export default function LoginPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-muted">hoặc</span>
+              <span className="bg-white px-2 text-muted">{t('auth.or')}</span>
             </div>
           </div>
 
           {/* Register link */}
           <div className="text-center">
-            <span className="text-sm text-muted">Chưa có tài khoản? </span>
+            <span className="text-sm text-muted">{t('auth.login.noAccount')} </span>
             <Link
               to="/register"
               className="text-sm text-primary font-medium hover:underline ml-1"
             >
-              Đăng ký ngay
+              {t('auth.login.registerLink')}
             </Link>
           </div>
         </div>
@@ -118,14 +121,13 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-xs text-muted">
-            Bằng cách tiếp tục, bạn đồng ý với{' '}
-            <Link to="/terms" className="text-primary hover:underline">
-              Điều khoản dịch vụ
-            </Link>{' '}
-            và{' '}
-            <Link to="/privacy" className="text-primary hover:underline">
-              Chính sách bảo mật
-            </Link>
+            <Trans
+              i18nKey="auth.continueAgreement"
+              components={[
+                <Link to="/terms" className="text-primary hover:underline" />,
+                <Link to="/privacy" className="text-primary hover:underline" />,
+              ]}
+            />
           </p>
         </div>
       </div>

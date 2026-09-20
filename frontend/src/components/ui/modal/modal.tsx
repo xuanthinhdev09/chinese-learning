@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 
 interface ModalProps {
@@ -31,6 +32,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
     },
     ref
   ) => {
+    const { t } = useTranslation();
     const previousActiveElement = useRef<HTMLElement | null>(null);
 
     // Handle escape key
@@ -126,7 +128,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
                   type="button"
                   onClick={onClose}
                   className="text-muted hover:text-foreground transition-colors p-1 rounded hover:bg-background-alt"
-                  aria-label="Đóng"
+                  aria-label={t('common.close')}
                 >
                   <svg
                     className="w-5 h-5"

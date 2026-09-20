@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useChangePasswordMutation } from './hooks/use-profile-hooks';
+import { translateApiError } from '../../utils/translate-api-error';
 
 /**
  * Change-password card: current, new, confirm. Confirm-match and min-length
  * are checked client-side; wrong current password surfaces the backend error.
  */
 export function ChangePasswordForm() {
+  const { t } = useTranslation();
   const changePasswordMutation = useChangePasswordMutation();
 
   const [currentPassword, setCurrentPassword] = useState('');
@@ -20,11 +23,11 @@ export function ChangePasswordForm() {
     setSuccessMessage('');
 
     if (newPassword.length < 8) {
-      setClientError('Mật khẩu mới phải có ít nhất 8 ký tự');
+      setClientError(t('profile.newPasswordTooShort'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setClientError('Xác nhận mật khẩu không khớp');
+      setClientError(t('profile.passwordMismatch'));
       return;
     }
 
@@ -32,7 +35,7 @@ export function ChangePasswordForm() {
       { currentPassword, newPassword },
       {
         onSuccess: () => {
-          setSuccessMessage('Đổi mật khẩu thành công');
+          setSuccessMessage(t('profile.passwordChanged'));
           setCurrentPassword('');
           setNewPassword('');
           setConfirmPassword('');
@@ -41,11 +44,12 @@ export function ChangePasswordForm() {
     );
   };
 
-  const errorMessage = clientError || changePasswordMutation.error?.message;
+  const errorMessage = clientError
+    || (changePasswordMutation.error ? translateApiError(changePasswordMutation.error, t) : '');
 
   return (
     <form onSubmit={handleSubmit} className="text-left">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Đổi mật khẩu</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.passwordTitle')}</h3>
 
       <div className="space-y-4 mb-4">
         <div>
@@ -53,7 +57,7 @@ export function ChangePasswordForm() {
             htmlFor="current-password"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Mật khẩu hiện tại
+            {t('profile.currentPassword')}
           </label>
           <input
             id="current-password"
@@ -69,7 +73,7 @@ export function ChangePasswordForm() {
             htmlFor="new-password"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Mật khẩu mới
+            {t('profile.newPassword')}
           </label>
           <input
             id="new-password"
@@ -85,7 +89,7 @@ export function ChangePasswordForm() {
             htmlFor="confirm-password"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Xác nhận mật khẩu mới
+            {t('profile.confirmNewPassword')}
           </label>
           <input
             id="confirm-password"
@@ -114,7 +118,7 @@ export function ChangePasswordForm() {
         disabled={changePasswordMutation.isPending}
         className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
       >
-        {changePasswordMutation.isPending ? 'Đang đổi...' : 'Đổi mật khẩu'}
+        {changePasswordMutation.isPending ? t('profile.changing') : t('profile.passwordTitle')}
       </button>
     </form>
   );

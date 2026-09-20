@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface SessionSummaryProps {
   streak: number;
   counts: {
@@ -13,6 +15,7 @@ interface SessionSummaryProps {
  * End-of-session recap: streak, per-section counts, and the way out.
  */
 export function SessionSummary({ streak, counts, onBack }: SessionSummaryProps) {
+  const { t } = useTranslation();
   const totalActions =
     counts.dialoguesReviewed +
     (counts.newDialogueDone ? 1 : 0) +
@@ -24,36 +27,36 @@ export function SessionSummary({ streak, counts, onBack }: SessionSummaryProps) 
       <div className="card p-8 text-center">
         <div className="text-6xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          Xong nhiệm vụ hôm nay!
+          {t('today.summary.title')}
         </h2>
         <p className="text-muted mb-8">
-          Bạn vừa hoàn thành {totalActions} hoạt động học tập.
+          {t('today.summary.completed', { count: totalActions })}
         </p>
 
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="rounded-lg bg-background-alt px-4 py-5">
             <p className="text-3xl mb-1">🔥</p>
             <p className="text-2xl font-bold text-foreground">{streak}</p>
-            <p className="text-xs text-muted">ngày liên tục</p>
+            <p className="text-xs text-muted">{t('today.summary.streak')}</p>
           </div>
           <div className="rounded-lg bg-background-alt px-4 py-5">
             <p className="text-3xl mb-1">🗣️</p>
             <p className="text-2xl font-bold text-foreground">{counts.dialoguesReviewed}</p>
-            <p className="text-xs text-muted">hội thoại đã ôn</p>
+            <p className="text-xs text-muted">{t('today.summary.dialoguesReviewed')}</p>
           </div>
           <div className="rounded-lg bg-background-alt px-4 py-5">
             <p className="text-3xl mb-1">📖</p>
             <p className="text-2xl font-bold text-foreground">
               {counts.newDialogueDone ? '✓' : '—'}
             </p>
-            <p className="text-xs text-muted">bài mới</p>
+            <p className="text-xs text-muted">{t('today.summary.newLesson')}</p>
           </div>
           <div className="rounded-lg bg-background-alt px-4 py-5">
             <p className="text-3xl mb-1">🃏</p>
             <p className="text-2xl font-bold text-foreground">
               {counts.keywordsPracticed + counts.vocabReviewed}
             </p>
-            <p className="text-xs text-muted">từ đã luyện</p>
+            <p className="text-xs text-muted">{t('today.summary.wordsPracticed')}</p>
           </div>
         </div>
 
@@ -61,11 +64,11 @@ export function SessionSummary({ streak, counts, onBack }: SessionSummaryProps) 
           onClick={onBack}
           className="w-full px-6 py-4 rounded-lg bg-primary text-white hover:bg-primary-dark active:scale-95 transition-all font-semibold text-lg"
         >
-          Về trang chủ
+          {t('today.backHome')}
         </button>
 
         <p className="text-sm text-muted mt-6">
-          Hẹn gặp lại ngày mai — lịch ôn đã được cập nhật tự động.
+          {t('today.summary.seeYouTomorrow')}
         </p>
       </div>
     </div>

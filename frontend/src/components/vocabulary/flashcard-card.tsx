@@ -1,27 +1,30 @@
 import { useState, useEffect } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
 import { Button, Badge, CircularProgress, Progress } from '../ui';
 import { EmptyStates } from '../common';
+import { translateApiError } from '../../utils/translate-api-error';
 
-// Quality rating options
+// Giá trị là key i18n — dịch lúc render (t()) để đổi ngôn ngữ giữa chừng vẫn đúng
 const QUALITY_OPTIONS = [
-  { value: 0, label: 'Again', emoji: '⏰', color: 'bg-destructive hover:bg-red-700', description: 'Ôn lại sau 10 phút' },
-  { value: 3, label: 'Hard', emoji: '💪', color: 'bg-warning hover:bg-amber-600', description: 'Cần cố gắng' },
-  { value: 4, label: 'Good', emoji: '👍', color: 'bg-accent hover:bg-green-600', description: 'Nhớ khá' },
-  { value: 5, label: 'Easy', emoji: '⭐', color: 'bg-primary hover:bg-primary-dark', description: 'Nhớ tốt' },
+  { value: 0, labelKey: 'vocabulary.rating.again', emoji: '⏰', color: 'bg-destructive hover:bg-red-700', descKey: 'vocabulary.ratingDesc.again' },
+  { value: 3, labelKey: 'vocabulary.rating.hard', emoji: '💪', color: 'bg-warning hover:bg-amber-600', descKey: 'vocabulary.ratingDesc.hard' },
+  { value: 4, labelKey: 'vocabulary.rating.good', emoji: '👍', color: 'bg-accent hover:bg-green-600', descKey: 'vocabulary.ratingDesc.good' },
+  { value: 5, labelKey: 'vocabulary.rating.easy', emoji: '⭐', color: 'bg-primary hover:bg-primary-dark', descKey: 'vocabulary.ratingDesc.easy' },
 ];
 
 const SPEED_OPTIONS = [
-  { value: 0.5, label: '0.5x', desc: 'Rất chậm' },
-  { value: 0.65, label: '0.65x', desc: 'Chậm' },
-  { value: 0.8, label: '0.8x', desc: 'Bình thường' },
-  { value: 1.0, label: '1.0x', desc: 'Tốc độ gốc' },
-  { value: 1.25, label: '1.25x', desc: 'Nhanh' },
+  { value: 0.5, label: '0.5x', descKey: 'vocabulary.speed.verySlow' },
+  { value: 0.65, label: '0.65x', descKey: 'vocabulary.speed.slow' },
+  { value: 0.8, label: '0.8x', descKey: 'vocabulary.speed.normal' },
+  { value: 1.0, label: '1.0x', descKey: 'vocabulary.speed.original' },
+  { value: 1.25, label: '1.25x', descKey: 'vocabulary.speed.fast' },
 ];
 
 export function FlashcardCard() {
+  const { t } = useTranslation();
   const {
     vocabularies,
     currentIndex,
@@ -90,7 +93,7 @@ export function FlashcardCard() {
       {/* Progress header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-muted">Tiến trình</span>
+          <span className="text-sm font-medium text-muted">{t('vocabulary.flashcard.progress')}</span>
           <div className="flex items-center gap-2">
             <CircularProgress value={progressPercent} size={32} showLabel={false} />
             <span className="text-sm font-medium text-foreground">{progress}</span>
@@ -150,7 +153,7 @@ export function FlashcardCard() {
                           setShowSpeedControl(!showSpeedControl);
                         }}
                         className="px-2 py-1 text-xs bg-primary-light text-primary-dark rounded hover:bg-primary hover:text-white transition-colors"
-                        title="Tốc độ đọc"
+                        title={t('vocabulary.speed.title')}
                       >
                         {speechRate}x
                       </button>
@@ -158,7 +161,7 @@ export function FlashcardCard() {
                       {showSpeedControl && (
                         <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg border border-border z-10 animate-fade-in">
                           <div className="p-2">
-                            <p className="text-xs text-muted mb-2 text-center">Tốc độ đọc</p>
+                            <p className="text-xs text-muted mb-2 text-center">{t('vocabulary.speed.title')}</p>
                             {SPEED_OPTIONS.map((option) => (
                               <button
                                 key={option.value}
@@ -179,7 +182,7 @@ export function FlashcardCard() {
                               >
                                 <div className="flex flex-col">
                                   <span className="font-semibold">{option.label}</span>
-                                  <span className="text-xs opacity-75">{option.desc}</span>
+                                  <span className="text-xs opacity-75">{t(option.descKey)}</span>
                                 </div>
                               </button>
                             ))}
@@ -199,7 +202,7 @@ export function FlashcardCard() {
                         'bg-gray-100 hover:bg-gray-200 active:scale-95',
                         isSpeaking && 'animate-pulse bg-primary-light'
                       )}
-                      title="Phát âm"
+                      title={t('vocabulary.flashcard.speak')}
                     >
                       <span className="text-lg">{isSpeaking ? '🔊' : '🔈'}</span>
                     </button>
@@ -241,7 +244,7 @@ export function FlashcardCard() {
               {/* Hint */}
               <p className="text-sm text-muted mt-8 flex items-center gap-2">
                 <span>👆</span>
-                <span>Click để lật thẻ</span>
+                <span>{t('vocabulary.flashcard.clickToFlip')}</span>
               </p>
             </div>
 
@@ -270,7 +273,7 @@ export function FlashcardCard() {
               <div className="text-center w-full space-y-4">
                 {vietnamese && (
                   <div className="animate-slide-up">
-                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">Nghĩa tiếng Việt</p>
+                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">{t('vocabulary.flashcard.vietnameseLabel')}</p>
                     <p className="text-xl font-semibold text-foreground chinese-text">
                       {vietnamese}
                     </p>
@@ -279,7 +282,7 @@ export function FlashcardCard() {
 
                 {english && english !== vietnamese && (
                   <div className="animate-slide-up" style={{ animationDelay: '50ms' }}>
-                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">English</p>
+                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">{t('vocabulary.flashcard.englishLabel')}</p>
                     <p className="text-lg text-foreground">
                       {english}
                     </p>
@@ -288,7 +291,7 @@ export function FlashcardCard() {
 
                 {!vietnamese && !english && current.meaning && (
                   <div className="animate-slide-up">
-                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">Meaning</p>
+                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">{t('vocabulary.flashcard.meaningLabel')}</p>
                     <p className="text-xl font-semibold text-foreground chinese-text">
                       {current.meaning}
                     </p>
@@ -299,7 +302,7 @@ export function FlashcardCard() {
               {/* Example */}
               {current.example && (
                 <div className="w-full mt-4 pt-4 border-t border-border animate-slide-up" style={{ animationDelay: '100ms' }}>
-                  <p className="text-xs text-muted mb-2 uppercase tracking-wide">Example</p>
+                  <p className="text-xs text-muted mb-2 uppercase tracking-wide">{t('vocabulary.flashcard.exampleLabel')}</p>
                   <p className="text-foreground text-sm chinese-text leading-relaxed">
                     {current.example}
                   </p>
@@ -314,7 +317,7 @@ export function FlashcardCard() {
       {isFlipped && (
         <div className="mt-6 space-y-4 animate-fade-in">
           <p className="text-sm text-center text-muted font-medium">
-            Bạn nhớ từ này thế nào?
+            {t('vocabulary.flashcard.howWell')}
           </p>
           <div className="grid grid-cols-4 gap-2 sm:gap-3">
             {QUALITY_OPTIONS.map((option) => (
@@ -331,17 +334,17 @@ export function FlashcardCard() {
                   'hover:shadow-md active:scale-95 hover:-translate-y-0.5',
                   option.color
                 )}
-                title={option.description}
+                title={t(option.descKey)}
               >
                 <div className="flex flex-col items-center gap-1 sm:gap-2">
                   <span className="text-xl sm:text-2xl">{option.emoji}</span>
-                  <span className="text-xs sm:text-sm font-semibold">{option.label}</span>
+                  <span className="text-xs sm:text-sm font-semibold">{t(option.labelKey)}</span>
                 </div>
               </button>
             ))}
           </div>
           {progressError && (
-            <p className="text-sm text-destructive text-center animate-shake">{progressError}</p>
+            <p className="text-sm text-destructive text-center animate-shake">{translateApiError(progressError, t)}</p>
           )}
         </div>
       )}
@@ -358,7 +361,7 @@ export function FlashcardCard() {
             disabled={currentIndex === 0}
             className="flex-1"
           >
-            ← Trước
+            {t('vocabulary.flashcard.prev')}
           </Button>
 
           <Button
@@ -369,7 +372,7 @@ export function FlashcardCard() {
             disabled={currentIndex >= vocabularies.length - 1}
             className="flex-1"
           >
-            Tiếp →
+            {t('vocabulary.flashcard.next')}
           </Button>
         </div>
       )}
@@ -377,8 +380,13 @@ export function FlashcardCard() {
       {/* Keyboard shortcuts hint */}
       <div className="mt-4 text-center">
         <p className="text-xs text-muted">
-          Phím tắt: <kbd className="px-1.5 py-0.5 bg-background-alt rounded text-foreground">Space</kbd> lật thẻ •
-          <kbd className="px-1.5 py-0.5 bg-background-alt rounded text-foreground ml-1">1-4</kbd> đánh giá
+          <Trans
+            i18nKey="vocabulary.flashcard.shortcutHint"
+            components={[
+              <kbd className="px-1.5 py-0.5 bg-background-alt rounded text-foreground" />,
+              <kbd className="px-1.5 py-0.5 bg-background-alt rounded text-foreground ml-1" />,
+            ]}
+          />
         </p>
       </div>
     </div>

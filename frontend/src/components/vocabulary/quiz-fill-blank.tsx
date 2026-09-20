@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Vocabulary } from '../../api/vocabulary-api';
 
 interface QuizFillBlankProps {
@@ -16,6 +17,7 @@ export function QuizFillBlank({
   showResult = false,
   isCorrect,
 }: QuizFillBlankProps) {
+  const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   // Generate fill-in-the-blank question
@@ -83,7 +85,7 @@ export function QuizFillBlank({
         )}
 
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Điền vào chỗ trống
+          {t('vocabulary.fillBlank.title')}
         </h2>
 
         <p className="text-4xl text-blue-600 dark:text-blue-400 mb-2">
@@ -142,14 +144,14 @@ export function QuizFillBlank({
           disabled={!selectedOption}
           className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
         >
-          Gửi câu trả lời
+          {t('vocabulary.common.submit')}
         </button>
       ) : (
         <button
           onClick={onNext}
           className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
-          Câu tiếp theo →
+          {t('vocabulary.common.nextArrow')}
         </button>
       )}
 
@@ -158,11 +160,11 @@ export function QuizFillBlank({
         <div className="mt-4 text-center">
           {isCorrect ? (
             <p className="text-green-600 dark:text-green-400 font-semibold">
-              ✓ Chính xác! "{vocabulary.hanzi}" nghĩa là "{vocabulary.vietnamese || vocabulary.english || vocabulary.meaning}"
+              {t('vocabulary.fillBlank.correct', { hanzi: vocabulary.hanzi, meaning: vocabulary.vietnamese || vocabulary.english || vocabulary.meaning })}
             </p>
           ) : (
             <p className="text-red-600 dark:text-red-400 font-semibold">
-              ✗ Đáp án đúng là "{correctOption?.text}" - {vocabulary.hanzi} ({vocabulary.vietnamese || vocabulary.english || vocabulary.meaning})
+              {t('vocabulary.common.wrongAnswer', { answer: correctOption?.text, hanzi: vocabulary.hanzi, meaning: vocabulary.vietnamese || vocabulary.english || vocabulary.meaning })}
             </p>
           )}
         </div>

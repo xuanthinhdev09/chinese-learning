@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Vocabulary } from '../../api/vocabulary-api';
 import VocabularyCard from './vocabulary-card';
 
@@ -7,6 +8,8 @@ interface VocabularyListProps {
 }
 
 export default function VocabularyList({ vocabularies, loading }: VocabularyListProps) {
+  const { t } = useTranslation();
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -20,7 +23,7 @@ export default function VocabularyList({ vocabularies, loading }: VocabularyList
   if (vocabularies.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Chưa có từ vựng</p>
+        <p className="text-gray-600">{t('vocabulary.list.empty')}</p>
       </div>
     );
   }

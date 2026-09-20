@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { useLanguagePreference, getDisplayMeaning } from '../../stores/language-preference-store';
 
 export function QuizCard() {
+  const { t } = useTranslation();
   const { preference } = useLanguagePreference();
   const {
     vocabularies,
@@ -78,7 +80,7 @@ export function QuizCard() {
       <div className="max-w-md mx-auto p-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Quiz Completed! 🎉
+            {t('vocabulary.quiz.completed')}
           </h2>
 
           <div className="mb-6">
@@ -86,7 +88,7 @@ export function QuizCard() {
               {score}%
             </p>
             <p className="text-gray-600 dark:text-gray-400">
-              {correctCount} / {vocabularies.length} đúng
+              {t('vocabulary.quiz.scoreLine', { correct: correctCount, total: vocabularies.length })}
             </p>
           </div>
 
@@ -95,13 +97,13 @@ export function QuizCard() {
               onClick={resetQuiz}
               className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
-              Làm lại
+              {t('vocabulary.quiz.retry')}
             </button>
             <button
               onClick={() => window.history.back()}
               className="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
-              Quay lại
+              {t('vocabulary.quiz.back')}
             </button>
           </div>
         </div>
@@ -113,7 +115,7 @@ export function QuizCard() {
     return (
       <div className="max-w-md mx-auto p-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400">No quiz loaded</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('vocabulary.quiz.notLoaded')}</p>
         </div>
       </div>
     );
@@ -125,11 +127,11 @@ export function QuizCard() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Tiến độ</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('vocabulary.flashcard.progress')}</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">{progress}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Điểm</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('vocabulary.quiz.scoreLabel')}</p>
             <p className="text-lg font-semibold text-blue-500">{score}%</p>
           </div>
         </div>
@@ -167,7 +169,7 @@ export function QuizCard() {
             </span>
           )}
 
-          <p className="text-gray-600 dark:text-gray-400 mt-6">Nghĩa của từ này là gì?</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-6">{t('vocabulary.quiz.question')}</p>
         </div>
 
         {/* Options */}
@@ -223,14 +225,14 @@ export function QuizCard() {
             disabled={!quiz.selectedOption}
             className="w-full mt-6 px-4 py-3 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
           >
-            Gửi câu trả lời
+            {t('vocabulary.common.submit')}
           </button>
         ) : (
           <button
             onClick={nextQuizQuestion}
             className="w-full mt-6 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            {currentIndex >= vocabularies.length - 1 ? 'Xem kết quả' : 'Câu tiếp theo'}
+            {currentIndex >= vocabularies.length - 1 ? t('vocabulary.quiz.seeResults') : t('vocabulary.quiz.next')}
           </button>
         )}
 
@@ -239,11 +241,11 @@ export function QuizCard() {
           <div className="mt-4 text-center">
             {quiz.isCorrect ? (
               <p className="text-green-600 dark:text-green-400 font-semibold">
-                ✓ Chính xác! {current.hanzi} nghĩa là "{getCorrectMeaning()}"
+                {t('vocabulary.quiz.correct', { hanzi: current.hanzi, meaning: getCorrectMeaning() })}
               </p>
             ) : (
               <p className="text-red-600 dark:text-red-400 font-semibold">
-                ✗ Đáp án đúng là "{getCorrectMeaning()}"
+                {t('vocabulary.quiz.wrong', { answer: getCorrectMeaning() })}
               </p>
             )}
           </div>

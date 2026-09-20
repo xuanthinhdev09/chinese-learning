@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { StatsCard } from '../../components/vocabulary/stats-card';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
+import { translateApiError } from '../../utils/translate-api-error';
 
 export function ReviewDashboardPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +26,7 @@ export function ReviewDashboardPage() {
       const result = await getProgressStats();
       setStats(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load stats');
+      setError(translateApiError(err, t));
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +41,7 @@ export function ReviewDashboardPage() {
       // Navigate to study page
       navigate('/vocabulary/study');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load review cards');
+      setError(translateApiError(err, t));
     }
   };
 
@@ -47,7 +50,7 @@ export function ReviewDashboardPage() {
       // Navigate to study page to select level
       navigate('/vocabulary/study');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Navigation failed');
+      setError(translateApiError(err, t));
     }
   };
 
@@ -57,10 +60,10 @@ export function ReviewDashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Bảng điều khiển học tập
+            {t('vocabulary.dashboard.title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Theo dõi tiến độ và ôn tập từ vựng
+            {t('vocabulary.dashboard.subtitle')}
           </p>
         </div>
 
@@ -72,7 +75,7 @@ export function ReviewDashboardPage() {
               onClick={loadStats}
               className="mt-2 text-sm underline text-red-600 dark:text-red-400"
             >
-              Thử lại
+              {t('common.retry')}
             </button>
           </div>
         )}
@@ -98,10 +101,10 @@ export function ReviewDashboardPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  Học từ mới
+                  {t('vocabulary.dashboard.newWords')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Bắt đầu học từ vựng HSK
+                  {t('vocabulary.dashboard.newWordsDesc')}
                 </p>
               </div>
             </div>
@@ -117,10 +120,10 @@ export function ReviewDashboardPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  Xem bài học
+                  {t('vocabulary.dashboard.viewLessons')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Duyệt danh sách bài HSK
+                  {t('vocabulary.dashboard.viewLessonsDesc')}
                 </p>
               </div>
             </div>
@@ -136,10 +139,10 @@ export function ReviewDashboardPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  Làm trắc nghiệm
+                  {t('vocabulary.dashboard.quiz')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Kiểm tra kiến thức
+                  {t('vocabulary.dashboard.quizDesc')}
                 </p>
               </div>
             </div>
@@ -156,10 +159,10 @@ export function ReviewDashboardPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  Làm mới dữ liệu
+                  {t('vocabulary.dashboard.refresh')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Cập nhật thống kê
+                  {t('vocabulary.dashboard.refreshDesc')}
                 </p>
               </div>
             </div>
@@ -169,13 +172,13 @@ export function ReviewDashboardPage() {
         {/* Learning Tips */}
         <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-            💡 Mẹo học tập hiệu quả
+            {t('vocabulary.dashboard.tipsTitle')}
           </h3>
           <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-            <li>• Ôn tập ngay khi từ hết hạn (spaced repetition)</li>
-            <li>• Học mỗi ngày để duy trì streak 🔥</li>
-            <li>• Sử dụng cả Flashcard và Quiz để đa dạng hóa</li>
-            <li>• Tập trung vào từ "Hard" và "Again"</li>
+            <li>• {t('vocabulary.dashboard.tip1')}</li>
+            <li>• {t('vocabulary.dashboard.tip2')}</li>
+            <li>• {t('vocabulary.dashboard.tip3')}</li>
+            <li>• {t('vocabulary.dashboard.tip4')}</li>
           </ul>
         </div>
       </div>

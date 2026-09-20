@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import i18n from '../../../i18n';
 
 interface FileUploadState {
   file: File | null;
@@ -17,10 +18,10 @@ export function useFileUpload() {
 
   const validateFile = (file: File): string | null => {
     if (!file.name.endsWith('.json')) {
-      return 'Only JSON files are allowed';
+      return i18n.t('import.onlyJson');
     }
     if (file.size > MAX_SIZE) {
-      return 'File size must be less than 10MB';
+      return i18n.t('import.fileTooLarge');
     }
     return null;
   };

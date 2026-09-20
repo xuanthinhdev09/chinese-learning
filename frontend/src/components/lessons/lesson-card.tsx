@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LessonSummary } from '../../api/hsk-api';
 
 interface LessonCardProps {
@@ -7,6 +8,7 @@ interface LessonCardProps {
 
 export default function LessonCard({ lesson }: LessonCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -18,7 +20,7 @@ export default function LessonCard({ lesson }: LessonCardProps) {
           <span className="text-blue-600 font-semibold">{lesson.order}</span>
         </div>
         <div className="bg-green-100 px-3 py-1 rounded-full">
-          <span className="text-sm text-green-700">{lesson.vocabularyCount} từ</span>
+          <span className="text-sm text-green-700">{t('lesson.wordCount', { count: lesson.vocabularyCount })}</span>
         </div>
       </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2 chinese-text">{lesson.title}</h3>

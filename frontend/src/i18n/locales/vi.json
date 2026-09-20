@@ -1,0 +1,443 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "retry": "Thử lại",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "back": "Quay lại",
+    "confirm": "Xác nhận",
+    "language": "Ngôn ngữ",
+    "emptyState": {
+      "noData": {
+        "title": "Chưa có dữ liệu",
+        "description": "Chưa có gì ở đây. Hãy quay lại sau!"
+      },
+      "noResults": {
+        "title": "Không tìm thấy kết quả",
+        "description": "Không tìm thấy nội dung bạn đang tìm."
+      },
+      "error": {
+        "title": "Đã có lỗi xảy ra",
+        "description": "Có lỗi khi tải nội dung này."
+      },
+      "noLessons": {
+        "title": "Chưa có bài học",
+        "description": "Bài học sẽ xuất hiện ở đây khi được thêm."
+      },
+      "noVocabulary": {
+        "title": "Chưa có từ vựng để học",
+        "description": "Bắt đầu học để thấy từ vựng ở đây."
+      }
+    }
+  },
+  "nav": {
+    "today": "Hôm nay",
+    "vocabulary": "Từ vựng",
+    "review": "Ôn tập",
+    "hskLevels": "HSK Levels",
+    "home": "Trang chủ",
+    "profile": "Hồ sơ",
+    "logout": "Đăng xuất",
+    "login": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "toggleMenu": "Mở/đóng menu",
+    "welcomeBack": "Chào mừng trở lại",
+    "viewProfile": "Xem hồ sơ của bạn",
+    "closeMenu": "Đóng menu"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mật khẩu",
+    "or": "hoặc",
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách bảo mật",
+    "continueAgreement": "Bằng cách tiếp tục, bạn đồng ý với <0>Điều khoản dịch vụ</0> và <1>Chính sách bảo mật</1>",
+    "login": {
+      "title": "Đăng nhập",
+      "tagline": "Học tiếng Trung hiệu quả mỗi ngày",
+      "emailRequired": "Vui lòng nhập email",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "forgotPassword": "Quên mật khẩu?",
+      "submit": "Đăng nhập",
+      "submitting": "Đang đăng nhập...",
+      "noAccount": "Chưa có tài khoản?",
+      "registerLink": "Đăng ký ngay",
+      "failed": "Đăng nhập thất bại"
+    },
+    "register": {
+      "title": "Đăng ký",
+      "subtitle": "Tạo tài khoản mới để bắt đầu học",
+      "username": "Tên người dùng",
+      "usernameRequired": "Vui lòng nhập tên người dùng",
+      "emailRequired": "Vui lòng nhập email",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "passwordPlaceholder": "Tối thiểu 8 ký tự",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPlaceholder": "Nhập lại mật khẩu",
+      "confirmRequired": "Vui lòng xác nhận mật khẩu",
+      "mismatch": "Mật khẩu không khớp!",
+      "mismatchShort": "Mật khẩu không khớp",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự!",
+      "termsAgreement": "Tôi đồng ý với <0>Điều khoản dịch vụ</0> và <1>Chính sách bảo mật</1>",
+      "submit": "Đăng ký",
+      "submitting": "Đang đăng ký...",
+      "hasAccount": "Đã có tài khoản?",
+      "loginLink": "Đăng nhập",
+      "failed": "Đăng ký thất bại",
+      "footer": "Bắt đầu hành trình học tiếng Trung của bạn ngay hôm nay"
+    }
+  },
+  "dashboard": {
+    "loading": "Đang tải dashboard...",
+    "greeting": "Xin chào, {{name}}! 👋",
+    "subtitle": "Tiếp tục hành trình học tiếng Trung của bạn",
+    "doneToday": "✓ Đã học hôm nay — giữ chuỗi ngày!",
+    "quickStart": "10-15 phút, một chạm",
+    "heroTitle": "🎯 Học hôm nay",
+    "streakDays": "🔥 {{count}} ngày",
+    "start": "Bắt đầu →",
+    "streakLabel": "ngày liên tiếp",
+    "dueToday": "từ cần ôn hôm nay"
+  },
+  "hsk": {
+    "title": "HSK Levels",
+    "subtitle": "Chọn trình độ để bắt đầu học",
+    "loadError": "Không thể tải dữ liệu HSK",
+    "levelLoadError": "Không thể tải thông tin HSK level",
+    "noContent": "Chưa có nội dung",
+    "lessonCount": "{{count}} bài học",
+    "percentComplete": "{{percent}}% hoàn thành",
+    "lessonsDone": "{{done}}/{{total}} bài",
+    "continue": "Tiếp tục học →",
+    "start": "Bắt đầu học →",
+    "lessons": "Bài học ({{count}})",
+    "noLessons": "Chưa có bài học cho trình độ này"
+  },
+  "lesson": {
+    "loadError": "Không thể tải thông tin bài học",
+    "breadcrumb": "Bài học",
+    "wordCount": "{{count}} từ vựng",
+    "vocabulary": "Từ vựng"
+  },
+  "today": {
+    "loading": "Đang soạn bài học hôm nay...",
+    "backHome": "Về trang chủ",
+    "stepHeader": "Bước {{current}}/{{total}}: {{label}}",
+    "emptyDone": "Đã học hôm nay rồi!",
+    "emptyDoneDesc": "Nhiệm vụ hôm nay hoàn thành — lịch ôn tiếp theo đã được lên.",
+    "emptyNothing": "Không có gì để ôn hôm nay",
+    "emptyNothingDesc": "Lịch ôn tập chưa đến hạn. Quay lại sau nhé!",
+    "keywordCardsTitle": "Từ khóa chính — lật thẻ",
+    "keywordQuizTitle": "Từ khóa chính — chọn nghĩa",
+    "vocabDueTitle": "Từ vựng đến hạn ôn",
+    "vocabDueTitleWithCount": "Từ vựng đến hạn ôn ({{current}}/{{total}})",
+    "segment": {
+      "dueDialogue": "Ôn hội thoại",
+      "newDialogue": "Bài mới",
+      "keywordCards": "Từ khóa chính",
+      "keywordQuiz": "Kiểm tra từ khóa",
+      "vocabCards": "Ôn từ vựng"
+    },
+    "dialogue": {
+      "empty": "Bài học chưa có hội thoại.",
+      "failed": "Chưa ↻",
+      "failedTitle": "Cần luyện lại",
+      "groupProgress": "Đoạn {{current}}/{{total}}",
+      "lineProgress": "Câu {{current}}/{{total}}",
+      "modeNew": "Bài mới — đọc theo",
+      "modeReview": "Ôn tập",
+      "nextGroup": "Đoạn tiếp →",
+      "nextGroupTitle": "Hết đoạn — chuyển sang đoạn kế tiếp",
+      "passed": "Trôi ✓",
+      "passedTitle": "Đọc trôi chảy",
+      "pause": "Tạm dừng",
+      "pauseTitle": "Tạm dừng",
+      "play": "Phát",
+      "playingStatus": "Đang phát…",
+      "pausedStatus": "Tạm dừng — bấm Tiếp tục để phát lại",
+      "playTitle": "Nghe hội thoại từ câu đang chọn",
+      "playlist": "Danh sách phát",
+      "resume": "Tiếp tục",
+      "resumeTitle": "Phát tiếp từ vị trí đang dừng",
+      "reviewed": "Đã ôn ✓",
+      "skip": "Bỏ qua →"
+    },
+    "group": {
+      "fallback": "Đoạn {{index}}",
+      "lineCount": "{{count}} câu",
+      "progress": "Đoạn {{current}}/{{total}}"
+    },
+    "lyrics": {
+      "groupHeader": "Đoạn {{order}} · {{title}}",
+      "meaningToggle": "Nghĩa Việt",
+      "pinyinToggle": "Pinyin",
+      "togglePinyinTitle": "Hiện/ẩn pinyin trên mọi dòng",
+      "toggleVietnameseTitle": "Hiện/ẩn nghĩa tiếng Việt trên mọi dòng"
+    },
+    "practice": {
+      "continue": "Tiếp tục →",
+      "empty": "Không có mục nào để luyện.",
+      "again": "Quên",
+      "hard": "Khó",
+      "good": "Tốt",
+      "easy": "Dễ",
+      "reveal": "👆 Lật xem nghĩa",
+      "saveFailed": "Lưu không thành công — thử lại",
+      "speak": "Phát âm"
+    },
+    "speed": {
+      "title": "Tốc độ đọc",
+      "slow": "Chậm — dễ nghe",
+      "slightlySlow": "Hơi chậm",
+      "normal": "Bình thường",
+      "fast": "Nhanh — luyện phản xạ"
+    },
+    "summary": {
+      "title": "Xong nhiệm vụ hôm nay!",
+      "completed": "Bạn vừa hoàn thành {{count}} hoạt động học tập.",
+      "streak": "ngày liên tục",
+      "dialoguesReviewed": "hội thoại đã ôn",
+      "newLesson": "bài mới",
+      "wordsPracticed": "từ đã luyện",
+      "seeYouTomorrow": "Hẹn gặp lại ngày mai — lịch ôn đã được cập nhật tự động."
+    }
+  },
+  "vocabulary": {
+    "dashboard": {
+      "title": "Bảng điều khiển học tập",
+      "subtitle": "Theo dõi tiến độ và ôn tập từ vựng",
+      "newWords": "Học từ mới",
+      "newWordsDesc": "Bắt đầu học từ vựng HSK",
+      "viewLessons": "Xem bài học",
+      "viewLessonsDesc": "Duyệt danh sách bài HSK",
+      "quiz": "Làm trắc nghiệm",
+      "quizDesc": "Kiểm tra kiến thức",
+      "refresh": "Làm mới dữ liệu",
+      "refreshDesc": "Cập nhật thống kê",
+      "tipsTitle": "💡 Mẹo học tập hiệu quả",
+      "tip1": "Ôn tập ngay khi từ hết hạn (spaced repetition)",
+      "tip2": "Học mỗi ngày để duy trì streak 🔥",
+      "tip3": "Sử dụng cả Flashcard và Quiz để đa dạng hóa",
+      "tip4": "Tập trung vào từ \"Hard\" và \"Again\""
+    },
+    "study": {
+      "title": "HSK Vocabulary Study",
+      "subtitle": "Learn Chinese vocabulary with multiple study modes",
+      "scopeLabel": "Phạm vi ôn tập",
+      "allWords": "Tất cả từ",
+      "lessonChip": "Bài {{order}} · {{count}} từ",
+      "scopeSelected": "Đã chọn bài {{order}} — bấm chế độ bên dưới để bắt đầu",
+      "scopeSelectedUnknown": "Đã chọn một bài — bấm chế độ bên dưới để bắt đầu",
+      "scopeAllSelected": "Đang chọn tất cả từ — chọn một bài để ôn riêng",
+      "noLessonsData": "Chưa có dữ liệu bài học cho trình độ này.",
+      "lessonFallback": "Bài học",
+      "allVocabTitle": "Tất cả từ vựng ({{count}} từ)",
+      "changeLesson": "← Đổi bài",
+      "dismiss": "Ẩn",
+      "loading": "Đang tải từ vựng..."
+    },
+    "modes": {
+      "flashcard": "Flashcards",
+      "quiz": "Quiz Meaning",
+      "fillBlank": "Fill Blank",
+      "pinyinMatch": "Pinyin Match"
+    },
+    "modeDesc": {
+      "flashcard": "Ôn tập với thẻ từ",
+      "quiz": "Chọn nghĩa đúng",
+      "fillBlank": "Điền vào chỗ trống",
+      "pinyinMatch": "Chọn Pinyin đúng"
+    },
+    "contentLang": {
+      "vietnamese": "Tiếng Việt",
+      "english": "English",
+      "both": "Cả hai",
+      "title": "Đổi ngôn ngữ hiển thị nghĩa"
+    },
+    "stats": {
+      "loadError": "Không thể tải thống kê",
+      "title": "Tiến độ học tập",
+      "total": "Tổng số từ",
+      "new": "Mới",
+      "learning": "Đang học",
+      "mastered": "Đã thành thạo",
+      "streakDays": "{{count}} ngày",
+      "dueTodayLabel": "Hôm nay cần ôn",
+      "dueTodayCount": "{{count}} từ",
+      "startReview": "Bắt đầu ôn tập",
+      "allDone": "🎉 Không có từ cần ôn hôm nay!",
+      "allDoneHint": "Học từ mới để tiếp tục"
+    },
+    "rating": {
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy"
+    },
+    "ratingDesc": {
+      "again": "Ôn lại sau 10 phút",
+      "hard": "Cần cố gắng",
+      "good": "Nhớ khá",
+      "easy": "Nhớ tốt"
+    },
+    "speed": {
+      "title": "Tốc độ đọc",
+      "verySlow": "Rất chậm",
+      "slow": "Chậm",
+      "normal": "Bình thường",
+      "original": "Tốc độ gốc",
+      "fast": "Nhanh"
+    },
+    "flashcard": {
+      "progress": "Tiến trình",
+      "speak": "Phát âm",
+      "clickToFlip": "Click để lật thẻ",
+      "vietnameseLabel": "Nghĩa tiếng Việt",
+      "englishLabel": "English",
+      "meaningLabel": "Meaning",
+      "exampleLabel": "Example",
+      "howWell": "Bạn nhớ từ này thế nào?",
+      "prev": "← Trước",
+      "next": "Tiếp →",
+      "shortcutHint": "Phím tắt: <0>Space</0> lật thẻ • <1>1-4</1> đánh giá"
+    },
+    "quiz": {
+      "completed": "Quiz Completed! 🎉",
+      "scoreLine": "{{correct}} / {{total}} đúng",
+      "retry": "Làm lại",
+      "back": "Quay lại",
+      "notLoaded": "No quiz loaded",
+      "scoreLabel": "Điểm",
+      "question": "Nghĩa của từ này là gì?",
+      "seeResults": "Xem kết quả",
+      "next": "Câu tiếp theo",
+      "correct": "✓ Chính xác! {{hanzi}} nghĩa là \"{{meaning}}\"",
+      "wrong": "✗ Đáp án đúng là \"{{answer}}\""
+    },
+    "common": {
+      "submit": "Gửi câu trả lời",
+      "nextArrow": "Câu tiếp theo →",
+      "wrongAnswer": "✗ Đáp án đúng là \"{{answer}}\" - {{hanzi}} ({{meaning}})"
+    },
+    "fillBlank": {
+      "title": "Điền vào chỗ trống",
+      "correct": "✓ Chính xác! \"{{hanzi}}\" nghĩa là \"{{meaning}}\""
+    },
+    "pinyinMatch": {
+      "title": "Chọn Pinyin đúng",
+      "question": "Pinyin của từ này là gì?",
+      "correct": "✓ Chính xác! {{hanzi}} đọc là \"{{pinyin}}\" - {{meaning}}"
+    },
+    "list": {
+      "empty": "Chưa có từ vựng"
+    },
+    "card": {
+      "speaking": "Đang phát...",
+      "listenAgain": "Nghe lại",
+      "listen": "Nghe phát âm"
+    }
+  },
+  "profile": {
+    "edit": "Chỉnh sửa profile",
+    "username": "Tên người dùng",
+    "usernamePlaceholder": "3-20 ký tự",
+    "usernameLength": "Tên phải từ 3 đến 20 ký tự",
+    "saving": "Đang lưu...",
+    "passwordTitle": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "newPasswordTooShort": "Mật khẩu mới phải có ít nhất 8 ký tự",
+    "passwordMismatch": "Xác nhận mật khẩu không khớp",
+    "passwordChanged": "Đổi mật khẩu thành công",
+    "changing": "Đang đổi...",
+    "avatarPickerLabel": "Chọn avatar",
+    "stats": {
+      "vocabLearned": "Từ vựng đã học",
+      "lessonsCompleted": "Bài hoàn thành",
+      "streak": "Chuỗi ngày học",
+      "activeDays": "Ngày hoạt động",
+      "loadError": "Không tải được thống kê. Thử tải lại trang."
+    }
+  },
+  "errors": {
+    "invalidCredentials": "Email hoặc mật khẩu không đúng",
+    "emailRegistered": "Email đã được đăng ký",
+    "usernameTaken": "Tên người dùng đã được sử dụng",
+    "invalidAvatar": "Ảnh đại diện không hợp lệ",
+    "wrongPassword": "Mật khẩu hiện tại không đúng",
+    "userNotFound": "Không tìm thấy người dùng",
+    "invalidEmail": "Email không hợp lệ",
+    "usernameTooShort": "Tên người dùng phải có ít nhất 3 ký tự",
+    "usernameTooLong": "Tên người dùng không được quá 20 ký tự",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+    "networkError": "Không thể kết nối máy chủ, vui lòng kiểm tra mạng và thử lại",
+    "unknown": "Có lỗi xảy ra, vui lòng thử lại",
+    "loadPlanFailed": "Không tải được kế hoạch học tập",
+    "saveDialogueReview": "Không lưu được kết quả ôn hội thoại",
+    "saveSessionCompletion": "Không ghi nhận hoàn thành phiên học",
+    "loadStats": "Không tải được thống kê",
+    "updateProfileFailed": "Cập nhật profile thất bại",
+    "changePasswordFailed": "Đổi mật khẩu thất bại"
+  },
+  "import": {
+    "title": "Nhập dữ liệu HSK",
+    "stepTitle": "Bước {{id}}: {{title}}",
+    "completePrevious": "Hoàn thành bước trước để tiếp tục",
+    "previousStep": "Bước trước",
+    "nextStep": "Bước sau",
+    "steps": {
+      "lessonsTitle": "Nhập bài học",
+      "lessonsDesc": "Tải lên file JSON chứa danh sách bài học",
+      "vocabulariesTitle": "Nhập từ vựng",
+      "vocabulariesDesc": "Tải lên file JSON chứa từ vựng của từng bài học",
+      "conversationsTitle": "Nhập hội thoại",
+      "conversationsDesc": "Tải lên file JSON chứa hội thoại của từng bài học"
+    },
+    "upload": {
+      "lessons": "File bài học (lessons.json)",
+      "vocabularies": "File từ vựng (vocabularies.json)",
+      "conversations": "File hội thoại (conversations.json)"
+    },
+    "button": {
+      "lessons": "Nhập bài học",
+      "vocabularies": "Nhập từ vựng",
+      "conversations": "Nhập hội thoại"
+    },
+    "errorPrefix": "Lỗi: {{message}}",
+    "success": "Nhập thành công",
+    "created": "Đã tạo: {{count}}",
+    "skipped": "Đã bỏ qua: {{count}}",
+    "errors": "Lỗi: {{count}}",
+    "downloadMapping": "Tải file mapping mẫu",
+    "importedLessonsTitle": "Bài học đã nhập",
+    "loadingLessons": "Đang tải danh sách bài học...",
+    "vocabCount": "Từ vựng: {{count}}",
+    "onlyJson": "Chỉ cho phép file JSON",
+    "fileTooLarge": "File phải nhỏ hơn 10MB",
+    "dropHere": "Thả file vào đây",
+    "dragDrop": "Kéo thả file JSON vào đây, hoặc",
+    "browse": "Chọn file",
+    "remove": "Xóa",
+    "createdLabel": "Đã tạo",
+    "skippedLabel": "Đã bỏ qua",
+    "errorsLabel": "Lỗi",
+    "processing": "Đang xử lý...",
+    "validationTitle": "Lỗi kiểm tra dữ liệu ({{count}})",
+    "dismiss": "Ẩn",
+    "structureErrors": "Lỗi cấu trúc",
+    "dataErrors": "Lỗi dữ liệu",
+    "constraintErrors": "Lỗi ràng buộc",
+    "fixRetry": "Sửa & thử lại",
+    "reset": "Đặt lại",
+    "rowPrefix": "Dòng {{row}}: ",
+    "gate": {
+      "title": "Khu vực nhập liệu",
+      "description": "Trang này chỉ dành cho chủ sở hữu. Nhập mật khẩu để tiếp tục.",
+      "wrongPassword": "Mật khẩu không đúng",
+      "unlock": "Mở khóa"
+    }
+  }
+}

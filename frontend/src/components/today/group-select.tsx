@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DialogueLine } from '../../api/daily-session';
 import { cn } from '../../utils/cn';
 
@@ -15,6 +16,7 @@ interface GroupSelectProps {
  * hình; backdrop vô hình đóng dropdown khi tap ngoài.
  */
 export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -32,7 +34,7 @@ export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps)
         className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-white dark:bg-gray-800 text-sm text-foreground transition-colors"
       >
         <span className="whitespace-nowrap">
-          Đoạn {activeIndex + 1}/{groups.length}
+          {t('today.group.progress', { current: activeIndex + 1, total: groups.length })}
         </span>
         <span className={cn('text-muted transition-transform', open && 'rotate-180')}>▾</span>
       </button>
@@ -59,7 +61,7 @@ export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps)
               >
                 <span className="truncate text-foreground">
                   <span className="chinese-text">
-                    {first.dialogueTitleHanzi ?? `Đoạn ${groupIdx + 1}`}
+                    {first.dialogueTitleHanzi ?? t('today.group.fallback', { index: groupIdx + 1 })}
                   </span>
                   {first.dialogueTitleVi && (
                     <span className="text-muted"> · {first.dialogueTitleVi}</span>
@@ -69,7 +71,7 @@ export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps)
                   className={cn('shrink-0 text-xs', isActive ? 'text-primary' : 'text-muted')}
                 >
                   {isActive ? '✓ ' : ''}
-                  {group.length} câu
+                  {t('today.group.lineCount', { count: group.length })}
                 </span>
               </button>
             );

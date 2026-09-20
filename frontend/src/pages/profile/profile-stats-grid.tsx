@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useProfileStats } from './hooks/use-profile-hooks';
 
 /**
@@ -5,26 +6,27 @@ import { useProfileStats } from './hooks/use-profile-hooks';
  * Numbers come from GET /users/me/stats.
  */
 export function ProfileStatsGrid() {
+  const { t } = useTranslation();
   const { data: stats, isLoading, isError } = useProfileStats();
 
   const cards = [
     {
-      label: 'Từ vựng đã học',
+      label: t('profile.stats.vocabLearned'),
       value: stats?.vocabularyLearned,
       color: 'text-blue-600',
     },
     {
-      label: 'Bài hoàn thành',
+      label: t('profile.stats.lessonsCompleted'),
       value: stats?.lessonsCompleted,
       color: 'text-green-600',
     },
     {
-      label: 'Chuỗi ngày học',
+      label: t('profile.stats.streak'),
       value: stats?.streakDays,
       color: 'text-orange-600',
     },
     {
-      label: 'Ngày hoạt động',
+      label: t('profile.stats.activeDays'),
       value: stats?.activeDays,
       color: 'text-purple-600',
     },
@@ -45,7 +47,7 @@ export function ProfileStatsGrid() {
       ))}
       {isError && (
         <p className="col-span-2 text-sm text-red-600 text-center" role="alert">
-          Không tải được thống kê. Thử tải lại trang.
+          {t('profile.stats.loadError')}
         </p>
       )}
     </div>

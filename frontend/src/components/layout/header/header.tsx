@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../stores/auth-store';
 import { Button } from '../../ui/button/button';
+import { LanguageToggle } from '../language-toggle/language-toggle';
 import { cn } from '../../../utils/cn';
 
 export interface HeaderProps {
@@ -13,6 +15,7 @@ export interface HeaderProps {
 export const Header = React.forwardRef<HTMLElement, HeaderProps>(
   ({ className = '', onMobileMenuToggle, isMobileMenuOpen = false }, ref) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { isAuthenticated, user, logout } = useAuthStore();
 
     const handleLogout = async () => {
@@ -48,7 +51,7 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
               <button
                 onClick={onMobileMenuToggle}
                 className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                aria-label="Toggle menu"
+                aria-label={t('nav.toggleMenu')}
                 aria-expanded={isMobileMenuOpen}
               >
                 <div className="w-6 h-5 flex flex-col justify-center gap-1.5">
@@ -78,13 +81,13 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                   onClick={() => navigate('/today')}
                   className="text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
                 >
-                  Hôm nay
+                  {t('nav.today')}
                 </button>
                 <button
                   onClick={() => navigate('/vocabulary/study')}
                   className="text-sm font-medium text-muted hover:text-foreground transition-colors"
                 >
-                  Từ vựng
+                  {t('nav.vocabulary')}
                 </button>
               </nav>
             )}
@@ -92,6 +95,7 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
             {/* User menu */}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
+                <LanguageToggle />
                 <span className="hidden sm:block text-sm text-muted">
                   {user?.email}
                 </span>
@@ -100,31 +104,32 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                   size="sm"
                   onClick={() => navigate('/profile')}
                 >
-                  Profile
+                  {t('nav.profile')}
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
                 >
-                  Logout
+                  {t('nav.logout')}
                 </Button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
+                <LanguageToggle />
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate('/login')}
                 >
-                  Login
+                  {t('nav.login')}
                 </Button>
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={() => navigate('/register')}
                 >
-                  Sign Up
+                  {t('nav.signUp')}
                 </Button>
               </div>
             )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../../utils/cn';
 
 export interface EmptyStateProps {
@@ -55,58 +56,73 @@ EmptyState.displayName = 'EmptyState';
 
 // Preset empty states for common use cases
 export const EmptyStates = {
-  NoData: ({ action, className, ...rest }: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="📭"
-      title="No data found"
-      description="There's nothing here yet. Check back later!"
-      action={action}
-      className={className}
-      {...rest}
-    />
-  ),
+  NoData: ({ action, className, ...rest }: Partial<EmptyStateProps>) => {
+    const { t } = useTranslation();
+    return (
+      <EmptyState
+        icon="📭"
+        title={t('common.emptyState.noData.title')}
+        description={t('common.emptyState.noData.description')}
+        action={action}
+        className={className}
+        {...rest}
+      />
+    );
+  },
 
-  NoResults: ({ action, className, ...rest }: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="🔍"
-      title="No results found"
-      description="We couldn't find what you're looking for."
-      action={action}
-      className={className}
-      {...rest}
-    />
-  ),
+  NoResults: ({ action, className, ...rest }: Partial<EmptyStateProps>) => {
+    const { t } = useTranslation();
+    return (
+      <EmptyState
+        icon="🔍"
+        title={t('common.emptyState.noResults.title')}
+        description={t('common.emptyState.noResults.description')}
+        action={action}
+        className={className}
+        {...rest}
+      />
+    );
+  },
 
-  Error: ({ action, className, ...rest }: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="⚠️"
-      title="Something went wrong"
-      description="An error occurred while loading this content."
-      action={action}
-      className={className}
-      {...rest}
-    />
-  ),
+  Error: ({ action, className, ...rest }: Partial<EmptyStateProps>) => {
+    const { t } = useTranslation();
+    return (
+      <EmptyState
+        icon="⚠️"
+        title={t('common.emptyState.error.title')}
+        description={t('common.emptyState.error.description')}
+        action={action}
+        className={className}
+        {...rest}
+      />
+    );
+  },
 
-  NoLessons: ({ action, className, ...rest }: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="📚"
-      title="No lessons yet"
-      description="Lessons will appear here once they're added."
-      action={action}
-      className={className}
-      {...rest}
-    />
-  ),
+  NoLessons: ({ action, className, ...rest }: Partial<EmptyStateProps>) => {
+    const { t } = useTranslation();
+    return (
+      <EmptyState
+        icon="📚"
+        title={t('common.emptyState.noLessons.title')}
+        description={t('common.emptyState.noLessons.description')}
+        action={action}
+        className={className}
+        {...rest}
+      />
+    );
+  },
 
-  NoVocabulary: ({ action, className, ...rest }: Partial<EmptyStateProps>) => (
-    <EmptyState
-      icon="📝"
-      title="No vocabulary to study"
-      description="Start learning to see vocabulary words here."
-      action={action}
-      className={className}
-      {...rest}
-    />
-  ),
+  NoVocabulary: ({ action, className, ...rest }: Partial<EmptyStateProps>) => {
+    const { t } = useTranslation();
+    return (
+      <EmptyState
+        icon="📝"
+        title={t('common.emptyState.noVocabulary.title')}
+        description={t('common.emptyState.noVocabulary.description')}
+        action={action}
+        className={className}
+        {...rest}
+      />
+    );
+  },
 };

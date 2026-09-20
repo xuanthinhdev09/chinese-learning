@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { useLanguagePreference } from '../../stores/language-preference-store';
 import { hskApi, LessonSummary } from '../../api/hsk-api';
@@ -12,6 +13,7 @@ type StudyModeId = 'flashcard' | 'quiz' | 'fill-blank' | 'pinyin-match';
 
 export function VocabularyStudyPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   /** null = cả level; set = ôn riêng một bài */
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
@@ -85,11 +87,12 @@ export function VocabularyStudyPage() {
   /** Level chưa có bài học nào (lessonCount = 0) — chỉ hiển thị, không chọn học được */
   const hasLessonContent = (hsk: { lessonCount: number }) => hsk.lessonCount > 0;
 
+  // Giá trị là key i18n — dịch lúc render để đổi ngôn ngữ giữa chừng vẫn đúng
   const studyModes = [
-    { id: 'flashcard', name: 'Flashcards', emoji: '📇', description: 'Ôn tập với thẻ từ', color: 'bg-blue-500' },
-    { id: 'quiz', name: 'Quiz Meaning', emoji: '🎯', description: 'Chọn nghĩa đúng', color: 'bg-green-500' },
-    { id: 'fill-blank', name: 'Fill Blank', emoji: '✏️', description: 'Điền vào chỗ trống', color: 'bg-purple-500' },
-    { id: 'pinyin-match', name: 'Pinyin Match', emoji: '🔊', description: 'Chọn Pinyin đúng', color: 'bg-orange-500' },
+    { id: 'flashcard', nameKey: 'vocabulary.modes.flashcard', emoji: '📇', descKey: 'vocabulary.modeDesc.flashcard', color: 'bg-blue-500' },
+    { id: 'quiz', nameKey: 'vocabulary.modes.quiz', emoji: '🎯', descKey: 'vocabulary.modeDesc.quiz', color: 'bg-green-500' },
+    { id: 'fill-blank', nameKey: 'vocabulary.modes.fillBlank', emoji: '✏️', descKey: 'vocabulary.modeDesc.fillBlank', color: 'bg-purple-500' },
+    { id: 'pinyin-match', nameKey: 'vocabulary.modes.pinyinMatch', emoji: '🔊', descKey: 'vocabulary.modeDesc.pinyinMatch', color: 'bg-orange-500' },
   ] as const;
 
   /**
@@ -132,10 +135,10 @@ export function VocabularyStudyPage() {
 
   const getLanguageLabel = () => {
     switch (preference) {
-      case 'vietnamese': return '🇻🇳 Tiếng Việt';
-      case 'english': return '🇬🇧 English';
-      case 'both': return '🌐 Cả hai';
-      default: return '🇻🇳 Tiếng Việt';
+      case 'vietnamese': return '🇻🇳 ' + t('vocabulary.contentLang.vietnamese');
+      case 'english': return '🇬🇧 ' + t('vocabulary.contentLang.english');
+      case 'both': return '🌐 ' + t('vocabulary.contentLang.both');
+      default: return '🇻🇳 ' + t('vocabulary.contentLang.vietnamese');
     }
   };
 
@@ -181,17 +184,17 @@ export function VocabularyStudyPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              HSK Vocabulary Study
+              {t('vocabulary.study.title')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Learn Chinese vocabulary with multiple study modes
+              {t('vocabulary.study.subtitle')}
             </p>
           </div>
 
           <button
             onClick={togglePreference}
             className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors flex items-center gap-2"
-            title="Change language preference"
+            title={t('vocabulary.contentLang.title')}
           >
             <span className="text-lg">{getLanguageLabel()}</span>
           </button>
@@ -226,11 +229,11 @@ export function VocabularyStudyPage() {
                 </h2>
                 {hasLessonContent(hsk) ? (
                   <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm">
-                    {hsk.lessonCount} bài học
+                    {t('hsk.lessonCount', { count: hsk.lessonCount })}
                   </span>
                 ) : (
                   <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full text-sm">
-                    Chưa có nội dung
+                    {t('hsk.noContent')}
                   </span>
                 )}
               </div>
@@ -244,7 +247,7 @@ export function VocabularyStudyPage() {
               {hasLessonContent(hsk) && selectedLevel === hsk.level && (
                 <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-                    Phạm vi ôn tập
+                    {t('vocabulary.study.scopeLabel')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -258,7 +261,7 @@ export function VocabularyStudyPage() {
                           : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-400'
                       }`}
                     >
-                      Tất cả từ
+                      {t('vocabulary.study.allWords')}
                     </button>
                     {lessons.map((lesson) => (
                       <button
@@ -274,14 +277,16 @@ export function VocabularyStudyPage() {
                             : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-400'
                         }`}
                       >
-                        Bài {lesson.order} · {lesson.vocabularyCount} từ
+                        {t('vocabulary.study.lessonChip', { order: lesson.order, count: lesson.vocabularyCount })}
                       </button>
                     ))}
                   </div>
                   <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     {selectedLessonId
-                      ? `Đã chọn ${studiedLesson ? `bài ${studiedLesson.order}` : 'một bài'} — bấm chế độ bên dưới để bắt đầu`
-                      : 'Đang chọn tất cả từ — chọn một bài để ôn riêng'}
+                      ? (studiedLesson
+                          ? t('vocabulary.study.scopeSelected', { order: studiedLesson.order })
+                          : t('vocabulary.study.scopeSelectedUnknown'))
+                      : t('vocabulary.study.scopeAllSelected')}
                   </p>
                 </div>
               )}
@@ -299,13 +304,13 @@ export function VocabularyStudyPage() {
                       className={`px-4 py-3 ${mode.color} text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-1`}
                     >
                       <span className="text-2xl">{mode.emoji}</span>
-                      <span className="text-sm font-semibold">{mode.name}</span>
+                      <span className="text-sm font-semibold">{t(mode.nameKey)}</span>
                     </button>
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Chưa có dữ liệu bài học cho trình độ này.
+                  {t('vocabulary.study.noLessonsData')}
                 </p>
               )}
             </div>
@@ -323,15 +328,15 @@ export function VocabularyStudyPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">{selectedHsk?.name}</p>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
             {selectedLessonId
-              ? studiedLesson?.title ?? 'Bài học'
-              : `Tất cả từ vựng (${vocabularies.length} từ)`}
+              ? (studiedLesson?.title ?? t('vocabulary.study.lessonFallback'))
+              : t('vocabulary.study.allVocabTitle', { count: vocabularies.length })}
           </h1>
         </div>
         <button
           onClick={handleBackToStart}
           className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 transition-colors text-sm"
         >
-          ← Đổi bài
+          {t('vocabulary.study.changeLesson')}
         </button>
       </div>
 
@@ -342,14 +347,14 @@ export function VocabularyStudyPage() {
             onClick={clearError}
             className="mt-2 text-sm underline"
           >
-            Dismiss
+            {t('vocabulary.study.dismiss')}
           </button>
         </div>
       )}
 
       {isLoading && (
         <div className="text-center py-12">
-          <p className="text-gray-500">Loading vocabulary...</p>
+          <p className="text-gray-500">{t('vocabulary.study.loading')}</p>
         </div>
       )}
 

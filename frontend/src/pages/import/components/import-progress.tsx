@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface ImportProgressProps {
   progress: number;
   created: number;
@@ -13,6 +15,8 @@ export function ImportProgress({
   errors,
   isImporting,
 }: ImportProgressProps) {
+  const { t } = useTranslation();
+
   if (!isImporting && progress === 0) return null;
 
   return (
@@ -27,9 +31,9 @@ export function ImportProgress({
 
       {/* Stats Grid */}
       <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Created" value={created} color="green" />
-        <StatCard label="Skipped" value={skipped} color="yellow" />
-        <StatCard label="Errors" value={errors} color="red" />
+        <StatCard label={t('import.createdLabel')} value={created} color="green" />
+        <StatCard label={t('import.skippedLabel')} value={skipped} color="yellow" />
+        <StatCard label={t('import.errorsLabel')} value={errors} color="red" />
       </div>
 
       {/* Status Message */}
@@ -54,7 +58,7 @@ export function ImportProgress({
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span>Processing...</span>
+          <span>{t('import.processing')}</span>
         </div>
       )}
     </div>

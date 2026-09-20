@@ -1,6 +1,8 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 import { MenuItem } from './menu-item';
+import { LanguageToggle } from './language-toggle/language-toggle';
 
 export interface MobileMenuProps {
   isOpen: boolean;
@@ -19,6 +21,7 @@ export interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -32,8 +35,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   // Navigation items grouped by section
   const mainNavItems = [
-    { path: '/today', icon: '🎯', label: 'Hôm nay' },
-    { path: '/vocabulary/study', icon: '📇', label: 'Từ vựng' },
+    { path: '/today', icon: '🎯', label: t('nav.today') },
+    { path: '/vocabulary/study', icon: '📇', label: t('nav.vocabulary') },
   ];
 
   return (
@@ -86,10 +89,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-semibold text-foreground">
-                    Welcome back
+                    {t('nav.welcomeBack')}
                   </p>
                   <p className="text-xs text-muted">
-                    View your profile
+                    {t('nav.viewProfile')}
                   </p>
                 </div>
                 <span className="text-muted" aria-hidden="true">→</span>
@@ -112,6 +115,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               ))}
             </section>
 
+            {/* Language Switcher */}
+            <section className="flex flex-col gap-2">
+              <LanguageToggle className="self-start" />
+            </section>
+
             {/* Close Button */}
             <button
               onClick={onClose}
@@ -123,7 +131,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 'transition-colors duration-150'
               )}
             >
-              Close Menu
+              {t('nav.closeMenu')}
             </button>
           </nav>
         </div>

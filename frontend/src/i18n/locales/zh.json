@@ -1,0 +1,443 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "出现错误",
+    "retry": "重试",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "back": "返回",
+    "confirm": "确认",
+    "language": "语言",
+    "emptyState": {
+      "noData": {
+        "title": "暂无数据",
+        "description": "这里还没有内容，稍后再来看看吧！"
+      },
+      "noResults": {
+        "title": "未找到结果",
+        "description": "找不到你要找的内容。"
+      },
+      "error": {
+        "title": "出现错误",
+        "description": "加载此内容时出错。"
+      },
+      "noLessons": {
+        "title": "暂无课程",
+        "description": "课程添加后会显示在这里。"
+      },
+      "noVocabulary": {
+        "title": "还没有可学的生词",
+        "description": "开始学习后，生词会显示在这里。"
+      }
+    }
+  },
+  "nav": {
+    "today": "今天",
+    "vocabulary": "生词",
+    "review": "复习",
+    "hskLevels": "HSK 等级",
+    "home": "首页",
+    "profile": "个人资料",
+    "logout": "退出登录",
+    "login": "登录",
+    "signUp": "注册",
+    "toggleMenu": "打开/关闭菜单",
+    "welcomeBack": "欢迎回来",
+    "viewProfile": "查看你的个人资料",
+    "closeMenu": "关闭菜单"
+  },
+  "auth": {
+    "email": "邮箱",
+    "password": "密码",
+    "or": "或",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "continueAgreement": "继续即表示你同意<0>服务条款</0>和<1>隐私政策</1>",
+    "login": {
+      "title": "登录",
+      "tagline": "每天高效学中文",
+      "emailRequired": "请输入邮箱",
+      "passwordRequired": "请输入密码",
+      "forgotPassword": "忘记密码？",
+      "submit": "登录",
+      "submitting": "正在登录...",
+      "noAccount": "还没有账号？",
+      "registerLink": "立即注册",
+      "failed": "登录失败"
+    },
+    "register": {
+      "title": "注册",
+      "subtitle": "创建新账号，开始学习",
+      "username": "用户名",
+      "usernameRequired": "请输入用户名",
+      "emailRequired": "请输入邮箱",
+      "passwordRequired": "请输入密码",
+      "passwordPlaceholder": "至少 8 个字符",
+      "confirmPassword": "确认密码",
+      "confirmPlaceholder": "再次输入密码",
+      "confirmRequired": "请再次输入密码",
+      "mismatch": "两次输入的密码不一致！",
+      "mismatchShort": "两次输入的密码不一致",
+      "passwordTooShort": "密码至少需要 8 个字符！",
+      "termsAgreement": "我同意<0>服务条款</0>和<1>隐私政策</1>",
+      "submit": "注册",
+      "submitting": "正在注册...",
+      "hasAccount": "已有账号？",
+      "loginLink": "登录",
+      "failed": "注册失败",
+      "footer": "今天就开启你的中文学习之旅"
+    }
+  },
+  "dashboard": {
+    "loading": "正在加载面板...",
+    "greeting": "你好，{{name}}！👋",
+    "subtitle": "继续你的中文学习之旅",
+    "doneToday": "✓ 今天已完成 — 保持连续打卡！",
+    "quickStart": "10-15 分钟，一键开始",
+    "heroTitle": "🎯 今日学习",
+    "streakDays": "🔥 {{count}} 天",
+    "start": "开始 →",
+    "streakLabel": "连续打卡天数",
+    "dueToday": "个生词今日待复习"
+  },
+  "hsk": {
+    "title": "HSK 等级",
+    "subtitle": "选择等级开始学习",
+    "loadError": "无法加载 HSK 数据",
+    "levelLoadError": "无法加载 HSK 等级信息",
+    "noContent": "暂无内容",
+    "lessonCount": "{{count}} 节课",
+    "percentComplete": "已完成 {{percent}}%",
+    "lessonsDone": "{{done}}/{{total}} 课",
+    "continue": "继续学习 →",
+    "start": "开始学习 →",
+    "lessons": "课程（{{count}}）",
+    "noLessons": "该等级还没有课程"
+  },
+  "lesson": {
+    "loadError": "无法加载课程信息",
+    "breadcrumb": "课程",
+    "wordCount": "{{count}} 个生词",
+    "vocabulary": "生词"
+  },
+  "today": {
+    "loading": "正在准备今天的学习...",
+    "backHome": "返回首页",
+    "stepHeader": "第 {{current}}/{{total}} 步：{{label}}",
+    "emptyDone": "今天已经学完啦！",
+    "emptyDoneDesc": "今日任务已完成 — 下次复习时间已安排。",
+    "emptyNothing": "今天没有要复习的内容",
+    "emptyNothingDesc": "复习计划还没到期，稍后再来吧！",
+    "keywordCardsTitle": "核心词语 — 翻卡学习",
+    "keywordQuizTitle": "核心词语 — 选择意思",
+    "vocabDueTitle": "到期的生词",
+    "vocabDueTitleWithCount": "到期的生词（{{current}}/{{total}}）",
+    "segment": {
+      "dueDialogue": "复习对话",
+      "newDialogue": "新课",
+      "keywordCards": "核心词语",
+      "keywordQuiz": "词语测验",
+      "vocabCards": "复习生词"
+    },
+    "dialogue": {
+      "empty": "本课还没有对话。",
+      "failed": "未通过 ↻",
+      "failedTitle": "需要再练一练",
+      "groupProgress": "第 {{current}}/{{total}} 段",
+      "lineProgress": "第 {{current}}/{{total}} 句",
+      "modeNew": "新课 — 跟读",
+      "modeReview": "复习",
+      "nextGroup": "下一段 →",
+      "nextGroupTitle": "本段结束 — 进入下一段",
+      "passed": "通过 ✓",
+      "passedTitle": "朗读流利",
+      "pause": "暂停",
+      "pauseTitle": "暂停",
+      "play": "播放",
+      "playingStatus": "正在播放…",
+      "pausedStatus": "已暂停 — 点击「继续」重新播放",
+      "playTitle": "从所选句开始听对话",
+      "playlist": "播放列表",
+      "resume": "继续",
+      "resumeTitle": "从暂停位置继续播放",
+      "reviewed": "已复习 ✓",
+      "skip": "跳过 →"
+    },
+    "group": {
+      "fallback": "第 {{index}} 段",
+      "lineCount": "{{count}} 句",
+      "progress": "第 {{current}}/{{total}} 段"
+    },
+    "lyrics": {
+      "groupHeader": "第 {{order}} 段 · {{title}}",
+      "meaningToggle": "越南语释义",
+      "pinyinToggle": "拼音",
+      "togglePinyinTitle": "显示/隐藏每句拼音",
+      "toggleVietnameseTitle": "显示/隐藏每句越南语释义"
+    },
+    "practice": {
+      "continue": "继续 →",
+      "empty": "没有可练习的内容。",
+      "again": "忘记",
+      "hard": "困难",
+      "good": "良好",
+      "easy": "简单",
+      "reveal": "👆 点击查看意思",
+      "saveFailed": "保存失败 — 请重试",
+      "speak": "发音"
+    },
+    "speed": {
+      "title": "朗读速度",
+      "slow": "慢速 — 容易听清",
+      "slightlySlow": "稍慢",
+      "normal": "正常",
+      "fast": "快速 — 练反应"
+    },
+    "summary": {
+      "title": "完成今天的任务！",
+      "completed": "你刚完成了 {{count}} 项学习活动。",
+      "streak": "连续打卡天数",
+      "dialoguesReviewed": "已复习对话",
+      "newLesson": "新课",
+      "wordsPracticed": "已练习生词",
+      "seeYouTomorrow": "明天见 — 复习计划已自动更新。"
+    }
+  },
+  "vocabulary": {
+    "dashboard": {
+      "title": "学习面板",
+      "subtitle": "跟踪进度，复习生词",
+      "newWords": "学新词",
+      "newWordsDesc": "开始学习 HSK 生词",
+      "viewLessons": "查看课程",
+      "viewLessonsDesc": "浏览 HSK 课程列表",
+      "quiz": "做测验",
+      "quizDesc": "检验学习成果",
+      "refresh": "刷新数据",
+      "refreshDesc": "更新统计信息",
+      "tipsTitle": "💡 高效学习小贴士",
+      "tip1": "生词一到复习时间就马上复习（间隔重复）",
+      "tip2": "每天学习，保持连续打卡 🔥",
+      "tip3": "抽认卡和测验搭配使用，学习更多样",
+      "tip4": "重点练习「困难」和「忘记」的词"
+    },
+    "study": {
+      "title": "HSK 词汇学习",
+      "subtitle": "用多种学习模式掌握汉语词汇",
+      "scopeLabel": "学习范围",
+      "allWords": "全部词语",
+      "lessonChip": "第 {{order}} 课 · {{count}} 个词",
+      "scopeSelected": "已选择第 {{order}} 课 — 点击下方模式开始",
+      "scopeSelectedUnknown": "已选择某一课 — 点击下方模式开始",
+      "scopeAllSelected": "当前为全部词语 — 选择一课可单独复习",
+      "noLessonsData": "该等级还没有课程数据。",
+      "lessonFallback": "课程",
+      "allVocabTitle": "全部生词（{{count}} 个）",
+      "changeLesson": "← 更换课程",
+      "dismiss": "隐藏",
+      "loading": "正在加载生词..."
+    },
+    "modes": {
+      "flashcard": "抽认卡",
+      "quiz": "意思测验",
+      "fillBlank": "填空",
+      "pinyinMatch": "拼音匹配"
+    },
+    "modeDesc": {
+      "flashcard": "用卡片复习",
+      "quiz": "选择正确的意思",
+      "fillBlank": "填入空缺处",
+      "pinyinMatch": "选择正确的拼音"
+    },
+    "contentLang": {
+      "vietnamese": "越南语",
+      "english": "英语",
+      "both": "两者都显示",
+      "title": "切换释义显示语言"
+    },
+    "stats": {
+      "loadError": "无法加载统计数据",
+      "title": "学习进度",
+      "total": "词语总数",
+      "new": "新词",
+      "learning": "学习中",
+      "mastered": "已掌握",
+      "streakDays": "{{count}} 天",
+      "dueTodayLabel": "今日待复习",
+      "dueTodayCount": "{{count}} 个词",
+      "startReview": "开始复习",
+      "allDone": "🎉 今天没有待复习的生词！",
+      "allDoneHint": "学习新词，继续前进"
+    },
+    "rating": {
+      "again": "忘记",
+      "hard": "困难",
+      "good": "良好",
+      "easy": "简单"
+    },
+    "ratingDesc": {
+      "again": "10 分钟后再次复习",
+      "hard": "还需要努力",
+      "good": "记得比较牢",
+      "easy": "记得很牢"
+    },
+    "speed": {
+      "title": "朗读速度",
+      "verySlow": "很慢",
+      "slow": "慢速",
+      "normal": "正常",
+      "original": "原始速度",
+      "fast": "快速"
+    },
+    "flashcard": {
+      "progress": "进度",
+      "speak": "发音",
+      "clickToFlip": "点击翻卡",
+      "vietnameseLabel": "越南语释义",
+      "englishLabel": "英语",
+      "meaningLabel": "释义",
+      "exampleLabel": "例句",
+      "howWell": "这个词你记得多牢？",
+      "prev": "← 上一个",
+      "next": "下一个 →",
+      "shortcutHint": "快捷键：<0>空格</0> 翻卡 • <1>1-4</1> 评分"
+    },
+    "quiz": {
+      "completed": "测验完成！🎉",
+      "scoreLine": "{{correct}} / {{total}} 正确",
+      "retry": "再做一次",
+      "back": "返回",
+      "notLoaded": "未加载测验",
+      "scoreLabel": "得分",
+      "question": "这个词的意思是什么？",
+      "seeResults": "查看结果",
+      "next": "下一题",
+      "correct": "✓ 正确！{{hanzi}} 的意思是“{{meaning}}”",
+      "wrong": "✗ 正确答案是“{{answer}}”"
+    },
+    "common": {
+      "submit": "提交答案",
+      "nextArrow": "下一题 →",
+      "wrongAnswer": "✗ 正确答案是“{{answer}}” - {{hanzi}}（{{meaning}}）"
+    },
+    "fillBlank": {
+      "title": "填空",
+      "correct": "✓ 正确！“{{hanzi}}”的意思是“{{meaning}}”"
+    },
+    "pinyinMatch": {
+      "title": "选择正确的拼音",
+      "question": "这个词的拼音是什么？",
+      "correct": "✓ 正确！{{hanzi}} 读作“{{pinyin}}” - {{meaning}}"
+    },
+    "list": {
+      "empty": "暂无生词"
+    },
+    "card": {
+      "speaking": "正在播放...",
+      "listenAgain": "再听一遍",
+      "listen": "听发音"
+    }
+  },
+  "profile": {
+    "edit": "编辑资料",
+    "username": "用户名",
+    "usernamePlaceholder": "3-20 个字符",
+    "usernameLength": "用户名需要 3 到 20 个字符",
+    "saving": "正在保存...",
+    "passwordTitle": "修改密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmNewPassword": "确认新密码",
+    "newPasswordTooShort": "新密码至少需要 8 个字符",
+    "passwordMismatch": "两次输入的密码不一致",
+    "passwordChanged": "密码修改成功",
+    "changing": "正在修改...",
+    "avatarPickerLabel": "选择头像",
+    "stats": {
+      "vocabLearned": "已学生词",
+      "lessonsCompleted": "已完成课程",
+      "streak": "连续打卡",
+      "activeDays": "活跃天数",
+      "loadError": "无法加载统计数据，请重新加载页面。"
+    }
+  },
+  "errors": {
+    "invalidCredentials": "邮箱或密码不正确",
+    "emailRegistered": "该邮箱已注册",
+    "usernameTaken": "用户名已被使用",
+    "invalidAvatar": "头像选择无效",
+    "wrongPassword": "当前密码不正确",
+    "userNotFound": "找不到该用户",
+    "invalidEmail": "邮箱格式无效",
+    "usernameTooShort": "用户名至少需要 3 个字符",
+    "usernameTooLong": "用户名不能超过 20 个字符",
+    "passwordTooShort": "密码至少需要 8 个字符",
+    "networkError": "无法连接服务器，请检查网络后重试",
+    "unknown": "出现错误，请重试",
+    "loadPlanFailed": "无法加载今日学习计划",
+    "saveDialogueReview": "无法保存对话复习结果",
+    "saveSessionCompletion": "无法记录学习完成情况",
+    "loadStats": "无法加载统计数据",
+    "updateProfileFailed": "更新个人资料失败",
+    "changePasswordFailed": "修改密码失败"
+  },
+  "import": {
+    "title": "导入 HSK 数据",
+    "stepTitle": "第 {{id}} 步：{{title}}",
+    "completePrevious": "请先完成上一步再继续",
+    "previousStep": "上一步",
+    "nextStep": "下一步",
+    "steps": {
+      "lessonsTitle": "导入课程",
+      "lessonsDesc": "上传包含课程列表的 JSON 文件",
+      "vocabulariesTitle": "导入生词",
+      "vocabulariesDesc": "上传包含每课生词的 JSON 文件",
+      "conversationsTitle": "导入对话",
+      "conversationsDesc": "上传包含每课对话的 JSON 文件"
+    },
+    "upload": {
+      "lessons": "课程文件（lessons.json）",
+      "vocabularies": "生词文件（vocabularies.json）",
+      "conversations": "对话文件（conversations.json）"
+    },
+    "button": {
+      "lessons": "导入课程",
+      "vocabularies": "导入生词",
+      "conversations": "导入对话"
+    },
+    "errorPrefix": "错误：{{message}}",
+    "success": "导入成功",
+    "created": "已创建：{{count}}",
+    "skipped": "已跳过：{{count}}",
+    "errors": "错误：{{count}}",
+    "downloadMapping": "下载示例映射文件",
+    "importedLessonsTitle": "已导入的课程",
+    "loadingLessons": "正在加载课程列表...",
+    "vocabCount": "生词：{{count}}",
+    "onlyJson": "仅支持 JSON 文件",
+    "fileTooLarge": "文件必须小于 10MB",
+    "dropHere": "将文件拖放到此处",
+    "dragDrop": "将 JSON 文件拖放到此处，或",
+    "browse": "选择文件",
+    "remove": "移除",
+    "createdLabel": "已创建",
+    "skippedLabel": "已跳过",
+    "errorsLabel": "错误",
+    "processing": "处理中...",
+    "validationTitle": "数据校验错误（{{count}}）",
+    "dismiss": "隐藏",
+    "structureErrors": "结构错误",
+    "dataErrors": "数据错误",
+    "constraintErrors": "约束错误",
+    "fixRetry": "修复并重试",
+    "reset": "重置",
+    "rowPrefix": "第 {{row}} 行：",
+    "gate": {
+      "title": "数据导入区",
+      "description": "此页面仅供所有者使用。请输入密码继续。",
+      "wrongPassword": "密码不正确",
+      "unlock": "解锁"
+    }
+  }
+}
