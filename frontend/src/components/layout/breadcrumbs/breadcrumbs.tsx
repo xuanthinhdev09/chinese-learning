@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../../utils/cn';
@@ -42,16 +43,30 @@ const linkChipClass = cn(
   'hover:bg-gray-100 dark:hover:bg-gray-700'
 );
 
+/** Cuộn quá ngưỡng này tính là "đã rời đỉnh trang" — breadcrumb ẩn theo. */
+const TOP_THRESHOLD_PX = 8;
+
 /**
  * Breadcrumbs bar cố định dưới header (top-16)
  *
  * Tối đa 2 chip: Home + crumb của route. Crumb là link nếu route hiện tại là
  * trang detail, còn với trang leaf (study/review) là chip highlight không bấm.
+ *
+ * Tự ẩn khi cuộn xuống, chỉ hiện lại khi về gần đỉnh trang. Bar vẫn chiếm chỗ
+ * (transform, không reflow) nên padding của layout không đổi theo cuộn.
  */
 export function Breadcrumbs() {
   const { pathname } = useLocation();
   const { t } = useTranslation();
   const crumb = getBreadcrumb(pathname);
+  const [atTop, setAtTop] = useState(true);
+
+  useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY <= TOP_THRESHOLD_PX);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   if (!crumb) return null;
 
@@ -61,9 +76,11 @@ export function Breadcrumbs() {
         'fixed top-16 left-0 right-0 z-40',
         'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md',
         'border-b border-gray-100 dark:border-gray-700',
-        'transition-all duration-200'
+        'transition-all duration-200',
+        atTop ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
       )}
       aria-label="Breadcrumb"
+      aria-hidden={!atTop}
     >
       <div className="container-custom">
         <ol className="flex items-center gap-1.5 py-3 text-sm">

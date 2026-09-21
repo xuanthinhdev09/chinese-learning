@@ -119,7 +119,8 @@
     "loadError": "无法加载课程信息",
     "breadcrumb": "课程",
     "wordCount": "{{count}} 个生词",
-    "vocabulary": "生词"
+    "vocabulary": "生词",
+    "practiceExercises": "练习题"
   },
   "today": {
     "loading": "正在准备今天的学习...",
@@ -424,5 +425,36 @@
       "wrongPassword": "密码不正确",
       "unlock": "解锁"
     }
+  },
+  "exercises": {
+    "title": "第{{lesson}}课 练习",
+    "loadError": "练习加载失败。该课是否尚未导入？",
+    "check": "检查",
+    "redo": "重做",
+    "score": "答对 {{correct}}/{{total}}",
+    "unknownType": "不支持的题型：{{type}}",
+    "pendingUploads": "还缺 {{count}} 张图片 — 请在各空位点击上传按钮添加课本扫描图。",
+    "uploadImage": "上传图片",
+    "example": "例",
+    "radicalHint": "先点选分组（蓝框），再点击字库中的汉字归入该组。点击组内汉字可退回字库。",
+    "radicalPool": "字库",
+    "radicalPoolEmpty": "所有汉字都已归组。",
+    "radicalGroupEmpty": "还没有汉字 — 先选此组，再点击上方字库中的汉字。",
+    "section": {
+      "listen": "听力",
+      "read": "阅读",
+      "phonetics": "语音",
+      "hanzi": "汉字"
+    },
+    "uploading": "上传中…",
+    "uploadFailed": "上传失败（png/jpg/webp ≤ 5MB）",
+    "uploadBadType": "仅支持 PNG / JPG / WebP 图片",
+    "uploadBadExt": "文件扩展名与该图片槽位不符",
+    "uploadTooLarge": "图片超过 5MB 限制",
+    "pasteSelectedHint": "已选择 — 按 Ctrl+V 粘贴图片",
+    "pasteBanner": "点击一个空白图片框，然后 Ctrl+V（或拖放）即可快速插入图片。",
+    "imageAlt": "练习图片 {{ref}}",
+    "audioMissing": "缺少音频文件 {{file}}",
+    "noAnswer": "口语练习，不计分"
   }
 }

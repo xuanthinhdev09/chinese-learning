@@ -3,8 +3,54 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../stores/auth-store';
 import { Button } from '../../ui/button/button';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownItem,
+  DropdownSeparator,
+} from '../../ui/dropdown/dropdown';
 import { LanguageToggle } from '../language-toggle/language-toggle';
 import { cn } from '../../../utils/cn';
+
+/**
+ * Avatar tròn: emoji đã chọn trong hồ sơ, hoặc chữ cái đầu của username khi
+ * chưa chọn avatar. Email/username đầy đủ chỉ nằm trong dropdown.
+ */
+function UserAvatar({
+  user,
+}: {
+  user?: { username: string; email: string; avatar?: string };
+}) {
+  const ring =
+    'transition-shadow hover:ring-2 hover:ring-primary/30 rounded-full';
+  if (user?.avatar) {
+    return (
+      <span
+        className={cn(
+          'flex h-9 w-9 items-center justify-center',
+          'bg-gray-100 text-lg select-none',
+          ring
+        )}
+        aria-hidden="true"
+      >
+        {user.avatar}
+      </span>
+    );
+  }
+  const initial = (user?.username ?? user?.email ?? '?').charAt(0).toUpperCase();
+  return (
+    <span
+      className={cn(
+        'flex h-9 w-9 items-center justify-center',
+        'bg-primary text-white text-sm font-semibold select-none',
+        ring
+      )}
+      aria-hidden="true"
+    >
+      {initial}
+    </span>
+  );
+}
 
 export interface HeaderProps {
   className?: string;
@@ -84,6 +130,12 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                   {t('nav.today')}
                 </button>
                 <button
+                  onClick={() => navigate('/hsk')}
+                  className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+                >
+                  {t('nav.hskLevels')}
+                </button>
+                <button
                   onClick={() => navigate('/vocabulary/study')}
                   className="text-sm font-medium text-muted hover:text-foreground transition-colors"
                 >
@@ -92,27 +144,31 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
               </nav>
             )}
 
-            {/* User menu */}
+            {/* User menu — chỉ avatar, tên + hành động trong dropdown */}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <LanguageToggle />
-                <span className="hidden sm:block text-sm text-muted">
-                  {user?.email}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/profile')}
+                <Dropdown
+                  align="end"
+                  trigger={
+                    <button
+                      type="button"
+                      className="rounded-full focus:outline-none"
+                      aria-label={t('nav.profile')}
+                    >
+                      <UserAvatar user={user ?? undefined} />
+                    </button>
+                  }
                 >
-                  {t('nav.profile')}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                >
-                  {t('nav.logout')}
-                </Button>
+                  <DropdownHeader>{user?.email}</DropdownHeader>
+                  <DropdownSeparator />
+                  <DropdownItem onClick={() => navigate('/profile')}>
+                    {t('nav.profile')}
+                  </DropdownItem>
+                  <DropdownItem danger onClick={handleLogout}>
+                    {t('nav.logout')}
+                  </DropdownItem>
+                </Dropdown>
               </div>
             ) : (
               <div className="flex items-center gap-3">

@@ -119,7 +119,8 @@
     "loadError": "Không thể tải thông tin bài học",
     "breadcrumb": "Bài học",
     "wordCount": "{{count}} từ vựng",
-    "vocabulary": "Từ vựng"
+    "vocabulary": "Từ vựng",
+    "practiceExercises": "Luyện bài tập"
   },
   "today": {
     "loading": "Đang soạn bài học hôm nay...",
@@ -424,5 +425,50 @@
       "wrongPassword": "Mật khẩu không đúng",
       "unlock": "Mở khóa"
     }
+  },
+  "exercises": {
+    "title": "Bài tập bài {{lesson}}",
+    "loadError": "Không thể tải bài tập. Đã import bài này chưa?",
+    "check": "Kiểm tra",
+    "redo": "Làm lại",
+    "score": "Đúng {{correct}}/{{total}}",
+    "unknownType": "Chưa hỗ trợ dạng đề: {{type}}",
+    "pendingUploads": "{{count}} ảnh chưa có — bấm nút upload tại từng chỗ trống để tải ảnh sách bài tập lên.",
+    "uploadImage": "Upload ảnh",
+    "example": "Ví dụ",
+    "radicalHint": "Bấm chọn nhóm (khung xanh), sau đó bấm chữ trong Kho chữ để xếp vào nhóm. Bấm chữ trong nhóm để trả về kho.",
+    "radicalPool": "Kho chữ",
+    "radicalPoolEmpty": "Đã xếp hết chữ vào các nhóm.",
+    "radicalGroupEmpty": "Chưa có chữ nào — chọn nhóm này rồi bấm chữ ở Kho chữ.",
+    "section": {
+      "listen": "Nghe",
+      "read": "Đọc",
+      "phonetics": "Phát âm",
+      "hanzi": "Chữ Hán"
+    },
+    "instr": {
+      "listen_judge_picture_tf": "Nghe câu, so với tranh in, đánh dấu đúng √ / sai X",
+      "listen_dialogue_choose_picture": "Nghe hội thoại, chọn tranh A-F khớp nội dung",
+      "listen_dialogue_choose_answer": "Nghe hội thoại + câu hỏi, chọn đáp án đúng",
+      "read_picture_for_sentence": "Đọc câu, chọn tranh A-F khớp nội dung",
+      "read_fill_blank_word": "Chọn từ phù hợp điền vào chỗ trống ( )",
+      "read_judge_tf": "Đọc 2 câu, xét câu in đậm có đúng nghĩa câu gốc không: đúng √ / sai X",
+      "read_match_qa": "Chọn câu A-F khớp với câu cho sẵn",
+      "listen_choose_word": "Nghe băng, chọn pinyin của từ nghe được (cặp âm gần nhau)",
+      "listen_repeat_drill": "Nghe băng, chú ý vị trí trọng âm từng từ rồi đọc theo (không có đáp án)",
+      "hanzi_classify_radical": "Xếp các chữ Hán vào đúng nhóm theo bộ thủ",
+      "hanzi_guess_meaning_picture": "Nhìn từ mới và tranh A-F, đoán nghĩa (ghép từ ↔ tranh)",
+      "hanzi_write_stroke_order": "Xem thứ tự nét rồi tự viết chữ (đáp án là chính chữ đó)"
+    },
+    "uploading": "Đang tải…",
+    "uploadFailed": "Upload thất bại (png/jpg/webp ≤ 5MB)",
+    "uploadBadType": "Chỉ nhận ảnh PNG / JPG / WebP",
+    "uploadBadExt": "Đuôi file không khớp ô ảnh này",
+    "uploadTooLarge": "Ảnh vượt quá 5MB",
+    "pasteSelectedHint": "Đã chọn — Ctrl+V để dán ảnh",
+    "pasteBanner": "Nhấn vào một ô ảnh trống rồi Ctrl+V (hoặc kéo thả) để gắn ảnh nhanh.",
+    "imageAlt": "Ảnh bài tập {{ref}}",
+    "audioMissing": "Chưa có file audio {{file}}",
+    "noAnswer": "luyện tập, không chấm điểm"
   }
 }

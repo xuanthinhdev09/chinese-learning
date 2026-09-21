@@ -7,6 +7,7 @@ import DashboardPage from './pages/dashboard/dashboard-page';
 import HskListPage from './pages/hsk/hsk-list-page';
 import HskDetailPage from './pages/hsk/hsk-detail-page';
 import LessonDetailPage from './pages/lessons/lesson-detail-page';
+import LessonExercisesPage from './pages/lessons/lesson-exercises-page';
 import ProfilePage from './pages/profile/profile-page';
 import { VocabularyStudyPage } from './pages/vocabulary/vocabulary-study-page';
 import { ReviewDashboardPage } from './pages/vocabulary/review-dashboard-page';
@@ -127,6 +128,7 @@ function App() {
           <Route path="hsk" element={<HskListPage />} />
           <Route path="hsk/:id" element={<HskDetailPage />} />
           <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+          <Route path="lessons/:lessonId/exercises" element={<LessonExercisesPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="vocabulary/study" element={<VocabularyStudyPage />} />
           <Route path="vocabulary/review" element={<ReviewDashboardPage />} />

@@ -46,8 +46,13 @@ async function rawFetch(url: string, options: RequestInit): Promise<Response> {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // Add Content-Type for POST/PUT/PATCH if not already set
-  if (options.method && ['POST', 'PUT', 'PATCH'].includes(options.method)) {
+  // Add Content-Type for POST/PUT/PATCH if not already set. FormData is
+  // exempt: the browser must set multipart/form-data with its own boundary.
+  if (
+    options.method &&
+    ['POST', 'PUT', 'PATCH'].includes(options.method) &&
+    !(options.body instanceof FormData)
+  ) {
     if (!headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
@@ -93,6 +98,10 @@ export const apiClient = {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     }),
+
+  /** Multipart upload: body goes through untouched, no JSON stringifying. */
+  postForm: (url: string, formData: FormData, options?: RequestInit) =>
+    apiFetch(url, { ...options, method: 'POST', body: formData }),
 
   put: (url: string, data?: any, options?: RequestInit) =>
     apiFetch(url, {

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { lessonsApi } from '../../api/lessons-api';
@@ -59,8 +59,16 @@ export default function LessonDetailPage() {
           {lesson.description && (
             <p className="mt-2 text-gray-600">{lesson.description}</p>
           )}
-          <div className="mt-4 text-sm text-gray-500">
-            {t('lesson.wordCount', { count: vocabularies?.length || 0 })}
+          <div className="mt-4 flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              {t('lesson.wordCount', { count: vocabularies?.length || 0 })}
+            </span>
+            <Link
+              to={`/lessons/${lessonId}/exercises`}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              {t('lesson.practiceExercises')}
+            </Link>
           </div>
         </div>
 

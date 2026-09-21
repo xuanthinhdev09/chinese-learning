@@ -122,7 +122,8 @@
     "breadcrumb": "Lessons",
     "wordCount_one": "{{count}} word",
     "wordCount_other": "{{count}} words",
-    "vocabulary": "Vocabulary"
+    "vocabulary": "Vocabulary",
+    "practiceExercises": "Practice exercises"
   },
   "today": {
     "loading": "Preparing today's session...",
@@ -434,5 +435,50 @@
       "wrongPassword": "Incorrect password",
       "unlock": "Unlock"
     }
+  },
+  "exercises": {
+    "title": "Lesson {{lesson}} exercises",
+    "loadError": "Failed to load exercises. Has this lesson been imported?",
+    "check": "Check",
+    "redo": "Redo",
+    "score": "{{correct}}/{{total}} correct",
+    "unknownType": "Unsupported exercise type: {{type}}",
+    "pendingUploads": "{{count}} images missing — use the upload button in each empty slot to attach workbook scans.",
+    "uploadImage": "Upload image",
+    "example": "Example",
+    "radicalHint": "Tap to pick a group (blue frame), then tap characters in the pool to sort them in. Tap a character inside a group to send it back.",
+    "radicalPool": "Character pool",
+    "radicalPoolEmpty": "All characters have been sorted.",
+    "radicalGroupEmpty": "Nothing here yet — pick this group, then tap characters in the pool.",
+    "section": {
+      "listen": "Listening",
+      "read": "Reading",
+      "phonetics": "Phonetics",
+      "hanzi": "Hanzi"
+    },
+    "instr": {
+      "listen_judge_picture_tf": "Listen to each sentence and mark √ (right) / X (wrong) against its picture",
+      "listen_dialogue_choose_picture": "Listen to each dialogue and pick the picture A-F that matches it",
+      "listen_dialogue_choose_answer": "Listen to the dialogue and question, then choose the correct answer",
+      "read_picture_for_sentence": "Read each sentence and pick the picture A-F that matches it",
+      "read_fill_blank_word": "Choose the right word to fill in each blank ( )",
+      "read_judge_tf": "Read the two sentences and judge whether the bold one matches the original: √ / X",
+      "read_match_qa": "Pick the response A-F that matches each given sentence",
+      "listen_choose_word": "Listen and choose the word you hear (a similar-sounding pair)",
+      "listen_repeat_drill": "Listen, note the stress in each word and repeat along (no answer)",
+      "hanzi_classify_radical": "Sort the characters into groups by radical",
+      "hanzi_guess_meaning_picture": "Look at each new word with pictures A-F and guess its meaning",
+      "hanzi_write_stroke_order": "Follow the stroke order and write the character yourself"
+    },
+    "uploading": "Uploading…",
+    "uploadFailed": "Upload failed (png/jpg/webp ≤ 5MB)",
+    "uploadBadType": "Only PNG / JPG / WebP images are accepted",
+    "uploadBadExt": "File extension does not match this image slot",
+    "uploadTooLarge": "Image exceeds the 5MB limit",
+    "pasteSelectedHint": "Selected — press Ctrl+V to paste an image",
+    "pasteBanner": "Click an empty image slot, then Ctrl+V (or drag & drop) to attach an image quickly.",
+    "imageAlt": "Exercise image {{ref}}",
+    "audioMissing": "Audio file {{file}} not available",
+    "noAnswer": "oral practice, not graded"
   }
 }

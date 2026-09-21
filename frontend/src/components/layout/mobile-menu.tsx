@@ -36,6 +36,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   // Navigation items grouped by section
   const mainNavItems = [
     { path: '/today', icon: '🎯', label: t('nav.today') },
+    { path: '/hsk', icon: '📚', label: t('nav.hskLevels') },
     { path: '/vocabulary/study', icon: '📇', label: t('nav.vocabulary') },
   ];
 
