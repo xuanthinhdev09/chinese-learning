@@ -11,6 +11,7 @@ import { SpacedRepetitionModule } from './spaced-repetition/spaced-repetition.mo
 import { ImportModule } from './import/import.module';
 import { DailySessionModule } from './daily-session/daily-session.module';
 import { TtsModule } from './tts/tts.module';
+import { ExercisesModule } from './exercises/exercises.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TtsModule } from './tts/tts.module';
     ImportModule,
     DailySessionModule,
     TtsModule,
+    ExercisesModule,
   ],
 })
 export class AppModule {}

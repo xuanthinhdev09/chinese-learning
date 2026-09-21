@@ -64,6 +64,8 @@ model Lesson {
   vocabularies      Vocabulary[]
   conversations     Conversation[]
   dialogueProgress  UserDialogueProgress[]
+  exercises         Exercise[]
+  exerciseImages    ExerciseImage[]
 
   @@map("lessons")
 }
@@ -209,4 +211,51 @@ model TtsAudio {
   createdAt    DateTime @default(now())
 
   @@map("tts_audio")
+}
+
+// One exercise item scanned from the HSK workbook (Sách bài tập). The question
+// shape varies per typeCode, so the type-specific data (items, options,
+// audio track, answer) lives in the payload JSON column — the validator owns
+// its typing, not the database. Order is global per lesson following the
+// book's print order; (lessonId, order) is unique so re-imports stay idempotent.
+model Exercise {
+  id               String   @id @default(cuid())
+  lessonId         String
+  order            Int
+  section          String // 听力 | 阅读 | 语音 | 汉字
+  typeCode         String // e.g. listen_judge_picture_tf — see workbook-type-catalog
+  instructionHanzi String?
+  instructionVi    String?
+  payload          Json
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  lesson           Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  images           ExerciseImage[]
+
+  @@unique([lessonId, order])
+  @@index([lessonId])
+  @@map("exercises")
+}
+
+// Image cropped from a workbook page scan and referenced by exercise payloads
+// via filePath. Pool images (answer options A-F shared by a whole exercise)
+// have no single exercise, hence the optional exerciseId; a per-item image
+// points at the exercise that uses it. Media files live on disk under
+// EXERCISE_IMAGE_STORAGE_DIR — same disk-backed pattern as TtsAudio files.
+model ExerciseImage {
+  id         String   @id @default(cuid())
+  lessonId   String
+  exerciseId String?
+  filePath   String
+  page       Int?
+  cropBox    Json? // [x, y, w, h] on the rendered page
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  lesson     Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  exercise   Exercise? @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+
+  @@unique([lessonId, filePath])
+  @@index([lessonId])
+  @@index([exerciseId])
+  @@map("exercise_images")
 }
