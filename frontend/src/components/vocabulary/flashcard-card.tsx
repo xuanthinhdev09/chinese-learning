@@ -229,10 +229,7 @@ export function FlashcardCard() {
                 </p>
               )}
 
-              {/* Pinyin */}
-              <p className="text-xl sm:text-2xl text-primary mb-3 font-light">
-                {current.pinyin}
-              </p>
+              {/* Pinyin chỉ nằm ở mặt sau — mặt trước chỉ có chữ Hán để tự nhớ cách đọc */}
 
               {/* POS */}
               {current.pos && (

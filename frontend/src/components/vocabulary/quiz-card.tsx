@@ -172,7 +172,10 @@ export function QuizCard() {
             </p>
           )}
 
-          <p className="text-2xl text-blue-600 dark:text-blue-400 mb-2">{current.pinyin}</p>
+          {/* Pinyin chỉ hiện sau khi đáp án đã được chốt (showResult) — không lộ cách đọc trước khi chọn */}
+          {quiz.showResult && (
+            <p className="text-2xl text-blue-600 dark:text-blue-400 mb-2">{current.pinyin}</p>
+          )}
 
           {current.pos && (
             <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm rounded">
