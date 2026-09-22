@@ -51,6 +51,10 @@ services:
       # Audio cache survives container rebuilds. Named volume (not bind mount)
       # so it inherits the nodejs ownership prepared in the Dockerfile.
       - tts_cache:/app/storage/tts
+      # Workbook exercise media — DB rows reference files here by relative
+      # path, so these volumes must survive backend rebuilds like tts_cache.
+      - exercise_images:/app/storage/exercise-images
+      - exercise_audio:/app/storage/exercise-audio
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,6 +91,10 @@ volumes:
   postgres_data:
     driver: local
   tts_cache:
+    driver: local
+  exercise_images:
+    driver: local
+  exercise_audio:
     driver: local
 
 networks:
