@@ -73,43 +73,57 @@ export function PicturePoolBody({ payload, images, answers, onAnswer, checked }:
         {payload.items.map((item) => {
           const chosen = answers[item.label];
           const correct = checked && isItemCorrect(item, chosen);
+          // Mobile stacks vertically (sentence row above, answer letters on
+          // one full-width row below); sm+ keeps the single inline row.
+          const hasText = !!(item.hanzi || item.pinyin);
+          const numberBadge = (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600">
+              {item.label}
+            </span>
+          );
           return (
             <div
               key={item.label}
-              className="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 p-3"
+              className="flex flex-col gap-2 rounded-xl border border-gray-200 p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600">
-                {item.label}
-              </span>
-              {(item.hanzi || item.pinyin) && (
-                <div className="min-w-0 flex-1">
-                  <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} />
+              {hasText && (
+                <div className="flex items-center gap-3 sm:flex-1">
+                  {numberBadge}
+                  <div className="min-w-0 flex-1">
+                    <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} />
+                  </div>
                 </div>
               )}
-              <div className="flex flex-wrap gap-1.5">
-                {POOL_LETTERS.slice(0, refs.length).map((letter) => (
-                  <LetterButton
-                    key={letter}
-                    value={letter}
-                    label={
-                      letter === usedByExample ? (
-                        <span className="line-through decoration-red-600 decoration-2">{letter}</span>
-                      ) : undefined
-                    }
-                    selected={chosen === letter}
-                    correct={checked && chosen === letter && item.answer === letter}
-                    wrong={checked && chosen === letter && item.answer !== letter}
-                    disabled={letter === usedByExample}
-                    onClick={() => onAnswer(item.label, letter)}
-                  />
-                ))}
+              <div className="flex items-center gap-3">
+                {!hasText && numberBadge}
+                {/* nowrap + flex-1 letters: the whole row always fits on one
+                    mobile line, no mid-row wrapping */}
+                <div className="flex flex-1 flex-nowrap gap-1.5 sm:flex-none sm:flex-wrap">
+                  {POOL_LETTERS.slice(0, refs.length).map((letter) => (
+                    <LetterButton
+                      key={letter}
+                      value={letter}
+                      label={
+                        letter === usedByExample ? (
+                          <span className="line-through decoration-red-600 decoration-2">{letter}</span>
+                        ) : undefined
+                      }
+                      selected={chosen === letter}
+                      correct={checked && chosen === letter && item.answer === letter}
+                      wrong={checked && chosen === letter && item.answer !== letter}
+                      disabled={letter === usedByExample}
+                      className="flex-1 sm:flex-none"
+                      onClick={() => onAnswer(item.label, letter)}
+                    />
+                  ))}
+                </div>
+                {checked && item.answer !== undefined && (
+                  <span className="flex shrink-0 items-center">
+                    <AnswerMark correct={correct} />
+                    <span className="ml-1 text-sm text-gray-500">{String(item.answer)}</span>
+                  </span>
+                )}
               </div>
-              {checked && item.answer !== undefined && (
-                <span className="flex items-center">
-                  <AnswerMark correct={correct} />
-                  <span className="ml-1 text-sm text-gray-500">{String(item.answer)}</span>
-                </span>
-              )}
             </div>
           );
         })}
