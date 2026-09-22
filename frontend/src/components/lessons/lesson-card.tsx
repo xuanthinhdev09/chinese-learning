@@ -12,7 +12,7 @@ export default function LessonCard({ lesson }: LessonCardProps) {
 
   return (
     <div
-      onClick={() => navigate(`/lessons/${lesson.id}`)}
+      onClick={() => navigate(`/lessons/${lesson.order}`)}
       className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
     >
       <div className="flex items-center justify-between mb-3">

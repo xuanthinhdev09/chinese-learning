@@ -8,6 +8,7 @@ import {
   SECTION_ORDER,
   exercisesApi,
 } from '../../api/exercises-api';
+import { useResolveLessonId } from '../../hooks/use-resolve-lesson-id';
 import { ExerciseCard } from '../../components/exercises/exercise-card';
 import { AudioPlayerProvider } from '../../components/exercises/audio-player-context';
 import {
@@ -47,7 +48,9 @@ function groupAdjacentByAudio(exercises: LessonExercise[]): AudioGroup[] {
 
 export default function LessonExercisesPage() {
   const { t } = useTranslation();
-  const { lessonId } = useParams<{ lessonId: string }>();
+  const { lessonId: lessonIdParam } = useParams<{ lessonId: string }>();
+  // Route param may be a lesson order (pretty URL /lessons/2/exercises) or raw id
+  const { lessonId, isResolving } = useResolveLessonId(lessonIdParam);
   const [answers, setAnswers] = useState<AnswersMap>({});
   const [checkedMap, setCheckedMap] = useState<CheckedMap>({});
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
@@ -141,7 +144,7 @@ export default function LessonExercisesPage() {
     />
   );
 
-  if (isLoading) {
+  if (isResolving || isLoading) {
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         {[...Array(4)].map((_, i) => (
@@ -170,7 +173,7 @@ export default function LessonExercisesPage() {
         <div className="mx-auto max-w-3xl space-y-6 pb-28">
           <header>
             <Link
-              to={`/lessons/${lessonId}`}
+              to={`/lessons/${data.lesson.order}`}
               className="text-sm text-blue-600 hover:underline"
             >
               ← {data.lesson.title}

@@ -3,11 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { lessonsApi } from '../../api/lessons-api';
 import { vocabularyApi } from '../../api/vocabulary-api';
+import { useResolveLessonId } from '../../hooks/use-resolve-lesson-id';
 import VocabularyList from '../../components/vocabulary/vocabulary-list';
 
 export default function LessonDetailPage() {
   const { t } = useTranslation();
-  const { lessonId } = useParams<{ lessonId: string }>();
+  const { lessonId: lessonIdParam } = useParams<{ lessonId: string }>();
+  // Route param may be a lesson order (pretty URL /lessons/2) or the raw id
+  const { lessonId, isResolving } = useResolveLessonId(lessonIdParam);
 
   const { data: lesson, isLoading: lessonLoading, error: lessonError } = useQuery({
     queryKey: ['lesson', lessonId],
@@ -21,7 +24,7 @@ export default function LessonDetailPage() {
     enabled: !!lessonId,
   });
 
-  if (lessonLoading || vocabLoading) {
+  if (isResolving || lessonLoading || vocabLoading) {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="h-8 bg-gray-200 rounded w-1/2 mb-4" />
@@ -64,7 +67,7 @@ export default function LessonDetailPage() {
               {t('lesson.wordCount', { count: vocabularies?.length || 0 })}
             </span>
             <Link
-              to={`/lessons/${lessonId}/exercises`}
+              to={`/lessons/${lesson.order}/exercises`}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               {t('lesson.practiceExercises')}
