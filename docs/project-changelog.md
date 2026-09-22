@@ -2,6 +2,13 @@
 
 Ghi nhận các thay đổi đáng kể của dự án. Mục mới nhất ở trên cùng.
 
+## 2026-09-22 — Deploy: L2 live, mobile exercise UI, exercise media bền vững
+
+- **Prod có L2**: sync DB (`exercises` + `exercise_images` 24 rows / 52 ảnh, pg_dump từ dev + remap lesson CUID dev→prod vì 2 DB seed riêng biệt) và file (52 ảnh + 4 audio `NN-1/2.mp3` — audio L2 02-1/02-2 mới). Prod: 24 exercises, 56 media files.
+- **Exercise media không còn mất khi rebuild**: named volumes `exercise_images` / `exercise_audio` trong `docker-compose.prod.yml` (pattern `tts_cache`), Dockerfile pre-create dir own nodejs. Trước đây storage nằm trong container fs → `--build backend` là mất.
+- **Frontend**: lesson URLs dùng order (`/lessons/2/exercises`) — `useResolveLessonId` vẫn nhận CUID cũ; `PicturePoolBody` mobile xếp chồng (câu trên, nút A-F 1 hàng dàn đều dưới), sm+ giữ inline. Fix UI 第16-20题 (看图片,选句子内容一致的图片) màn hình nhỏ.
+- Tool: `backend/validate-lesson-json.ts` — validate workbook-json v3 độc lập (`npx tsx validate-lesson-json.ts <file>`).
+
 ## 2026-09-21 (tối) — Fix UI bài tập theo feedback L1
 
 - Render block Ví dụ (payload.example) — `TfJudgeBody` (1-5, 26-30) + `PicturePoolBody`/`TextOptionsBody` (6-10, 16-20, 31-35); ảnh/đáp án ví dụ bị gạch đỏ + disable nút tương ứng (không áp cho per-item options 11-15 vì A/B/C lặp theo câu)
