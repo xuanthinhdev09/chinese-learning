@@ -95,11 +95,14 @@
     "subtitle": "Tiếp tục hành trình học tiếng Trung của bạn",
     "doneToday": "✓ Đã học hôm nay — giữ chuỗi ngày!",
     "quickStart": "10-15 phút, một chạm",
-    "heroTitle": "🎯 Học hôm nay",
+    "heroTitle": "🎯 Bắt đầu học",
     "streakDays": "🔥 {{count}} ngày",
     "start": "Bắt đầu →",
     "streakLabel": "ngày liên tiếp",
-    "dueToday": "từ cần ôn hôm nay"
+    "dueToday": "từ cần ôn hôm nay",
+    "review": "Ôn tập",
+    "reviewTitle": "Ôn tập đến hạn",
+    "reviewCount": "{{words}} từ + {{dialogues}} hội thoại đến hạn"
   },
   "hsk": {
     "title": "Trình độ HSK",
@@ -121,6 +124,21 @@
     "wordCount": "{{count}} từ vựng",
     "vocabulary": "Từ vựng",
     "practiceExercises": "Luyện bài tập"
+  },
+  "learn": {
+    "lessonLabel": "Bài {{order}}",
+    "stage": {
+      "vocab": "Từ vựng",
+      "dialogue": "Luyện nghe",
+      "exercises": "Bài tập"
+    },
+    "vocabFlashcardTitle": "Từ vựng — lật thẻ",
+    "vocabQuizTitle": "Từ vựng — chọn nghĩa",
+    "completeTitle": "Hoàn thành bài học!",
+    "completeDesc": "Bạn đã hoàn thành cả 3 hoạt động của bài này.",
+    "reStudy": "Học lại",
+    "recommended": "Nên làm",
+    "nextLesson": "Bài kế tiếp →"
   },
   "today": {
     "loading": "Đang soạn bài học hôm nay...",
@@ -186,7 +204,11 @@
       "easy": "Dễ",
       "reveal": "👆 Lật xem nghĩa",
       "saveFailed": "Lưu không thành công — thử lại",
-      "speak": "Phát âm"
+      "speak": "Phát âm",
+      "praise3": "🔥 Đang vào guồng!",
+      "praise5": "⚡ Chuỗi 5 đúng!",
+      "praise10": "🏆 Không thể ngăn cản!",
+      "praise20": "👑 Hoàn hảo!"
     },
     "speed": {
       "title": "Tốc độ đọc",

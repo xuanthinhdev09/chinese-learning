@@ -1,6 +1,9 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { VocabularyService } from './vocabulary.service';
 
+const NON_ADMIN_EMAIL = 'user@example.com';
+const ADMIN_EMAIL = 'admin@example.com';
+
 function buildPrismaMock() {
   return {
     lesson: {
@@ -17,6 +20,12 @@ function buildService(prisma: ReturnType<typeof buildPrismaMock>) {
 }
 
 describe('VocabularyService — sequential lesson locking', () => {
+  const originalAdminEmails = process.env.ADMIN_EMAILS;
+
+  afterEach(() => {
+    process.env.ADMIN_EMAILS = originalAdminEmails;
+  });
+
   it('throws Forbidden when lesson order is beyond the user first uncompleted lesson', async () => {
     const prisma = buildPrismaMock();
     prisma.lesson.findUnique.mockResolvedValue({ id: 'l3', order: 3, courseId: 'c1' });
@@ -24,7 +33,7 @@ describe('VocabularyService — sequential lesson locking', () => {
     prisma.lesson.findFirst.mockResolvedValue({ order: 2 });
     const service = buildService(prisma);
 
-    await expect(service.findByLesson('l3', 'u1')).rejects.toThrow(ForbiddenException);
+    await expect(service.findByLesson('l3', 'u1', NON_ADMIN_EMAIL)).rejects.toThrow(ForbiddenException);
     expect(prisma.vocabulary.findMany).not.toHaveBeenCalled();
   });
 
@@ -35,7 +44,7 @@ describe('VocabularyService — sequential lesson locking', () => {
     prisma.vocabulary.findMany.mockResolvedValue([{ id: 'v1' }]);
     const service = buildService(prisma);
 
-    const result = await service.findByLesson('l2', 'u1');
+    const result = await service.findByLesson('l2', 'u1', NON_ADMIN_EMAIL);
 
     expect(result).toEqual([{ id: 'v1' }]);
   });
@@ -47,7 +56,7 @@ describe('VocabularyService — sequential lesson locking', () => {
     prisma.vocabulary.findMany.mockResolvedValue([{ id: 'v1' }]);
     const service = buildService(prisma);
 
-    const result = await service.findByLesson('l15', 'u1');
+    const result = await service.findByLesson('l15', 'u1', NON_ADMIN_EMAIL);
 
     expect(result).toEqual([{ id: 'v1' }]);
   });
@@ -56,7 +65,21 @@ describe('VocabularyService — sequential lesson locking', () => {
     const prisma = buildPrismaMock();
     const service = buildService(prisma);
 
-    await expect(service.findByLesson('missing', 'u1')).rejects.toThrow(NotFoundException);
+    await expect(service.findByLesson('missing', 'u1', NON_ADMIN_EMAIL)).rejects.toThrow(NotFoundException);
+  });
+
+  it('bypasses the lock for an admin email (ADMIN_EMAILS)', async () => {
+    process.env.ADMIN_EMAILS = ADMIN_EMAIL;
+    const prisma = buildPrismaMock();
+    prisma.lesson.findUnique.mockResolvedValue({ id: 'l3', order: 3, courseId: 'c1' });
+    prisma.lesson.findFirst.mockResolvedValue({ order: 2 });
+    prisma.vocabulary.findMany.mockResolvedValue([{ id: 'v1' }]);
+    const service = buildService(prisma);
+
+    const result = await service.findByLesson('l3', 'u1', ADMIN_EMAIL);
+
+    expect(result).toEqual([{ id: 'v1' }]);
+    expect(prisma.vocabulary.findMany).toHaveBeenCalled();
   });
 
   it('caps hsk-level vocabulary at the user unlocked order, ignoring any client hint', async () => {
@@ -65,7 +88,7 @@ describe('VocabularyService — sequential lesson locking', () => {
     prisma.lesson.findFirst.mockResolvedValue({ order: 2 });
     const service = buildService(prisma);
 
-    await service.findByHSKLevel(2, 'u1');
+    await service.findByHSKLevel(2, 'u1', NON_ADMIN_EMAIL);
 
     expect(prisma.vocabulary.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -80,7 +103,7 @@ describe('VocabularyService — sequential lesson locking', () => {
     prisma.lesson.findFirst.mockResolvedValue(null);
     const service = buildService(prisma);
 
-    await service.findByHSKLevel(2, 'u1');
+    await service.findByHSKLevel(2, 'u1', NON_ADMIN_EMAIL);
 
     expect(prisma.vocabulary.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { hskLevel: 2 } })
@@ -91,10 +114,24 @@ describe('VocabularyService — sequential lesson locking', () => {
     const prisma = buildPrismaMock();
     const service = buildService(prisma);
 
-    await service.findByHSKLevel(9, 'u1');
+    await service.findByHSKLevel(9, 'u1', NON_ADMIN_EMAIL);
 
     expect(prisma.vocabulary.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { hskLevel: 9 } })
+    );
+  });
+
+  it('does not cap hsk-level vocabulary for an admin email', async () => {
+    process.env.ADMIN_EMAILS = ADMIN_EMAIL;
+    const prisma = buildPrismaMock();
+    prisma.course.findFirst.mockResolvedValue({ id: 'c1' });
+    prisma.lesson.findFirst.mockResolvedValue({ order: 2 });
+    const service = buildService(prisma);
+
+    await service.findByHSKLevel(2, 'u1', ADMIN_EMAIL);
+
+    expect(prisma.vocabulary.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { hskLevel: 2 } })
     );
   });
 });

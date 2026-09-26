@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus, UseGuards } f
 import { DailySessionService } from './daily-session.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { CompleteSessionDto, CompleteSessionResultDto, CurrentLessonDto, DailySessionResponseDto, DialogueReviewResultDto, RecordDialogueReviewDto } from './dto/daily-session.dto';
+import { CompleteActivityDto, CompleteSessionDto, CompleteSessionResultDto, CurrentLessonDto, DailySessionResponseDto, DialogueReviewResultDto, LessonProgressDto, RecordDialogueReviewDto } from './dto/daily-session.dto';
 
 @Controller('daily-session')
 @UseGuards(JwtAuthGuard)
@@ -51,5 +51,28 @@ export class DailySessionController {
     @Body() dto: CompleteSessionDto
   ): Promise<CompleteSessionResultDto> {
     return this.dailySessionService.completeSession(user.userId, dto);
+  }
+
+  /**
+   * POST /daily-session/activity-complete — mark one wizard activity complete
+   */
+  @Post('activity-complete')
+  @HttpCode(HttpStatus.OK)
+  async completeActivity(
+    @CurrentUser() user: any,
+    @Body() dto: CompleteActivityDto
+  ): Promise<LessonProgressDto> {
+    return this.dailySessionService.completeActivity(user.userId, dto);
+  }
+
+  /**
+   * GET /daily-session/lesson-status?lessonId= — read 3 activity flags for a lesson
+   */
+  @Get('lesson-status')
+  async getLessonStatus(
+    @CurrentUser() user: any,
+    @Query('lessonId') lessonId: string
+  ): Promise<LessonProgressDto> {
+    return this.dailySessionService.getLessonStatus(user.userId, lessonId);
   }
 }

@@ -26,6 +26,15 @@ const RATING_OPTIONS = [
   { value: 5, labelKey: 'today.practice.easy', emoji: '⭐', color: 'bg-primary hover:bg-primary-dark' },
 ];
 
+// Chuỗi đúng liên tiếp trong quiz → mốc khen ngắn (variable reward nhẹ, không
+// cần hệ điểm). Key trỏ tới today.practice.praise*.
+const PRAISE_MILESTONES: Record<number, string> = {
+  3: 'today.practice.praise3',
+  5: 'today.practice.praise5',
+  10: 'today.practice.praise10',
+  20: 'today.practice.praise20',
+};
+
 function shuffle<T>(array: T[]): T[] {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -46,6 +55,8 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
   const [picked, setPicked] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [correctStreak, setCorrectStreak] = useState(0);
+  const [praiseKey, setPraiseKey] = useState<string | null>(null);
   const { play, isBusy: isSpeaking } = useTtsAudio();
 
   const current = items[index];
@@ -99,6 +110,10 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
     if (picked || saving) return;
     setPicked(option);
     const correct = option === current.meaning;
+    const newStreak = correct ? correctStreak + 1 : 0;
+    setCorrectStreak(newStreak);
+    // Mốc chuỗi đúng → khen ngắn; trả lời sai reset chuỗi (xóa khen).
+    setPraiseKey(correct ? PRAISE_MILESTONES[newStreak] ?? null : null);
     setSaving(true);
     try {
       await onRate(current, correct ? 4 : 0);
@@ -179,6 +194,12 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
           </div>
         )}
       </div>
+
+      {praiseKey && (
+        <p className="text-center mt-4 text-lg font-bold text-accent animate-fade-in" role="status">
+          {t(praiseKey)}
+        </p>
+      )}
 
       {error && (
         <p className="text-sm text-destructive text-center mt-4 animate-shake">

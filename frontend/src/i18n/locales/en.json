@@ -95,12 +95,15 @@
     "subtitle": "Continue your Chinese learning journey",
     "doneToday": "✓ Done for today — keep the streak going!",
     "quickStart": "10-15 minutes, one tap",
-    "heroTitle": "🎯 Study for today",
+    "heroTitle": "🎯 Start learning",
     "streakDays_one": "🔥 {{count}} day",
     "streakDays_other": "🔥 {{count}} days",
     "start": "Start →",
     "streakLabel": "days in a row",
-    "dueToday": "words due for review today"
+    "dueToday": "words due for review today",
+    "review": "Review",
+    "reviewTitle": "Due reviews",
+    "reviewCount": "{{words}} words + {{dialogues}} dialogues due"
   },
   "hsk": {
     "title": "HSK Levels",
@@ -124,6 +127,21 @@
     "wordCount_other": "{{count}} words",
     "vocabulary": "Vocabulary",
     "practiceExercises": "Practice exercises"
+  },
+  "learn": {
+    "lessonLabel": "Lesson {{order}}",
+    "stage": {
+      "vocab": "Vocabulary",
+      "dialogue": "Listening",
+      "exercises": "Exercises"
+    },
+    "vocabFlashcardTitle": "Vocabulary — flashcards",
+    "vocabQuizTitle": "Vocabulary — pick meaning",
+    "completeTitle": "Lesson complete!",
+    "completeDesc": "You finished all 3 activities in this lesson.",
+    "reStudy": "Study again",
+    "recommended": "Suggested",
+    "nextLesson": "Next lesson →"
   },
   "today": {
     "loading": "Preparing today's session...",
@@ -190,7 +208,11 @@
       "easy": "Easy",
       "reveal": "👆 Tap to reveal",
       "saveFailed": "Couldn't save — try again",
-      "speak": "Speak"
+      "speak": "Speak",
+      "praise3": "🔥 On a roll!",
+      "praise5": "⚡ 5 in a row!",
+      "praise10": "🏆 Unstoppable!",
+      "praise20": "👑 Perfect!"
     },
     "speed": {
       "title": "Reading speed",

@@ -22,7 +22,11 @@ function buildPrismaMock() {
     },
     course: { findFirst: jest.fn().mockResolvedValue(null) },
     vocabulary: { findMany: jest.fn().mockResolvedValue([]) },
-    userProgress: { upsert: jest.fn().mockResolvedValue({ isCompleted: true, completedAt: new Date() }) },
+    userProgress: {
+      upsert: jest.fn().mockResolvedValue({ isCompleted: true, completedAt: new Date() }),
+      findUnique: jest.fn().mockResolvedValue(null),
+      update: jest.fn().mockResolvedValue({ isCompleted: true, completedAt: new Date() }),
+    },
   };
 }
 
@@ -223,5 +227,114 @@ describe('DailySessionService — current lesson lookup', () => {
     expect(await service.getCurrentLesson('u1')).toEqual(emptyLesson);
     // only the resolveActiveCourseId lookup ran — no lesson query afterwards
     expect(prisma.lesson.findFirst).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('DailySessionService — per-activity completion', () => {
+  const D = new Date('2026-09-25T10:00:00Z');
+
+  it('records only the vocab flag and does not complete the lesson', async () => {
+    const prisma = buildPrismaMock();
+    prisma.userProgress.findUnique.mockResolvedValue({
+      isCompleted: false,
+      vocabCompletedAt: D,
+      dialogueCompletedAt: null,
+      exercisesCompletedAt: null,
+    });
+    const { service } = buildService(prisma);
+
+    const result = await service.completeActivity('u1', { lessonId: 'l1', activity: 'vocab' });
+
+    expect(result.vocabCompletedAt).not.toBeNull();
+    expect(result.dialogueCompletedAt).toBeNull();
+    expect(result.exercisesCompletedAt).toBeNull();
+    expect(result.isCompleted).toBe(false);
+    expect(prisma.userProgress.update).not.toHaveBeenCalled();
+  });
+
+  it('derives isCompleted true when all three activities are done', async () => {
+    const prisma = buildPrismaMock();
+    prisma.userProgress.findUnique.mockResolvedValue({
+      isCompleted: false,
+      vocabCompletedAt: D,
+      dialogueCompletedAt: D,
+      exercisesCompletedAt: D,
+    });
+    const { service } = buildService(prisma);
+
+    const result = await service.completeActivity('u1', { lessonId: 'l1', activity: 'exercises' });
+
+    expect(result.isCompleted).toBe(true);
+    expect(prisma.userProgress.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ isCompleted: true }) })
+    );
+  });
+
+  it('writes the matching column for each activity', async () => {
+    const prisma = buildPrismaMock();
+    const { service } = buildService(prisma);
+
+    await service.completeActivity('u1', { lessonId: 'l1', activity: 'dialogue' });
+
+    expect(prisma.userProgress.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({ dialogueCompletedAt: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('is sticky — update only sets the target column, never clears others', async () => {
+    const prisma = buildPrismaMock();
+    const { service } = buildService(prisma);
+
+    await service.completeActivity('u1', { lessonId: 'l1', activity: 'vocab' });
+
+    const update = prisma.userProgress.upsert.mock.calls[0][0].update;
+    expect(update).toEqual({ vocabCompletedAt: expect.any(Date) });
+    expect(update).not.toHaveProperty('dialogueCompletedAt');
+    expect(update).not.toHaveProperty('exercisesCompletedAt');
+  });
+
+  it('throws NotFound when the lesson does not exist', async () => {
+    const prisma = buildPrismaMock();
+    prisma.lesson.findUnique.mockResolvedValue(null);
+    const { service } = buildService(prisma);
+
+    await expect(
+      service.completeActivity('u1', { lessonId: 'ghost', activity: 'vocab' })
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('getLessonStatus returns all-null for a lesson with no progress', async () => {
+    const prisma = buildPrismaMock();
+    const { service } = buildService(prisma);
+
+    const status = await service.getLessonStatus('u1', 'l1');
+
+    expect(status).toEqual({
+      lessonId: 'l1',
+      vocabCompletedAt: null,
+      dialogueCompletedAt: null,
+      exercisesCompletedAt: null,
+      isCompleted: false,
+    });
+  });
+
+  it('getLessonStatus reflects recorded flags', async () => {
+    const prisma = buildPrismaMock();
+    prisma.userProgress.findUnique.mockResolvedValue({
+      isCompleted: false,
+      vocabCompletedAt: D,
+      dialogueCompletedAt: D,
+      exercisesCompletedAt: null,
+    });
+    const { service } = buildService(prisma);
+
+    const status = await service.getLessonStatus('u1', 'l1');
+
+    expect(status.vocabCompletedAt).not.toBeNull();
+    expect(status.dialogueCompletedAt).not.toBeNull();
+    expect(status.exercisesCompletedAt).toBeNull();
+    expect(status.isCompleted).toBe(false);
   });
 });

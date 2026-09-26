@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { isAdminEmail } from '../common/admin';
 
 interface HSK30CsvRow {
   ID: string;
@@ -45,16 +46,17 @@ export class VocabularyService {
     return firstOpen ? firstOpen.order : null;
   }
 
-  async findByLesson(lessonId: string, userId: string) {
+  async findByLesson(lessonId: string, userId: string, email: string) {
     const lesson = await this.prisma.lesson.findUnique({
       where: { id: lessonId },
       select: { id: true, order: true, courseId: true },
     });
     if (!lesson) throw new NotFoundException('Lesson not found');
 
-    // Chặn tuần tự phía server — UI khóa chip chỉ là hiển thị, nội dung phải chặn tại đây
+    // Chặn tuần tự phía server — UI khóa chip chỉ là hiển thị, nội dung phải chặn tại đây.
+    // Admin (theo ADMIN_EMAILS) được truy cập mọi bài, bỏ qua lock.
     const cap = await this.firstUncompletedOrder(userId, lesson.courseId);
-    if (cap !== null && lesson.order > cap) {
+    if (!isAdminEmail(email) && cap !== null && lesson.order > cap) {
       throw new ForbiddenException('Lesson is locked — complete previous lessons first');
     }
 
@@ -68,9 +70,9 @@ export class VocabularyService {
 
   /**
    * Phạm vi "tất cả từ" luôn bị chặn theo tiến độ của user (order <= bài đang học) —
-   * cap tính server-side, không tin tham số gửi lên từ client
+   * cap tính server-side, không tin tham số gửi lên từ client. Admin thấy tất cả.
    */
-  async findByHSKLevel(hskLevel: number, userId: string) {
+  async findByHSKLevel(hskLevel: number, userId: string, email: string) {
     const course = await this.prisma.course.findFirst({
       where: { level: hskLevel },
       select: { id: true },
@@ -80,7 +82,7 @@ export class VocabularyService {
     const vocabularies = await this.prisma.vocabulary.findMany({
       where: {
         hskLevel,
-        ...(cap !== null && { lesson: { order: { lte: cap } } }),
+        ...(cap !== null && !isAdminEmail(email) && { lesson: { order: { lte: cap } } }),
       },
       orderBy: { hskCode: 'asc' },
     });

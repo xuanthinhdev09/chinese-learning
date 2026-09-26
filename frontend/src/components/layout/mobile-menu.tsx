@@ -1,7 +1,6 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
-import { MenuItem } from './menu-item';
 import { LanguageToggle } from './language-toggle/language-toggle';
 
 export interface MobileMenuProps {
@@ -10,35 +9,17 @@ export interface MobileMenuProps {
 }
 
 /**
- * Modern minimalist mobile menu with card-style items
- *
- * Structure:
- * - User Section (top): Profile card with avatar
- * - Main Navigation: Grouped menu items
- * - Secondary Section: Profile and settings
- * - Close Action: Bottom close button
+ * Mobile menu: hồ sơ + language toggle. 3 nút nav chính đã bỏ theo thiết kế
+ * luồng học mới (trang chủ là điểm vào duy nhất).
  */
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
 
   const handleNavigate = (path: string) => {
     navigate(path);
     onClose();
   };
-
-  // Check if route is active
-  const isActive = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
-  };
-
-  // Navigation items grouped by section
-  const mainNavItems = [
-    { path: '/today', icon: '🎯', label: t('nav.today') },
-    { path: '/hsk', icon: '📚', label: t('nav.hskLevels') },
-    { path: '/vocabulary/study', icon: '📇', label: t('nav.vocabulary') },
-  ];
 
   return (
     <>
@@ -102,19 +83,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
             {/* Divider */}
             <div className="border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Main Navigation */}
-            <section className="flex flex-col gap-2">
-              {mainNavItems.map((item) => (
-                <MenuItem
-                  key={item.path}
-                  icon={item.icon}
-                  label={item.label}
-                  onClick={() => handleNavigate(item.path)}
-                  isActive={isActive(item.path)}
-                />
-              ))}
-            </section>
 
             {/* Language Switcher */}
             <section className="flex flex-col gap-2">

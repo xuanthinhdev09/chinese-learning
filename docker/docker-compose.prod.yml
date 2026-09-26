@@ -37,6 +37,8 @@ services:
       REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-30d}
       PORT: 3000
       NODE_ENV: production
+      # Admin emails (comma-separated) — bypass sequential lesson lock
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       # Set to "false" ONLY for a temporary HTTP-only deployment (no domain
       # yet) — auth cookies then work over plain HTTP. Remove (or "true")
       # once HTTPS is on; absent value = secure in production automatically.

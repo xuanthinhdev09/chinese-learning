@@ -55,6 +55,9 @@ export class LessonsService {
         vocabularies: {
           orderBy: { id: 'asc' },
         },
+        conversations: {
+          orderBy: [{ dialogueOrder: 'asc' }, { order: 'asc' }],
+        },
       },
     });
 

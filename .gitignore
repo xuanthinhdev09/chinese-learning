@@ -14,6 +14,9 @@ out/
 .env.production
 .env.development
 
+# Claude Code settings — chứa API token (DeepSeek, Z.ai)
+**/.claude/settings.json
+
 # Deploy runbook — chứa thông tin nhạy cảm (IP, credentials), chỉ tồn tại local
 docs/vps-deploy-runbook.md
 

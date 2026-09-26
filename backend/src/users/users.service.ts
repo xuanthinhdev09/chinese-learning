@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { isAdminEmail } from '../common/admin';
 import { AVATAR_EMOJIS } from './constants/avatar-emojis';
 
 @Injectable()
@@ -22,8 +23,8 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Return user without sensitive data
-    return this.excludePasswordHash(user);
+    // Return user without sensitive data, plus admin flag (ADMIN_EMAILS)
+    return { ...this.excludePasswordHash(user), isAdmin: isAdminEmail(user.email) };
   }
 
   /**

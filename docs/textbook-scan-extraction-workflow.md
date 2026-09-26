@@ -137,6 +137,7 @@ npm run import:textbook -- ../../content-source/extracted/import/hsk2-textbook.j
 | `content-source/pdf/HSK 2 Sách bài tập.pdf` | 169 trang scan — nguồn |
 | `content-source/extracted-wb/lesson-NN.json` | data frame v3 per-lesson (đầu vào import) |
 | `content-source/audio/hsk2/` + `audio-manifest.txt` | audio đề nghe gốc user cung cấp (`NN-1.mp3`/`NN-2.mp3`) |
+| `content-source/tools/derive_example_answers.py` | xác định đáp án câu mẫu bằng loại trừ (xem luồng nạp) |
 | `backend/src/import/workbook/` | validator + importer v3 |
 | `backend/src/import/cli/import-workbook-v3.cli.ts` | CLI import (`npm run import:workbook`) |
 
@@ -145,8 +146,9 @@ npm run import:textbook -- ../../content-source/extracted/import/hsk2-textbook.j
 **Luồng nạp 1 bài:**
 
 1. Trích đề từ scan → `extracted-wb/lesson-NN.json`; answer key paste trực tiếp vào file (user làm)
-2. Import: `cd backend && npm run import:workbook -- --file ../../content-source/extracted-wb/lesson-01.json` (tunnel VPS 5433→5432 đang chạy)
-3. Upstream ảnh: mở trang `/lessons/:lessonId/exercises` trong app, upload scan tại từng slot (slot thiếu ảnh hiển thị trên UI)
+2. Xác định đáp án câu mẫu bằng **loại trừ**: `python tools/derive_example_answers.py <NN>` — khối pool (6 lựa chọn A-F + 5 câu hỏi, gồm listen_dialogue_choose_picture / read_picture_for_sentence / read_fill_blank_word / read_match_qa): answer key không có đáp án câu mẫu, 5 đáp án item luôn là 5 chữ cái phân biệt → `example.answer` = chữ cái còn lại. Script điền khi thiếu, báo `MISMATCH` khi lệch, bỏ qua khi mơ hồ (item answer trùng).
+3. Import: `cd backend && npm run import:workbook -- --file ../../content-source/extracted-wb/lesson-01.json` (tunnel VPS 5433→5432 đang chạy)
+4. Upstream ảnh: mở trang `/lessons/:lessonId/exercises` trong app, upload scan tại từng slot (slot thiếu ảnh hiển thị trên UI)
 
 **Idempotency:** upsert theo `(lessonId, order)` cho đề và `(lessonId, filePath)` cho ảnh; row không còn trong file bị xoá; thiếu file ảnh/audio trên disk chỉ là warning (`imagesMissingOnDisk`/`audioMissingOnDisk`) — re-import sau khi bổ sung là đủ. Media nằm trong `storage/exercise-images|exercise-audio` của backend, serve qua endpoint có JWT (bản quyền BLCUP, không public).
 

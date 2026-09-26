@@ -95,11 +95,14 @@
     "subtitle": "继续你的中文学习之旅",
     "doneToday": "✓ 今天已完成 — 保持连续打卡！",
     "quickStart": "10-15 分钟，一键开始",
-    "heroTitle": "🎯 今日学习",
+    "heroTitle": "🎯 开始学习",
     "streakDays": "🔥 {{count}} 天",
     "start": "开始 →",
     "streakLabel": "连续打卡天数",
-    "dueToday": "个生词今日待复习"
+    "dueToday": "个生词今日待复习",
+    "review": "复习",
+    "reviewTitle": "到期复习",
+    "reviewCount": "{{words}} 个生词 + {{dialogues}} 段对话到期"
   },
   "hsk": {
     "title": "HSK 等级",
@@ -121,6 +124,21 @@
     "wordCount": "{{count}} 个生词",
     "vocabulary": "生词",
     "practiceExercises": "练习题"
+  },
+  "learn": {
+    "lessonLabel": "第{{order}}课",
+    "stage": {
+      "vocab": "词汇",
+      "dialogue": "听力",
+      "exercises": "练习"
+    },
+    "vocabFlashcardTitle": "词汇 — 抽认卡",
+    "vocabQuizTitle": "词汇 — 选意思",
+    "completeTitle": "本课完成！",
+    "completeDesc": "你已完成本课的全部 3 项活动。",
+    "reStudy": "重新学习",
+    "recommended": "建议",
+    "nextLesson": "下一课 →"
   },
   "today": {
     "loading": "正在准备今天的学习...",
@@ -186,7 +204,11 @@
       "easy": "简单",
       "reveal": "👆 点击查看意思",
       "saveFailed": "保存失败 — 请重试",
-      "speak": "发音"
+      "speak": "发音",
+      "praise3": "🔥 进入状态了！",
+      "praise5": "⚡ 连对 5 题！",
+      "praise10": "🏆 势不可挡！",
+      "praise20": "👑 完美！"
     },
     "speed": {
       "title": "朗读速度",

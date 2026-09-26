@@ -276,19 +276,27 @@ export class SpacedRepetitionService {
   }
 
   /**
-   * Calculate learning streak (consecutive days with activity)
+   * Calculate learning streak (consecutive days with activity), with a 1-day
+   * "freeze": a single missed day sandwiched between active days keeps the
+   * streak alive (giảm what-the-hell effect — gãy 1 ngày không reset về 0).
+   * Hai ngày liên tiếp không hoạt động mới làm gãy streak. Ngày hôm nay luôn
+   * là "đang chờ" — không tính là miss.
    * @param userId - User ID
    * @returns Number of consecutive days
    */
   private async calculateStreak(userId: string): Promise<number> {
     const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
     let streak = 0;
-    let currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let pendingGap = false; // a missed day waiting to be "frozen" by an older active day
+    let currentDate = new Date(todayStart);
 
     // Check each day going backwards
     while (true) {
       const dayStart = new Date(currentDate);
       const dayEnd = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+      const isToday = currentDate.getTime() === todayStart.getTime();
 
       // Activity = vocabulary review OR dialogue review (dialogue shadowing
       // is the primary daily-session signal; both keep the streak alive)
@@ -316,19 +324,26 @@ export class SpacedRepetitionService {
       const hasActivity = Boolean(vocabActivity || dialogueActivity);
 
       if (hasActivity) {
-        streak++;
-        currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-      } else {
-        // Check if it's today (no activity yet today doesn't break streak)
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        if (currentDate.getTime() === todayStart.getTime()) {
-          currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-          continue;
+        // An active day resolves a pending gap as frozen (bridged on both
+        // sides), then counts itself.
+        if (pendingGap) {
+          streak++;
+          pendingGap = false;
         }
-        break;
+        streak++;
+      } else if (isToday) {
+        // Today hasn't happened yet — skip, neither active nor a miss.
+      } else if (pendingGap) {
+        break; // two consecutive missed days → streak broken
+      } else {
+        pendingGap = true; // single missed day, may still be frozen
       }
+
+      currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
     }
 
+    // A trailing gap (missed day with no older active day to bridge) is not
+    // frozen — there is no streak to preserve. It's simply dropped.
     return streak;
   }
 

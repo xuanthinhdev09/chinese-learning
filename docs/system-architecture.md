@@ -1,6 +1,6 @@
 # System Architecture
 
-Tài liệu kiến trúc hệ thống. Phần subsystem mới nhất (bài tập sách bài tập) được mô tả chi tiết ở §3; các subsystem cũ tham khảo `docs/codebase-summary.md` và plan `plans/260907-0949-daily-session-content-pipeline/`.
+Tài liệu kiến trúc hệ thống. Subsystem bài tập sách bài tập mô tả ở §3; luồng học 3 giai đoạn (unified lesson wizard, 25/09) ở §4; các subsystem cũ tham khảo `docs/codebase-summary.md` và plan `plans/260907-0949-daily-session-content-pipeline/`.
 
 ## 1. Tổng quan stack
 
@@ -19,11 +19,12 @@ Tài liệu kiến trúc hệ thống. Phần subsystem mới nhất (bài tập
 | `vocabulary` | Từ vựng, khóa tuần tự theo lesson |
 | `spaced-repetition` | Ôn tập ngắt quãng |
 | `import` | Import nội dung: giáo khoa v2 + sách bài tập v3 (`workbook/`) |
-| `daily-session` | Buổi học hằng ngày |
+| `daily-session` | Buổi học hằng ngày + 3-flag progress (§4) |
 | `tts` | Azure TTS, cache disk (`TtsStorageService`) |
 | `exercises` | Bài tập sách bài tập (mới, 21/09) — chi tiết §3 |
+| `common` | Tiện ích dùng chung — `admin.ts` (`isAdminEmail`, §4.3) |
 
-Frontend route liên quan: `/lessons/:lessonId` (lesson detail), `/lessons/:lessonId/exercises` (luyện bài tập).
+Frontend route liên quan: `/learn/:lessonId` (wizard 3 giai đoạn, §4). Route cũ `/lessons/:lessonId` và `/lessons/:lessonId/exercises` chỉ còn là redirect về `/learn/:id`.
 
 ## 3. Subsystem Exercises (bài tập sách bài tập)
 
@@ -80,6 +81,45 @@ content-source/extracted-wb/lesson-NN.json (data frame v3)
 
 Answer key do user paste vào file JSON per bài; thiếu ảnh/audio không chặn import — re-import sau khi bổ sung là đủ (idempotent).
 
+## 4. Luồng học 3 giai đoạn (unified lesson wizard, 25/09)
+
+Thay thế luồng cũ `/today` (1 nút "hoàn thành bài") bằng wizard 1 route `/learn/:lessonId` với 3 stage bắt buộc theo thứ tự **vocab → dialogue → exercises**.
+
+### 4.1 Data model — 3-flag completion
+
+`UserProgress` thêm 3 cột `DateTime?`: `vocabCompletedAt`, `dialogueCompletedAt`, `exercisesCompletedAt` (migration `20260925042159_add_activity_completion`, chỉ `ADD COLUMN` — không backfill).
+
+- Ghi flag: `userProgress.upsert` theo `(userId, lessonId)`, set `now()` vào field tương ứng. Flag **sticky** (không bao giờ bị xóa), nhưng gọi lại cùng activity sẽ **ghi đè timestamp** — không phải set-once.
+- `isCompleted` là cột persisted (không drop). `completeActivity` set `isCompleted = true, completedAt = now` khi đủ 3 flag (chỉ khi trước đó false); response trả `allDone || column`.
+- Row hoàn thành theo luồng cũ (`POST /daily-session/complete`) có `isCompleted = true` nhưng 3 flag **null** — UI coi là đã xong để hiện banner hoàn thành thay vì mở lại từ stage đầu.
+- Reload đọc lại flag qua `GET /lesson-status` (chỉ trả `column`, không suy diễn).
+
+### 4.2 API (`daily-session/daily-session.controller.ts`)
+
+| Route | Input | Output | Ý nghĩa |
+|---|---|---|---|
+| `POST /daily-session/activity-complete` | body `{ lessonId: string, activity: 'vocab'\|'dialogue'\|'exercises' }` (`CompleteActivityDto`, `@IsIn`) | `LessonProgressDto` | Đánh dấu 1 stage xong, trả về 3 flag mới |
+| `GET /daily-session/lesson-status?lessonId=` | query `lessonId` | `LessonProgressDto` | Đọc 3 flag — khôi phục checkmark + nhảy tới stage chưa xong khi reload |
+
+`LessonProgressDto = { lessonId, vocabCompletedAt: string\|null, dialogueCompletedAt: string\|null, exercisesCompletedAt: string\|null, isCompleted: boolean }`.
+
+Cả 2 route JWT-guarded (controller-level `JwtAuthGuard`), dùng throttle mặc định — **không** `@SkipThrottle`.
+
+### 4.3 Admin bypass — `common/admin.ts`
+
+`isAdminEmail(email)` — source-of-truth duy nhất cho whitelist admin (env `ADMIN_EMAILS`, phân tách bằng dấu phẩy, so khớp case-insensitive). Email trong whitelist bỏ qua khóa tuần tự ở server (`vocabulary.service`) và ẩn lock trên UI. Frontend nhận `isAdmin` qua `GET /users/me` (`user-response.dto.ts`); wired through `auth.service`, `users.service`, `vocabulary.service`.
+
+### 4.4 Frontend wizard (`pages/lessons/`)
+
+- `lesson-learn-page.tsx` — route `/learn/:lessonId`; seed checkmark từ `GET /lesson-status`, stepper chọn tự do 3 stage (không khóa tuần tự); đủ 3 → banner hoàn thành + nút bài kế (`GET /daily-session/current-lesson`).
+- `vocab-stage.tsx` — flashcard bắt buộc chạy hết rồi mới tới quiz.
+- Stage dialogue — dùng lại `DialogueReader`; **chỉ pass shadowing ("trôi") mới mark complete**. Chưa trôi vẫn ghi SRS (`POST /dialogue-review`) để lên lịch ôn lại nhưng không mở khóa.
+- `exercises-stage.tsx` — câu checkable (có nút "Kiểm tra") phải được check hết; exercise view-only (drill / stroke order) tính done ngay khi render. Rule tách thành pure helper `completion-detection.ts` → `isExercisesStageComplete()` (unit-test được, không phụ thuộc React/i18n).
+- `legacy-lesson-redirect.tsx` — `/lessons/:order` + `/lessons/:order/exercises` → `/learn/:id`; param nhận cả order (số) lẫn CUID qua `useResolveLessonId`.
+
+`pages/lessons/lesson-detail-page.tsx` và `lesson-exercises-page.tsx` **không còn route** (orphaned) — giữ file, không dùng.
+
 ## Unresolved questions
 
 - Import prod (phase 5) chưa chạy — cần kiểm tra volume mount cho `storage/exercise-*` trên VPS trước khi import.
+- `lesson-detail-page.tsx` / `lesson-exercises-page.tsx` orphaned — chờ xác nhận xóa hẳn (không còn reference nào trong `src/`).

@@ -1,4 +1,4 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsIn, IsString } from 'class-validator';
 import { Conversation, Vocabulary } from '@prisma/client';
 import { VocabularyWithProgressDto } from '../../spaced-repetition/dto/progress.dto';
 
@@ -13,6 +13,14 @@ export class RecordDialogueReviewDto {
 export class CompleteSessionDto {
   @IsString()
   lessonId: string;
+}
+
+export class CompleteActivityDto {
+  @IsString()
+  lessonId: string;
+
+  @IsIn(['vocab', 'dialogue', 'exercises'])
+  activity: 'vocab' | 'dialogue' | 'exercises';
 }
 
 export interface DialogueLineDto {
@@ -78,4 +86,13 @@ export interface CompleteSessionResultDto {
   isCompleted: boolean;
   completedAt: string;
   streak: number;
+}
+
+/** Per-activity completion flags for a lesson (drives the 3-stage wizard) */
+export interface LessonProgressDto {
+  lessonId: string;
+  vocabCompletedAt: string | null;
+  dialogueCompletedAt: string | null;
+  exercisesCompletedAt: string | null;
+  isCompleted: boolean;
 }

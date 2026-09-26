@@ -110,3 +110,31 @@ export async function completeSession(lessonId: string): Promise<CompleteSession
   if (!response.ok) throw new Error('Failed to record session completion');
   return response.json();
 }
+
+/** Per-activity completion flags for a lesson (drives the 3-stage wizard) */
+export interface LessonProgress {
+  lessonId: string;
+  vocabCompletedAt: string | null;
+  dialogueCompletedAt: string | null;
+  exercisesCompletedAt: string | null;
+  isCompleted: boolean;
+}
+
+export type LessonActivity = 'vocab' | 'dialogue' | 'exercises';
+
+export async function completeActivity(
+  lessonId: string,
+  activity: LessonActivity
+): Promise<LessonProgress> {
+  const response = await apiClient.post('/daily-session/activity-complete', { lessonId, activity });
+  if (!response.ok) throw new Error('Failed to record activity completion');
+  return response.json();
+}
+
+export async function getLessonStatus(lessonId: string): Promise<LessonProgress> {
+  const response = await apiClient.get(
+    `/daily-session/lesson-status?lessonId=${encodeURIComponent(lessonId)}`
+  );
+  if (!response.ok) throw new Error('Failed to load lesson status');
+  return response.json();
+}

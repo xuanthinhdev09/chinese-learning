@@ -120,30 +120,6 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
               </button>
             )}
 
-            {/* Navigation */}
-            {isAuthenticated && (
-              <nav className="hidden md:flex items-center gap-6">
-                <button
-                  onClick={() => navigate('/today')}
-                  className="text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
-                >
-                  {t('nav.today')}
-                </button>
-                <button
-                  onClick={() => navigate('/hsk')}
-                  className="text-sm font-medium text-muted hover:text-foreground transition-colors"
-                >
-                  {t('nav.hskLevels')}
-                </button>
-                <button
-                  onClick={() => navigate('/vocabulary/study')}
-                  className="text-sm font-medium text-muted hover:text-foreground transition-colors"
-                >
-                  {t('nav.vocabulary')}
-                </button>
-              </nav>
-            )}
-
             {/* User menu — chỉ avatar, tên + hành động trong dropdown */}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">

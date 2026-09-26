@@ -15,19 +15,19 @@ export class VocabularyController {
   @HttpCode(HttpStatus.OK)
   async findByLesson(
     @Param('lessonId') lessonId: string,
-    @CurrentUser() user: { userId: string }
+    @CurrentUser() user: { userId: string; email: string }
   ) {
-    return this.vocabularyService.findByLesson(lessonId, user.userId);
+    return this.vocabularyService.findByLesson(lessonId, user.userId, user.email);
   }
 
   @Get('hsk-level/:level')
   @HttpCode(HttpStatus.OK)
   async findByHSKLevel(
     @Param('level') level: string,
-    @CurrentUser() user: { userId: string }
+    @CurrentUser() user: { userId: string; email: string }
   ) {
     // Phạm vi "tất cả từ" bị cap theo tiến độ của user ngay trên server
-    return this.vocabularyService.findByHSKLevel(parseInt(level), user.userId);
+    return this.vocabularyService.findByHSKLevel(parseInt(level), user.userId, user.email);
   }
 
   @Public()

@@ -3,12 +3,14 @@ import { Conversation, Lesson } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SpacedRepetitionService } from '../spaced-repetition/spaced-repetition.service';
 import {
+  CompleteActivityDto,
   CompleteSessionDto,
   CompleteSessionResultDto,
   CurrentLessonDto,
   DailySessionResponseDto,
   DialogueLineDto,
   DialogueReviewResultDto,
+  LessonProgressDto,
   NextLessonDto,
   RecordDialogueReviewDto,
 } from './dto/daily-session.dto';
@@ -20,6 +22,13 @@ const GRADUATED_STAGE = 4;
 // Lesson keywords feeding the daily exercises (plan: fixed params, YAGNI)
 const KEYWORDS_PER_LESSON = 8;
 const DUE_VOCABULARY_LIMIT = 15;
+
+// Maps the wizard activity name to its UserProgress timestamp column
+const ACTIVITY_FIELD = {
+  vocab: 'vocabCompletedAt',
+  dialogue: 'dialogueCompletedAt',
+  exercises: 'exercisesCompletedAt',
+} as const;
 
 function toLineDto(conversation: Conversation): DialogueLineDto {
   return {
@@ -224,6 +233,70 @@ export class DailySessionService {
       isCompleted: progress.isCompleted,
       completedAt: (progress.completedAt ?? now).toISOString(),
       streak,
+    };
+  }
+
+  /**
+   * Mark one of the three wizard activities complete for a lesson. Sticky and
+   * idempotent: setting a flag never clears it. When all three flags are set,
+   * isCompleted is derived true (which drives sequential lesson unlocking).
+   */
+  async completeActivity(userId: string, dto: CompleteActivityDto): Promise<LessonProgressDto> {
+    const lesson = await this.prisma.lesson.findUnique({ where: { id: dto.lessonId } });
+    if (!lesson) {
+      throw new NotFoundException('Lesson not found');
+    }
+
+    const now = new Date();
+    const field = ACTIVITY_FIELD[dto.activity];
+
+    await this.prisma.userProgress.upsert({
+      where: { userId_lessonId: { userId, lessonId: lesson.id } },
+      create: { userId, lessonId: lesson.id, [field]: now },
+      update: { [field]: now },
+    });
+
+    const progress = await this.prisma.userProgress.findUnique({
+      where: { userId_lessonId: { userId, lessonId: lesson.id } },
+    });
+
+    const allDone =
+      progress?.vocabCompletedAt != null &&
+      progress?.dialogueCompletedAt != null &&
+      progress?.exercisesCompletedAt != null;
+
+    if (allDone && progress && !progress.isCompleted) {
+      await this.prisma.userProgress.update({
+        where: { userId_lessonId: { userId, lessonId: lesson.id } },
+        data: { isCompleted: true, completedAt: now },
+      });
+    }
+
+    return {
+      lessonId: lesson.id,
+      vocabCompletedAt: progress?.vocabCompletedAt?.toISOString() ?? null,
+      dialogueCompletedAt: progress?.dialogueCompletedAt?.toISOString() ?? null,
+      exercisesCompletedAt: progress?.exercisesCompletedAt?.toISOString() ?? null,
+      // Legacy rows completed via completeSession keep isCompleted=true with null flags
+      isCompleted: allDone || (progress?.isCompleted ?? false),
+    };
+  }
+
+  /**
+   * Read the 3 per-activity flags for a lesson (used by the wizard to restore
+   * stage checkmarks on reload). Unknown/no-progress lesson returns all-null.
+   */
+  async getLessonStatus(userId: string, lessonId: string): Promise<LessonProgressDto> {
+    const progress = await this.prisma.userProgress.findUnique({
+      where: { userId_lessonId: { userId, lessonId } },
+    });
+
+    return {
+      lessonId,
+      vocabCompletedAt: progress?.vocabCompletedAt?.toISOString() ?? null,
+      dialogueCompletedAt: progress?.dialogueCompletedAt?.toISOString() ?? null,
+      exercisesCompletedAt: progress?.exercisesCompletedAt?.toISOString() ?? null,
+      isCompleted: progress?.isCompleted ?? false,
     };
   }
 

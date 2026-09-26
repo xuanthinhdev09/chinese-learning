@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { useLanguagePreference } from '../../stores/language-preference-store';
+import { useAuthStore } from '../../stores/auth-store';
 import { hskApi, LessonSummary } from '../../api/hsk-api';
 import { getCurrentLesson, CurrentLesson } from '../../api/daily-session';
 import { FlashcardCard } from '../../components/vocabulary/flashcard-card';
@@ -34,6 +35,9 @@ export function VocabularyStudyPage() {
 
   // Ngôn ngữ nội dung (vi/en/both) — quyết định nghĩa hiển thị trong quiz options
   const { preference } = useLanguagePreference();
+
+  // Admin (theo ADMIN_EMAILS) được mở mọi bài — bỏ lock tuần tự
+  const isAdmin = useAuthStore((s) => s.user?.isAdmin);
 
   // Real course list from the API; word counts stay out because the levels
   // endpoint does not aggregate them (lesson count shown instead)
@@ -90,6 +94,7 @@ export function VocabularyStudyPage() {
 
   /** Học tuần tự: bài bị khóa = nằm SAU bài đang học trong cùng course */
   const isLessonLocked = (hskId: string, order: number) =>
+    !isAdmin &&
     currentLesson?.courseId === hskId &&
     currentLesson.order !== null &&
     order > currentLesson.order;

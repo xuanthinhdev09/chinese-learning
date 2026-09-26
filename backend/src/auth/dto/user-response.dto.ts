@@ -4,4 +4,5 @@ export class UserResponseDto {
   username: string;
   avatar: string | null;
   createdAt: Date;
+  isAdmin: boolean;
 }

@@ -31,7 +31,7 @@ const TYPE_RENDERERS: Record<string, (props: ExerciseRendererProps) => ReactNode
 
 /** Gradable answer types: everything except the oral drill (no answers) and
  * stroke order (the answer is the character the learner copies by hand). */
-const GRADABLE_TYPES = new Set(
+export const GRADABLE_TYPES = new Set(
   Object.keys(TYPE_RENDERERS).filter(
     (t) => t !== 'listen_repeat_drill' && t !== 'hanzi_write_stroke_order',
   ),

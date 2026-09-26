@@ -6,8 +6,8 @@ import RegisterPage from './pages/auth/register-page';
 import DashboardPage from './pages/dashboard/dashboard-page';
 import HskListPage from './pages/hsk/hsk-list-page';
 import HskDetailPage from './pages/hsk/hsk-detail-page';
-import LessonDetailPage from './pages/lessons/lesson-detail-page';
-import LessonExercisesPage from './pages/lessons/lesson-exercises-page';
+import LessonLearnPage from './pages/lessons/lesson-learn-page';
+import LegacyLessonRedirect from './pages/lessons/legacy-lesson-redirect';
 import ProfilePage from './pages/profile/profile-page';
 import { VocabularyStudyPage } from './pages/vocabulary/vocabulary-study-page';
 import { ReviewDashboardPage } from './pages/vocabulary/review-dashboard-page';
@@ -59,13 +59,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Public route wrapper (redirect to today's session if authenticated —
-// opening the app should land straight in learning)
+// Public route wrapper (redirect to homepage if authenticated)
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   if (isAuthenticated) {
-    return <Navigate to="/today" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -122,13 +121,14 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/today" replace />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="today" element={<TodaySessionPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="hsk" element={<HskListPage />} />
           <Route path="hsk/:id" element={<HskDetailPage />} />
-          <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
-          <Route path="lessons/:lessonId/exercises" element={<LessonExercisesPage />} />
+          <Route path="lessons/:lessonId" element={<LegacyLessonRedirect />} />
+          <Route path="lessons/:lessonId/exercises" element={<LegacyLessonRedirect />} />
+          <Route path="learn/:lessonId" element={<LessonLearnPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="vocabulary/study" element={<VocabularyStudyPage />} />
           <Route path="vocabulary/review" element={<ReviewDashboardPage />} />

@@ -16,6 +16,18 @@ export interface Lesson {
   };
 }
 
+export interface LessonConversation {
+  id: string;
+  order: number;
+  speaker: string | null;
+  hanzi: string;
+  pinyin: string;
+  vietnamese: string;
+  dialogueOrder: number | null;
+  dialogueTitleHanzi: string | null;
+  dialogueTitleVi: string | null;
+}
+
 export interface LessonDetail extends Lesson {
   vocabularies: {
     id: string;
@@ -26,6 +38,8 @@ export interface LessonDetail extends Lesson {
     example: string | null;
     wordType: string | null;
   }[];
+  /** Shadowing lines for the 3-stage wizard's dialogue step */
+  conversations: LessonConversation[];
 }
 
 export interface PaginatedLessons {

@@ -75,7 +75,7 @@ const AUDIO_TYPES = new Set([
 
 const AUDIO_FILE_PATTERN = /^\d{2}-[12]\.mp3$/;
 const IMAGE_FILE_PATTERN = /^lesson-\d{2}\/[A-Za-z0-9_-]+\.(png|jpe?g|webp)$/;
-const REF_PATTERN = /^p\d{2}-crop-\d+$/;
+const REF_PATTERN = /^p\d{2,3}-crop-\d+$/;
 
 function isString(v: unknown): v is string {
   return typeof v === 'string' && v.length > 0;

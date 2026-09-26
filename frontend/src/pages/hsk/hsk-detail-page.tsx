@@ -1,20 +1,43 @@
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { hskApi } from '../../api/hsk-api';
+import { useResolveHskLevelId } from '../../hooks/use-resolve-hsk-level-id';
+import { getCurrentLesson, CurrentLesson } from '../../api/daily-session';
+import { useAuthStore } from '../../stores/auth-store';
 import LessonCard from '../../components/lessons/lesson-card';
 
 export default function HskDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  // Route param có thể là level number (pretty URL /hsk/2) hoặc id CUID cũ
+  const { levelId, isResolving } = useResolveHskLevelId(id);
+
+  // Admin (theo ADMIN_EMAILS) mở mọi bài — bỏ lock tuần tự
+  const isAdmin = useAuthStore((s) => s.user?.isAdmin);
+
+  // Bài đang học = ranh giới mở khóa tuần tự (cùng nguồn với modal học từ vựng)
+  const [currentLesson, setCurrentLesson] = useState<CurrentLesson | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentLesson()
+      .then((current) => {
+        if (!cancelled) setCurrentLesson(current);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const { data: hskLevel, isLoading, error } = useQuery({
-    queryKey: ['hsk-level', id],
-    queryFn: () => hskApi.getLevel(id!),
-    enabled: !!id,
+    queryKey: ['hsk-level', levelId],
+    queryFn: () => hskApi.getLevel(levelId!),
+    enabled: !!levelId,
   });
 
-  if (isLoading) {
+  if (isResolving || isLoading) {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
@@ -36,6 +59,13 @@ export default function HskDetailPage() {
       </div>
     );
   }
+
+  // Bài bị khóa = nằm SAU bài đang học trong cùng course (giống modal học từ vựng)
+  const isLessonLocked = (order: number) =>
+    !isAdmin &&
+    currentLesson?.courseId === hskLevel.id &&
+    currentLesson.order !== null &&
+    order > currentLesson.order;
 
   return (
     <>
@@ -62,7 +92,11 @@ export default function HskDetailPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {hskLevel.lessons.map((lesson) => (
-              <LessonCard key={lesson.id} lesson={lesson} />
+              <LessonCard
+                key={lesson.id}
+                lesson={lesson}
+                locked={isLessonLocked(lesson.order)}
+              />
             ))}
           </div>
         )}

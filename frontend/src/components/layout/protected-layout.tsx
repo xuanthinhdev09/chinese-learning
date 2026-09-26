@@ -37,8 +37,10 @@ export function ProtectedLayout() {
       <main
         className={cn(
           'transition-all duration-200',
-          // /today breaks out to the wide container for the dialogue grid
-          location.pathname.startsWith('/today') ? 'container-custom-wide' : 'container-custom',
+          // /today + /learn break out to the wide container for the dialogue grid
+          location.pathname.startsWith('/today') || location.pathname.startsWith('/learn')
+            ? 'container-custom-wide'
+            : 'container-custom',
           hasBreadcrumbs ? 'pt-32 pb-8' : 'py-8'
         )}
       >

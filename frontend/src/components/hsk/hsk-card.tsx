@@ -31,7 +31,7 @@ export default function HskCard({ hsk, progress = 0, locked = false, className =
 
   const handleClick = () => {
     if (!isInactive) {
-      navigate(`/hsk/${hsk.id}`);
+      navigate(`/hsk/${hsk.level}`);
     }
   };
 

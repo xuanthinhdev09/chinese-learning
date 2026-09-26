@@ -2,6 +2,41 @@
 
 Ghi nhận các thay đổi đáng kể của dự án. Mục mới nhất ở trên cùng.
 
+## 2026-09-26 — Gamification hành vi: 3 đòn bẩy (soft default, khen chuỗi, streak freeze)
+
+Tăng động lực học theo tâm lý học hành vi (đánh giá flow 7.5 → 8.5–9):
+
+- **Soft default thay khóa cứng** — stepper 3 stage vẫn bấm tự do, nhưng bước chưa xong đầu tiên (thứ tự từ vựng → luyện nghe → bài tập) được gợi ý mờ bằng badge "Nên làm" + ring nhẹ (`StageStepper.recommendedIndex`, `learn.recommended`). Giữ autonomy, lấy lại scaffolding cho người mới.
+- **Khen chuỗi đúng (variable reward)** — quiz từ vựng đếm chuỗi trả lời đúng liên tiếp; đạt mốc 3/5/10/20 hiện khen ngắn (`today.practice.praise3/5/10/20`), trả lời sai reset chuỗi. Áp chung cho cả quiz trong wizard lẫn ôn tập.
+- **Streak freeze 1 ngày** — `spaced-repetition.calculateStreak`: 1 ngày lỡ giữa 2 ngày hoạt động được "đóng băng" (không reset streak); 2 ngày lỡ liên tiếp mới gãy. Ngày hôm nay luôn là "đang chờ". Giảm what-the-hell effect, giữ loss aversion mà không phạt quá nặng.
+
+**Verify:** backend 105/105 tests pass; `tsc` frontend + backend sạch; i18n en khớp vi.
+
+## 2026-09-25 — Luồng học thống nhất 3 giai đoạn (unified lesson wizard)
+
+Thay luồng cũ `/today` (1 nút hoàn thành bài) bằng wizard 1 route với 3 stage bắt buộc theo thứ tự **vocab → dialogue → exercises**, mỗi stage tự nhận biết hoàn thành.
+
+**Backend:**
+
+- `UserProgress` thêm 3 cột nullable `vocabCompletedAt` / `dialogueCompletedAt` / `exercisesCompletedAt`; `isCompleted` set true khi đủ 3 flag (upsert per-activity, ghi đè timestamp nếu gọi lại). Migration `20260925042159_add_activity_completion` (chỉ `ADD COLUMN`, không backfill — row cũ giữ `isCompleted=true` với 3 flag null, UI coi như đã xong)
+- Endpoint mới: `POST /daily-session/activity-complete` (body `{ lessonId, activity }`, `activity ∈ vocab|dialogue|exercises`) và `GET /daily-session/lesson-status?lessonId=` — khôi phục checkmark per-stage khi reload; cả 2 trả `LessonProgressDto`
+- Admin check tách ra `backend/src/common/admin.ts` (`isAdminEmail`, env `ADMIN_EMAILS`) — source-of-truth duy nhất, wired through auth/users/vocabulary
+
+**Frontend:**
+
+- Route `/learn/:lessonId` — `lesson-learn-page.tsx`: stepper chọn tự do 3 stage (26/09 — bỏ khóa tuần tự), đủ 3 → banner hoàn thành + nút bài kế (`/daily-session/current-lesson`). Seed checkmark + nhảy tới stage chưa xong từ `GET /lesson-status`
+- **Học lại bài cũ (26/09)** — banner hoàn thành thêm nút "Học lại" (`learn.reStudy`): tắt banner, vào lại 3 stage để ôn lại bài đã xong (flag server vẫn sticky, không reset tiến độ)
+- Stage vocab (`vocab-stage.tsx`): flashcard bắt buộc chạy hết → quiz
+- Stage dialogue: chỉ pass shadowing ("trôi") mới mark complete; chưa trôi vẫn ghi SRS để ôn lại nhưng không mở khóa
+- Stage exercises (`exercises-stage.tsx`): câu checkable phải check hết, view-only (drill / stroke order) tính done khi render; rule tách thành pure helper `completion-detection.ts` (`isExercisesStageComplete`)
+- Homepage = điểm vào duy nhất: hero "bắt đầu học" → dẫn thẳng `/hsk` (router học tự chọn) + mục ôn tập → `/vocabulary/review` (26/09 — bỏ chooser khuyến nghị/tự chọn vì 2 luồng cùng nội dung)
+- **Bỏ 3 nút nav** ở header + mobile menu (Hôm nay / Trình độ HSK / Từ Vựng); header chỉ còn logo, language toggle, avatar dropdown; mobile menu chỉ còn hồ sơ + language toggle
+- Legacy: `/lessons/:order` và `/lessons/:order/exercises` → redirect `/learn/:id` (`legacy-lesson-redirect.tsx`); `/today` giữ nhưng ẩn khỏi nav; root `/` → `/dashboard`
+- Hook mới `use-resolve-hsk-level-id.ts` — `/hsk/:id` nhận số level hoặc CUID
+- `lesson-detail-page.tsx` / `lesson-exercises-page.tsx` thành **orphaned** (không còn route, chưa xóa)
+
+**Verify:** 105/105 backend tests pass; `tsc` + `npm run build` frontend pass.
+
 ## 2026-09-22 — Deploy: L2 live, mobile exercise UI, exercise media bền vững
 
 - **Prod có L2**: sync DB (`exercises` + `exercise_images` 24 rows / 52 ảnh, pg_dump từ dev + remap lesson CUID dev→prod vì 2 DB seed riêng biệt) và file (52 ảnh + 4 audio `NN-1/2.mp3` — audio L2 02-1/02-2 mới). Prod: 24 exercises, 56 media files.

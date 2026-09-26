@@ -16,6 +16,7 @@ import {
   REFRESH_TOKEN_ROTATION_GRACE_MS,
 } from './token-lifetimes';
 import { refreshTokenSecret } from './token-secrets';
+import { isAdminEmail } from '../common/admin';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -39,6 +40,7 @@ export class AuthService {
     username: string;
     avatar: string | null;
     createdAt: Date;
+    isAdmin: boolean;
   }> {
     const { email, username, password } = registerDto;
 
@@ -79,6 +81,7 @@ export class AuthService {
       username: user.username,
       avatar: user.avatar,
       createdAt: user.createdAt,
+      isAdmin: isAdminEmail(user.email),
     };
   }
 
@@ -130,6 +133,7 @@ export class AuthService {
         username: user.username,
         avatar: user.avatar,
         createdAt: user.createdAt,
+        isAdmin: isAdminEmail(user.email),
       },
     };
   }

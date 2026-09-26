@@ -4,20 +4,27 @@ import { LessonSummary } from '../../api/hsk-api';
 
 interface LessonCardProps {
   lesson: LessonSummary;
+  /** Bài bị khóa tuần tự (chưa học xong bài trước) — hiển thị mờ, không bấm được */
+  locked?: boolean;
 }
 
-export default function LessonCard({ lesson }: LessonCardProps) {
+export default function LessonCard({ lesson, locked = false }: LessonCardProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
     <div
-      onClick={() => navigate(`/lessons/${lesson.order}`)}
-      className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
+      onClick={locked ? undefined : () => navigate(`/learn/${lesson.id}`)}
+      title={locked ? t('vocabulary.study.lessonLocked') : lesson.title}
+      className={
+        locked
+          ? 'bg-white rounded-xl shadow-sm border border-gray-100 p-6 opacity-60 cursor-not-allowed'
+          : 'bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow'
+      }
     >
       <div className="flex items-center justify-between mb-3">
         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-          <span className="text-blue-600 font-semibold">{lesson.order}</span>
+          <span className="text-blue-600 font-semibold">{locked ? '🔒' : lesson.order}</span>
         </div>
         <div className="bg-green-100 px-3 py-1 rounded-full">
           <span className="text-sm text-green-700">{t('lesson.wordCount', { count: lesson.vocabularyCount })}</span>
