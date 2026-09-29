@@ -77,6 +77,7 @@ model Vocabulary {
   traditional  String?
   pinyin       String
   meaning      String
+  meaningEn    String?
   audioUrl     String?
   example      String?
   wordType     String?
@@ -105,6 +106,7 @@ model Conversation {
   hanzi          String
   pinyin         String
   vietnamese     String
+  english        String?
   audioUrl       String?
   difficulty     Int?
   createdAt      DateTime            @default(now())
@@ -115,6 +117,7 @@ model Conversation {
   dialogueOrder          Int?
   dialogueTitleHanzi     String?
   dialogueTitleVi        String?
+  dialogueTitleEn        String?
   lesson                 Lesson              @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   conversationVocabularies ConversationVocabulary[]
 

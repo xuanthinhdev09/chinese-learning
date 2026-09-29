@@ -194,10 +194,10 @@
     },
     "lyrics": {
       "groupHeader": "Segment {{order}} · {{title}}",
-      "meaningToggle": "Vietnamese",
+      "meaningToggle": "Meaning",
       "pinyinToggle": "Pinyin",
       "togglePinyinTitle": "Show/hide pinyin on every line",
-      "toggleVietnameseTitle": "Show/hide Vietnamese meaning on every line"
+      "toggleVietnameseTitle": "Show/hide meaning on every line"
     },
     "practice": {
       "continue": "Continue →",
@@ -462,6 +462,13 @@
     "title": "Lesson {{lesson}} exercises",
     "loadError": "Failed to load exercises. Has this lesson been imported?",
     "check": "Check",
+    "drill": {
+      "word_stress": "Word stress",
+      "sentence_stress": "Sentence stress",
+      "sentence_intonation": "Sentence intonation",
+      "rising_intonation": "Rising intonation",
+      "stress_and_intonation": "Stress + intonation"
+    },
     "redo": "Redo",
     "score": "{{correct}}/{{total}} correct",
     "unknownType": "Unsupported exercise type: {{type}}",

@@ -7,9 +7,10 @@ export interface Vocabulary {
   hanzi: string;
   traditional: string | null;
   pinyin: string;
-  meaning: string;      // Legacy format: "english | vietnamese"
-  english: string;     // NEW - Extracted English meaning
-  vietnamese: string;  // NEW - Extracted Vietnamese meaning
+  meaning: string;        // Vietnamese gloss (DB source)
+  meaningEn: string | null; // English gloss (DB, added 29/09)
+  english: string;     // Derived: meaningEn ('' when absent)
+  vietnamese: string;  // Derived: meaning ('' when absent)
   audioUrl: string | null;
   example: string | null;
   wordType: string | null;
@@ -60,6 +61,7 @@ export interface VocabularyWithProgress {
   traditional: string | null;
   pinyin: string;
   meaning: string;
+  meaningEn: string | null;
   english: string;
   vietnamese: string;
   pos: string | null;
@@ -89,36 +91,13 @@ export interface ProgressStatsResponse {
   streak: number;
 }
 
-// Parse meaning format "english | vietnamese" into separate fields
-function parseMeaning(meaning: string): { english: string; vietnamese: string } {
-  if (!meaning) {
-    return { english: '', vietnamese: '' };
-  }
-
-  // Check if meaning contains the separator
-  const parts = meaning.split('|').map(p => p.trim());
-
-  if (parts.length >= 2) {
-    return {
-      english: parts[0],
-      vietnamese: parts[1],
-    };
-  }
-
-  // If no separator found, treat as English only
-  return {
-    english: meaning,
-    vietnamese: '',
-  };
-}
-
-// Process vocabulary items to add parsed fields
+// `meaning` holds the Vietnamese gloss; `meaningEn` the English gloss (added
+// 29/09). Both nullable in DB — default to '' so display helpers never crash.
 function processVocabulary(item: any): Vocabulary {
-  const { english, vietnamese } = parseMeaning(item.meaning);
   return {
     ...item,
-    english,
-    vietnamese,
+    english: item.meaningEn || '',
+    vietnamese: item.meaning || '',
   };
 }
 

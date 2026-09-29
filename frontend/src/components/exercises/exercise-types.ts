@@ -26,6 +26,7 @@ export interface ExerciseRendererPayload {
     hanzi?: string;
     pinyin?: string;
     vi?: string;
+    en?: string;
     judgeHanzi?: string;
     judgePinyin?: string;
     radical?: string;
@@ -53,6 +54,7 @@ export interface ExampleJudgeItem {
   hanzi?: string;
   pinyin?: string;
   vi?: string;
+  en?: string;
   judgeHanzi?: string;
   judgePinyin?: string;
   imageRef?: string;

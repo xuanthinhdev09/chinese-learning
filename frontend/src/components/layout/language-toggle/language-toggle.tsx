@@ -8,7 +8,7 @@ interface LanguageToggleProps {
   className?: string;
 }
 
-/** Segmented VI/EN/ZH control that switches the whole UI language. */
+/** Segmented VI/EN control that switches the whole UI language. */
 export function LanguageToggle({ className = '' }: LanguageToggleProps) {
   const { t } = useTranslation();
   const lang = useUiLanguage((state) => state.lang);

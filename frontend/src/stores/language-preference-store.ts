@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import type { UiLanguage } from '../i18n';
+import { useUiLanguage } from './ui-language-store';
+
 export type LanguagePreference = 'vietnamese' | 'english' | 'both';
 
 interface LanguagePreferenceState {
@@ -47,3 +50,14 @@ export const getDisplayMeaning = (
       return vietnamese || english;
   }
 };
+
+/** Derive the content (meaning) language from the UI language. */
+export function preferenceForUiLanguage(lang: UiLanguage): LanguagePreference {
+  return lang === 'en' ? 'english' : 'vietnamese';
+}
+
+/** Content meaning language follows the UI language (en → English gloss, vi →
+ * Vietnamese). Replaces the old separate vi/en/both preference for meanings. */
+export function useContentPreference(): LanguagePreference {
+  return preferenceForUiLanguage(useUiLanguage((s) => s.lang));
+}

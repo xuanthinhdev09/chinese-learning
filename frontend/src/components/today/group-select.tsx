@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DialogueLine } from '../../api/daily-session';
 import { cn } from '../../utils/cn';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 
 interface GroupSelectProps {
   groups: DialogueLine[][];
@@ -18,6 +19,7 @@ interface GroupSelectProps {
 export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const preference = useContentPreference();
 
   return (
     <div className="relative">
@@ -44,6 +46,7 @@ export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps)
         <div className="absolute bottom-full left-0 mb-2 z-30 w-64 max-h-60 overflow-y-auto rounded-lg border border-border bg-white dark:bg-gray-800 shadow-lg animate-fade-in">
           {groups.map((group, groupIdx) => {
             const first = group[0];
+            const titleMeaning = getDisplayMeaning(first.dialogueTitleVi || '', first.dialogueTitleEn || '', preference);
             const isActive = groupIdx === activeIndex;
             return (
               <button
@@ -63,8 +66,8 @@ export function GroupSelect({ groups, activeIndex, onSelect }: GroupSelectProps)
                   <span className="chinese-text">
                     {first.dialogueTitleHanzi ?? t('today.group.fallback', { index: groupIdx + 1 })}
                   </span>
-                  {first.dialogueTitleVi && (
-                    <span className="text-muted"> · {first.dialogueTitleVi}</span>
+                  {titleMeaning && (
+                    <span className="text-muted"> · {titleMeaning}</span>
                   )}
                 </span>
                 <span

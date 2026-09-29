@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
+import { useAuthStore } from '../../stores/auth-store';
+import { UserAvatar } from './user-avatar';
 import { LanguageToggle } from './language-toggle/language-toggle';
 
 export interface MobileMenuProps {
@@ -15,6 +17,7 @@ export interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const user = useAuthStore((s) => s.user);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -59,16 +62,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   'hover:scale-[1.01] hover:shadow-md'
                 )}
               >
-                {/* Avatar placeholder */}
-                <div className={cn(
-                  'w-12 h-12 rounded-full',
-                  'bg-gradient-to-br from-primary to-secondary',
-                  'flex items-center justify-center',
-                  'text-white font-semibold text-lg',
-                  'flex-shrink-0'
-                )}>
-                  U
-                </div>
+                <UserAvatar user={user ?? undefined} size="lg" />
                 <div className="flex-1 text-left">
                   <p className="text-sm font-semibold text-foreground">
                     {t('nav.welcomeBack')}

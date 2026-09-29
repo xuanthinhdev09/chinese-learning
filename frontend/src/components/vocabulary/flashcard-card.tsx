@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
 import { Button, Badge, CircularProgress, Progress } from '../ui';
@@ -44,6 +45,7 @@ export function FlashcardCard() {
   const [resultAnimation, setResultAnimation] = useState<'correct' | 'wrong' | null>(null);
 
   const current = vocabularies[currentIndex];
+  const preference = useContentPreference();
   const progress = vocabularies.length > 0 ? `${currentIndex + 1}/${vocabularies.length}` : '0/0';
   const progressPercent = vocabularies.length > 0 ? ((currentIndex + 1) / vocabularies.length) * 100 : 0;
 
@@ -51,15 +53,6 @@ export function FlashcardCard() {
   useEffect(() => {
     setResultAnimation(null);
   }, [currentIndex]);
-
-  // Get meanings for display
-  const getDisplayMeanings = () => {
-    if (!current) return { english: '', vietnamese: '' };
-    return {
-      english: current.english || '',
-      vietnamese: current.vietnamese || current.meaning || '',
-    };
-  };
 
   const handleRate = async (quality: number) => {
     if (!current) return;
@@ -86,7 +79,11 @@ export function FlashcardCard() {
     );
   }
 
-  const { english, vietnamese } = getDisplayMeanings();
+  const meaning = getDisplayMeaning(
+    current.vietnamese || current.meaning || '',
+    current.english || '',
+    preference,
+  );
 
   return (
     <div className="max-w-lg mx-auto p-4 sm:p-6">
@@ -266,31 +263,13 @@ export function FlashcardCard() {
               {/* Divider */}
               <div className="w-16 h-0.5 bg-border rounded mb-4" />
 
-              {/* Meanings */}
+              {/* Meaning — follows the UI language (en → English, vi → Vietnamese) */}
               <div className="text-center w-full space-y-4">
-                {vietnamese && (
-                  <div className="animate-slide-up">
-                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">{t('vocabulary.flashcard.vietnameseLabel')}</p>
-                    <p className="text-xl font-semibold text-foreground chinese-text">
-                      {vietnamese}
-                    </p>
-                  </div>
-                )}
-
-                {english && english !== vietnamese && (
-                  <div className="animate-slide-up" style={{ animationDelay: '50ms' }}>
-                    <p className="text-xs text-muted mb-1 uppercase tracking-wide">{t('vocabulary.flashcard.englishLabel')}</p>
-                    <p className="text-lg text-foreground">
-                      {english}
-                    </p>
-                  </div>
-                )}
-
-                {!vietnamese && !english && current.meaning && (
+                {meaning && (
                   <div className="animate-slide-up">
                     <p className="text-xs text-muted mb-1 uppercase tracking-wide">{t('vocabulary.flashcard.meaningLabel')}</p>
                     <p className="text-xl font-semibold text-foreground chinese-text">
-                      {current.meaning}
+                      {meaning}
                     </p>
                   </div>
                 )}

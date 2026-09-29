@@ -10,7 +10,7 @@ import { AnswerMark, LetterButton, SentenceText } from './exercise-bits';
 function ExampleBlock({ example }: { example: ExerciseExample }) {
   return (
     <div className="rounded-xl bg-blue-50 p-3">
-      <SentenceText hanzi={example.hanzi} pinyin={example.pinyin} />
+      <SentenceText hanzi={example.hanzi} pinyin={example.pinyin} vi={example.vi} en={example.en} />
       {example.answer && <span className="text-sm font-semibold text-blue-700">→ {example.answer}</span>}
     </div>
   );
@@ -77,7 +77,7 @@ export function TextOptionsBody({ payload, answers, onAnswer, checked }: Exercis
                 {item.label}
               </span>
               <div className="min-w-0 flex-1">
-                <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} />
+                <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} vi={item.vi} en={item.en} />
               </div>
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">

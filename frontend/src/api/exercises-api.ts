@@ -16,6 +16,7 @@ export interface ExerciseItem {
   hanzi?: string;
   pinyin?: string;
   vi?: string;
+  en?: string;
   judgeHanzi?: string;
   radical?: string;
   imageRef?: string;
@@ -29,12 +30,14 @@ export interface OptionText {
   hanzi: string;
   pinyin?: string;
   vi?: string;
+  en?: string;
 }
 
 export interface ExerciseExample {
   hanzi?: string;
   pinyin?: string;
   vi?: string;
+  en?: string;
   imageRef?: string;
   answer?: string;
 }

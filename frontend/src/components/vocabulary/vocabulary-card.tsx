@@ -4,6 +4,7 @@ import { Vocabulary } from '../../api/vocabulary-api';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
 import { Badge } from '../ui';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 
 export interface VocabularyCardProps {
   vocabulary: Vocabulary;
@@ -21,6 +22,8 @@ export default function VocabularyCard({
   const { t } = useTranslation();
   const { play, isBusy: isSpeaking } = useTtsAudio();
   const [hasSpoken, setHasSpoken] = useState(false);
+  const preference = useContentPreference();
+  const meaning = getDisplayMeaning(vocabulary.vietnamese || vocabulary.meaning || '', vocabulary.english || '', preference);
 
   const handleSpeak = () => {
     if (vocabulary.hanzi) {
@@ -49,9 +52,9 @@ export default function VocabularyCard({
           {vocabulary.pinyin}
         </div>
 
-        {/* Meaning - Vietnamese */}
+        {/* Meaning — follows UI language */}
         <div className="text-xl text-foreground font-semibold mb-4">
-          {vocabulary.meaning}
+          {meaning}
         </div>
 
         {/* Word type badge */}
@@ -104,6 +107,8 @@ export interface VocabularyCardCompactProps {
 
 export function VocabularyCardCompact({ vocabulary, className = '' }: VocabularyCardCompactProps) {
   const { play, isBusy: isSpeaking } = useTtsAudio();
+  const preference = useContentPreference();
+  const meaning = getDisplayMeaning(vocabulary.vietnamese || vocabulary.meaning || '', vocabulary.english || '', preference);
 
   return (
     <div className={cn('card p-4 hover:shadow-md transition-shadow', className)}>
@@ -116,7 +121,7 @@ export function VocabularyCardCompact({ vocabulary, className = '' }: Vocabulary
         {/* Middle section */}
         <div className="flex-1 min-w-0">
           <div className="text-sm text-muted">{vocabulary.pinyin}</div>
-          <div className="text-base font-medium text-foreground truncate">{vocabulary.meaning}</div>
+          <div className="text-base font-medium text-foreground truncate">{meaning}</div>
           {vocabulary.wordType && (
             <span className="inline-block mt-1 text-xs text-muted">
               • {vocabulary.wordType}

@@ -2,12 +2,24 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
+import {
+  getDisplayMeaning,
+  useContentPreference,
+  type LanguagePreference,
+} from '../../stores/language-preference-store';
 
 export interface PracticeItem {
   id: string;
   hanzi: string;
   pinyin: string;
   meaning: string;
+  /** English gloss (added 29/09); display falls back to `meaning` when empty */
+  english?: string;
+}
+
+/** Display meaning for a practice item in the active content language. */
+function displayMeaning(item: PracticeItem, preference: LanguagePreference): string {
+  return getDisplayMeaning(item.meaning, item.english || '', preference);
 }
 
 interface PracticeRunnerProps {
@@ -58,6 +70,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
   const [correctStreak, setCorrectStreak] = useState(0);
   const [praiseKey, setPraiseKey] = useState<string | null>(null);
   const { play, isBusy: isSpeaking } = useTtsAudio();
+  const preference = useContentPreference();
 
   const current = items[index];
 
@@ -66,10 +79,10 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
     if (mode !== 'quiz' || !current) return [];
     const distractors = shuffle(items.filter((item) => item.id !== current.id))
       .slice(0, 3)
-      .map((item) => item.meaning);
-    return shuffle([current.meaning, ...distractors]);
+      .map((item) => displayMeaning(item, preference));
+    return shuffle([displayMeaning(current, preference), ...distractors]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current?.id, mode]);
+  }, [current?.id, mode, preference]);
 
   if (!current) {
     return (
@@ -109,7 +122,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
   const handlePick = async (option: string) => {
     if (picked || saving) return;
     setPicked(option);
-    const correct = option === current.meaning;
+    const correct = option === displayMeaning(current, preference);
     const newStreak = correct ? correctStreak + 1 : 0;
     setCorrectStreak(newStreak);
     // Mốc chuỗi đúng → khen ngắn; trả lời sai reset chuỗi (xóa khen).
@@ -161,7 +174,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
           revealed ? (
             <div className="animate-fade-in">
               <div className="w-16 h-0.5 bg-border rounded mx-auto mb-4" />
-              <p className="text-xl font-semibold text-foreground">{current.meaning}</p>
+              <p className="text-xl font-semibold text-foreground">{displayMeaning(current, preference)}</p>
             </div>
           ) : (
             <button
@@ -181,7 +194,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
                 disabled={Boolean(picked) || saving}
                 className={cn(
                   'px-4 py-3 rounded-lg border text-left transition-colors',
-                  picked === option && option === current.meaning
+                  picked === option && option === displayMeaning(current, preference)
                     ? 'border-accent bg-accent/10 text-accent font-semibold'
                     : picked === option
                       ? 'border-destructive bg-destructive/10 text-destructive'
@@ -204,7 +217,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
       {error && (
         <p className="text-sm text-destructive text-center mt-4 animate-shake">
           {error}{' '}
-          <button onClick={() => handleRate(mode === 'quiz' ? (picked === current.meaning ? 4 : 0) : 4)} className="underline">
+          <button onClick={() => handleRate(mode === 'quiz' ? (picked === displayMeaning(current, preference) ? 4 : 0) : 4)} className="underline">
             {t('common.retry')}
           </button>
         </p>

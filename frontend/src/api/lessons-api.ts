@@ -23,9 +23,11 @@ export interface LessonConversation {
   hanzi: string;
   pinyin: string;
   vietnamese: string;
+  english: string | null;
   dialogueOrder: number | null;
   dialogueTitleHanzi: string | null;
   dialogueTitleVi: string | null;
+  dialogueTitleEn: string | null;
 }
 
 export interface LessonDetail extends Lesson {

@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
-import { useLanguagePreference, getDisplayMeaning } from '../../stores/language-preference-store';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 import { translateApiError } from '../../utils/translate-api-error';
 
 export function QuizCard() {
   const { t } = useTranslation();
-  const { preference } = useLanguagePreference();
+  const preference = useContentPreference();
   const {
     vocabularies,
     currentIndex,

@@ -38,9 +38,11 @@ function toLineDto(conversation: Conversation): DialogueLineDto {
     hanzi: conversation.hanzi,
     pinyin: conversation.pinyin,
     vietnamese: conversation.vietnamese,
+    english: conversation.english,
     dialogueOrder: conversation.dialogueOrder,
     dialogueTitleHanzi: conversation.dialogueTitleHanzi,
     dialogueTitleVi: conversation.dialogueTitleVi,
+    dialogueTitleEn: conversation.dialogueTitleEn,
   };
 }
 

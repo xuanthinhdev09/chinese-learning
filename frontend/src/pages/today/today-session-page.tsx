@@ -30,10 +30,10 @@ const STEP_LABEL_KEYS: Record<Step['kind'], string> = {
   'vocab-cards': 'today.segment.vocabCards',
 };
 
-function toPracticeItems(items: Array<{ id: string; hanzi: string; pinyin: string; meaning: string }>): PracticeItem[] {
+function toPracticeItems(items: Array<{ id: string; hanzi: string; pinyin: string; meaning: string; meaningEn?: string | null }>): PracticeItem[] {
   return items
     .filter((item) => item.hanzi && item.meaning)
-    .map((item) => ({ id: item.id, hanzi: item.hanzi, pinyin: item.pinyin, meaning: item.meaning }));
+    .map((item) => ({ id: item.id, hanzi: item.hanzi, pinyin: item.pinyin, meaning: item.meaning, english: item.meaningEn ?? undefined }));
 }
 
 /**

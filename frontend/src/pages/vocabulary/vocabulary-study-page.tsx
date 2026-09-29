@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
-import { useLanguagePreference } from '../../stores/language-preference-store';
+import { useContentPreference } from '../../stores/language-preference-store';
 import { useAuthStore } from '../../stores/auth-store';
 import { hskApi, LessonSummary } from '../../api/hsk-api';
 import { getCurrentLesson, CurrentLesson } from '../../api/daily-session';
@@ -34,7 +34,7 @@ export function VocabularyStudyPage() {
   } = useVocabularyStore();
 
   // Ngôn ngữ nội dung (vi/en/both) — quyết định nghĩa hiển thị trong quiz options
-  const { preference } = useLanguagePreference();
+  const preference = useContentPreference();
 
   // Admin (theo ADMIN_EMAILS) được mở mọi bài — bỏ lock tuần tự
   const isAdmin = useAuthStore((s) => s.user?.isAdmin);

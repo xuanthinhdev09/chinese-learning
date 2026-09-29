@@ -27,6 +27,13 @@ export const useUiLanguage = create<UiLanguageState>()(
     }),
     {
       name: 'ui-language',
+      merge: (persistedState, currentState) => {
+        // 'zh' was removed from UiLanguage — rehydrating a stale 'zh' would
+        // leave the toggle inactive (i18n already falls back to 'vi').
+        const p = persistedState as { lang?: unknown } | undefined;
+        const lang = p?.lang === 'en' ? 'en' : 'vi';
+        return { ...currentState, lang };
+      },
     }
   )
 );

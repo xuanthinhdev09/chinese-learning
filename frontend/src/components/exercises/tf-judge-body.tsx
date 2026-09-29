@@ -19,15 +19,22 @@ export function TfJudgeBody({ payload, images, answers, onAnswer, checked }: Exe
             {t('exercises.example')}
           </p>
           {examples.map((ex, i) => (
-            <div key={i} className="flex flex-wrap items-center gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                例
-              </span>
-              {ex.imageRef && images[ex.imageRef] && (
-                <ExerciseImageSlot image={images[ex.imageRef]} compact />
-              )}
-              <div className="min-w-0 flex-1">
-                <SentenceText hanzi={ex.hanzi} pinyin={ex.pinyin} />
+            <div key={i} className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600">
+                  例
+                </span>
+                {ex.imageRef && images[ex.imageRef] && (
+                  <ExerciseImageSlot image={images[ex.imageRef]} compact />
+                )}
+                {ex.answer && (
+                  <span className="flex min-w-9 items-center justify-center rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium text-gray-700">
+                    {ex.answer}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 sm:flex-1">
+                <SentenceText hanzi={ex.hanzi} pinyin={ex.pinyin} vi={ex.vi} en={ex.en} />
                 {ex.judgeHanzi && (
                   <div className="mt-1">
                     <p className="chinese-text text-base font-medium text-gray-800">
@@ -39,11 +46,6 @@ export function TfJudgeBody({ payload, images, answers, onAnswer, checked }: Exe
                   </div>
                 )}
               </div>
-              {ex.answer && (
-                <span className="chinese-text rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-700">
-                  {ex.answer}
-                </span>
-              )}
             </div>
           ))}
         </div>
@@ -63,7 +65,7 @@ export function TfJudgeBody({ payload, images, answers, onAnswer, checked }: Exe
               <ExerciseImageSlot image={images[item.imageRef]} compact />
             )}
             <div className="min-w-0 flex-1">
-              <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} />
+              <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} vi={item.vi} en={item.en} />
               {item.judgeHanzi && (
                 <div className="mt-1">
                   <p className="chinese-text text-base font-medium text-gray-800">

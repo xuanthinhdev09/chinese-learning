@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 
 /**
  * Small presentation pieces shared by the exercise renderers: letter
  * buttons, answer marks, and the standard hanzi/pinyin text stack
- * (content sentences stay Vietnamese-free — pinyin only).
+ * (with an optional vi/en gloss line that follows the UI language).
  */
 
 export function LetterButton({
@@ -52,14 +53,21 @@ export function AnswerMark({ correct }: { correct: boolean }) {
 export function SentenceText({
   hanzi,
   pinyin,
+  vi,
+  en,
 }: {
   hanzi?: string;
   pinyin?: string;
+  vi?: string;
+  en?: string;
 }) {
+  const preference = useContentPreference();
+  const gloss = getDisplayMeaning(vi || '', en || '', preference);
   return (
     <div className="min-w-0">
       {hanzi && <p className="chinese-text text-base text-gray-900">{hanzi}</p>}
       {pinyin && <p className="text-sm italic text-blue-700">{pinyin}</p>}
+      {gloss && <p className="text-xs text-gray-500">{gloss}</p>}
     </div>
   );
 }

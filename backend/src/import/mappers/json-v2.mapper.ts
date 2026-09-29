@@ -39,6 +39,7 @@ export class JsonV2Mapper {
       pinyin: vocab.pinyin,
       // extraction workflow emits vietnamese; meaning kept for spec symmetry
       meaning: vocab.meaning || vocab.vietnamese || '',
+      meaningEn: vocab.english || null,
       wordType: vocab.word_type || null,
       example: vocab.example || null,
       isKeyword: vocab.is_keyword === true,
@@ -51,6 +52,9 @@ export class JsonV2Mapper {
     return {
       pinyin: vocab.pinyin,
       meaning: vocab.meaning || vocab.vietnamese || '',
+      // Only overwrite English when the JSON carries it — a lesson without
+      // english yet must not null out an already-translated gloss.
+      ...(vocab.english !== undefined ? { meaningEn: vocab.english } : {}),
       wordType: vocab.word_type || null,
       example: vocab.example || null,
       isKeyword: vocab.is_keyword === true,
@@ -68,6 +72,7 @@ export class JsonV2Mapper {
       hanzi: conv.hanzi,
       pinyin: conv.pinyin,
       vietnamese: conv.vietnamese,
+      english: conv.english || null,
       dialogueOrder: conv.dialogue_order ?? null,
       dialogueTitleHanzi: conv.dialogue_title_hanzi || null,
       dialogueTitleVi: conv.dialogue_title_vi || null,

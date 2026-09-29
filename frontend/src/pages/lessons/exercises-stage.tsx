@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,11 +15,17 @@ import {
 } from '../../components/exercises/exercise-audio-player';
 import { AnswersMap, CheckedMap } from '../../components/exercises/exercise-types';
 import { isExercisesStageComplete } from './completion-detection';
+import {
+  ImageSlotSelectionContext,
+  ImageSlotSelection,
+} from '../../components/exercises/image-slot-selection-context';
 
 interface AudioGroup {
   audio: string | null;
   exercises: LessonExercise[];
 }
+
+type UploadRegistry = Map<string, (file: File) => void>;
 
 /** Merge ADJACENT exercises sharing one audio file into a single group. */
 function groupAdjacentByAudio(exercises: LessonExercise[]): AudioGroup[] {
@@ -51,6 +57,40 @@ export function ExercisesStage({
   const { t } = useTranslation();
   const [answers, setAnswers] = useState<AnswersMap>({});
   const [checkedMap, setCheckedMap] = useState<CheckedMap>({});
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const uploadRegistry = useRef<UploadRegistry>(new Map());
+
+  // Window-level paste: an image on the clipboard goes to the selected slot.
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      if (!selectedImageId) return;
+      const item = Array.from(e.clipboardData?.items ?? []).find((i) =>
+        i.type.startsWith('image/'),
+      );
+      const file = item?.getAsFile();
+      if (!file) return;
+      uploadRegistry.current.get(selectedImageId)?.(file);
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [selectedImageId]);
+
+  const registerUpload = useCallback(
+    (id: string, upload: ((file: File) => void) | null) => {
+      if (upload) uploadRegistry.current.set(id, upload);
+      else uploadRegistry.current.delete(id);
+    },
+    [],
+  );
+
+  const selection = useMemo<ImageSlotSelection>(
+    () => ({
+      selectedId: selectedImageId,
+      onSelect: (id) => setSelectedImageId((prev) => (prev === id ? null : id)),
+      registerUpload,
+    }),
+    [selectedImageId, registerUpload],
+  );
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['lesson-exercises', lessonId],
@@ -155,6 +195,7 @@ export function ExercisesStage({
 
   return (
     <AudioPlayerProvider>
+      <ImageSlotSelectionContext.Provider value={selection}>
       {/* extra bottom padding keeps content clear of the sticky audio bar */}
       <div className="mx-auto max-w-3xl space-y-6 pb-28">
         {grouped.map(({ section, groups }) => (
@@ -177,6 +218,7 @@ export function ExercisesStage({
         ))}
       </div>
       <StickyAudioBar />
+      </ImageSlotSelectionContext.Provider>
     </AudioPlayerProvider>
   );
 }

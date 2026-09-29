@@ -2,6 +2,41 @@
 
 Ghi nhận các thay đổi đáng kể của dự án. Mục mới nhất ở trên cùng.
 
+## 2026-09-29 — English cho phần hội thoại/listening (课文)
+
+- `Conversation` thêm cột `english` (migration `20260929170500_add_conversation_english`); wire qua DTO import + mapper + `DialogueLineDto`/`toLineDto`.
+- Dịch **245 dòng hội thoại** (230 trong JSON nguồn + 16 dòng DB-only) `vi → en` (tự dịch — tránh quota Gemini).
+- `lyrics-panel.tsx` hiển thị nghĩa theo ngôn ngữ UI (`getDisplayMeaning`); label toggle đổi "Nghĩa Việt" → "Nghĩa"/"Meaning".
+
+**Verify:** backend 105/105 tests pass; `tsc` frontend + backend sạch; DB 245/245 conversations có `english`.
+
+## 2026-09-29 — Bỏ ngôn ngữ zh + bổ sung English cho nội dung (từ vựng + bài tập)
+
+Giao diện còn `vi` + `en` (bỏ `zh`); nội dung học thêm nghĩa English song song nghĩa Việt.
+
+**Code (đã xong, verify):**
+- i18n UI bỏ `zh` (`i18n/index.ts`, xóa `zh.json`, bỏ nhánh `startsWith('zh')` trong `exercise-card.tsx`). Người dùng đang lưu `zh` cũ tự rơi về `vi`.
+- `Vocabulary` thêm cột `meaningEn` (migration `20260929093000_add_vocabulary_meaning_en`); mapper import v2 map `english → meaningEn` (update conditional — không null nghĩa khi JSON thiếu `english`).
+- Frontend bỏ `parseMeaning` sai (trước đây split `|`); `processVocabulary` dùng `meaningEn` cho english, `meaning` cho vietnamese.
+- Bài tập: thêm field `en` song song `vi` trong payload JSON; `SentenceText` render gloss theo `language-preference` (vi/en/both); `DRILL_TYPE_LABELS` hardcode → i18n `exercises.drill.*`.
+
+**Verify:** backend 105/105 tests pass; `tsc` frontend + backend sạch; i18n JSON valid.
+
+**Dữ liệu (đã sync 29/09):**
+- Migration `add_vocabulary_meaning_en` đã áp dụng.
+- Từ vựng: dịch 156 từ (`vi → en`), sync vào DB (`meaningEn` + nghĩa Việt đã sửa) — 156 updated, 0 missing.
+- Bài tập: 867 gloss dịch (138 Gemini + 729 tự dịch — hết quota Gemini), re-import 15 bài (171 exercise, 0 removed). `en` chảy vào DB qua cột payload Json.
+
+## 2026-09-26 — Sync exercise L3-15 + media lên prod
+
+Prod trước chỉ có L1+L2 (24 exercise). Sync toàn bộ bài tập còn lại lên prod bằng importer workbook-v3 chạy local trỏ vào prod DB qua SSH tunnel (port 5434 — 5433 bị Docker Desktop/vlaz chiếm) + scp file media.
+
+- **DB prod**: 171 exercise (đủ 15/15 bài; L1-6 = 12 đề, L7-15 = 11 đề), 361 row `exercise_images` — parity với local (171/361).
+- **Media prod**: audio đủ 30 file (`01-1` → `15-2`, trước chỉ 4), ảnh thêm `lesson-03/` (26 ảnh).
+- **Ảnh L4-15 chưa có** (chưa upload/crop) — hiển thị slot "pending upload" theo thiết kế, user tự upload qua UI sau.
+- **Không clean** 2 row `exercisesCompletedAt` dơ của L3/L4 (user chốt bỏ qua).
+- Không thay đổi code — chỉ sync dữ liệu.
+
 ## 2026-09-26 — Gamification hành vi: 3 đòn bẩy (soft default, khen chuỗi, streak freeze)
 
 Tăng động lực học theo tâm lý học hành vi (đánh giá flow 7.5 → 8.5–9):

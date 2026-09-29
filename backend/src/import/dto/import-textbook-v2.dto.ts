@@ -23,6 +23,8 @@ export interface TextbookV2VocabularyItemDto {
   meaning?: string;
   /** Vietnamese gloss — the extraction workflow emits this instead of meaning */
   vietnamese?: string;
+  /** English gloss — added by translate_vocab_english.py (29/09) */
+  english?: string;
   word_type?: string;
   example?: string;
   /** Lesson keyword flag consumed by the daily session exercises */
@@ -36,6 +38,8 @@ export interface TextbookV2ConversationItemDto {
   hanzi: string;
   pinyin: string;
   vietnamese: string;
+  /** English gloss — added 29/09 */
+  english?: string;
   /** 课文 group within the lesson (book prints 3-4 titled dialogues) */
   dialogue_order?: number;
   dialogue_title_hanzi?: string;

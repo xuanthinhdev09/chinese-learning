@@ -190,10 +190,10 @@
     },
     "lyrics": {
       "groupHeader": "Đoạn {{order}} · {{title}}",
-      "meaningToggle": "Nghĩa Việt",
+      "meaningToggle": "Nghĩa",
       "pinyinToggle": "Phiên âm",
       "togglePinyinTitle": "Hiện/ẩn pinyin trên mọi dòng",
-      "toggleVietnameseTitle": "Hiện/ẩn nghĩa tiếng Việt trên mọi dòng"
+      "toggleVietnameseTitle": "Hiện/ẩn nghĩa trên mọi dòng"
     },
     "practice": {
       "continue": "Tiếp tục →",
@@ -452,6 +452,13 @@
     "title": "Bài tập bài {{lesson}}",
     "loadError": "Không thể tải bài tập. Đã import bài này chưa?",
     "check": "Kiểm tra",
+    "drill": {
+      "word_stress": "Trọng âm từ",
+      "sentence_stress": "Trọng âm câu",
+      "sentence_intonation": "Ngữ điệu câu",
+      "rising_intonation": "Ngữ điệu lên",
+      "stress_and_intonation": "Trọng âm + ngữ điệu"
+    },
     "redo": "Làm lại",
     "score": "Đúng {{correct}}/{{total}}",
     "unknownType": "Chưa hỗ trợ dạng đề: {{type}}",

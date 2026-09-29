@@ -138,7 +138,7 @@ export default function LessonLearnPage() {
     () =>
       (vocabQuery.data ?? [])
         .filter((v) => v.hanzi && v.meaning)
-        .map((v) => ({ id: v.id, hanzi: v.hanzi, pinyin: v.pinyin, meaning: v.meaning })),
+        .map((v) => ({ id: v.id, hanzi: v.hanzi, pinyin: v.pinyin, meaning: v.meaning, english: v.english })),
     [vocabQuery.data],
   );
 

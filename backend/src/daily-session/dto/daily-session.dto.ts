@@ -30,10 +30,12 @@ export interface DialogueLineDto {
   hanzi: string;
   pinyin: string;
   vietnamese: string;
+  english: string | null;
   /** 课文 group within the lesson; null on legacy rows */
   dialogueOrder: number | null;
   dialogueTitleHanzi: string | null;
   dialogueTitleVi: string | null;
+  dialogueTitleEn: string | null;
 }
 
 export interface DueDialogueDto {

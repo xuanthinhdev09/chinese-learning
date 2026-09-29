@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DialogueLine } from '../../api/daily-session';
 import { cn } from '../../utils/cn';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 
 interface LyricsPanelProps {
   lines: DialogueLine[];
@@ -25,6 +26,7 @@ interface LyricsPanelProps {
  */
 export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietnamese, className }: LyricsPanelProps) {
   const { t } = useTranslation();
+  const preference = useContentPreference();
   // Re-attach on index change so the NEW active line scrolls into view
   // (ref callback identity must change, same trick as the old sidebar list).
   const activeLineRef = useCallback(
@@ -44,6 +46,7 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
   const renderLine = (line: DialogueLine, lineIndex: number) => {
     const isActive = lineIndex === index;
     const isPast = lineIndex < index;
+    const titleMeaning = getDisplayMeaning(line.dialogueTitleVi || '', line.dialogueTitleEn || '', preference);
     // Header nhóm 课文: in khi dialogueOrder đổi so với dòng trước (dữ liệu
     // legacy không có nhóm → không header). Nội dung gắn với vị trí dòng,
     // không đổi theo active → height panel ổn định khi chuyển câu.
@@ -57,7 +60,7 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
             <span className="chinese-text normal-case">
               {t('today.lyrics.groupHeader', { order: line.dialogueOrder, title: line.dialogueTitleHanzi })}
             </span>
-            {line.dialogueTitleVi && <span className="font-normal normal-case">({line.dialogueTitleVi})</span>}
+            {titleMeaning && <span className="font-normal normal-case">({titleMeaning})</span>}
           </p>
         )}
         <button
@@ -100,7 +103,7 @@ export function LyricsPanel({ lines, index, onSelectLine, showPinyin, showVietna
               isActive ? 'mt-2 text-sm text-foreground sm:text-base' : 'mt-1 text-xs text-muted/70',
             )}
           >
-            {line.vietnamese}
+            {getDisplayMeaning(line.vietnamese, line.english || '', preference)}
           </span>
         )}
         </button>

@@ -24,6 +24,7 @@ export function VocabStage({
   if (step === 'flashcard') {
     return (
       <PracticeRunner
+        key="flashcard"
         title={t('learn.vocabFlashcardTitle')}
         items={items}
         mode="flashcard"
@@ -35,6 +36,7 @@ export function VocabStage({
 
   return (
     <PracticeRunner
+      key="quiz"
       title={t('learn.vocabQuizTitle')}
       items={items}
       mode="quiz"

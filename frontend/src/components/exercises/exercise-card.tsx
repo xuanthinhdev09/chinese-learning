@@ -90,14 +90,12 @@ export function ExerciseCard({
       ? countRadicalScore(exerciseAnswers, exercise)
       : correctCount;
   // Hybrid instructions: hanzi line always from DB (book text); the
-  // translation line uses the per-typeCode i18n template, hidden for zh,
-  // falling back to the DB vi string for unknown typeCodes.
+  // translation line uses the per-typeCode i18n template, falling back to
+  // the DB vi string for unknown typeCodes.
   const instrKey = `exercises.instr.${exercise.typeCode}`;
-  const instructionLine = i18n.language.startsWith('zh')
-    ? undefined
-    : i18n.exists(instrKey)
-      ? t(instrKey)
-      : exercise.instructionVi;
+  const instructionLine = i18n.exists(instrKey)
+    ? t(instrKey)
+    : exercise.instructionVi;
   const sectionKey = SECTION_KEYS[exercise.section];
   const sectionLabel = sectionKey ? t(`exercises.section.${sectionKey}`) : exercise.section;
 

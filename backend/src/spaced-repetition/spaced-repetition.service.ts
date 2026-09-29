@@ -157,6 +157,7 @@ export class SpacedRepetitionService {
       traditional: p.vocabulary.traditional,
       pinyin: p.vocabulary.pinyin,
       meaning: p.vocabulary.meaning,
+      meaningEn: p.vocabulary.meaningEn,
       pos: p.vocabulary.pos,
       hskCode: p.vocabulary.hskCode,
       hskLevel: p.vocabulary.hskLevel,

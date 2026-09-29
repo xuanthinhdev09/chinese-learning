@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { usePersistentToggle } from '../../hooks/use-persistent-toggle';
 import { DialogueLine } from '../../api/daily-session';
+import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 import { DialogueActions, PlaybackControls } from './dialogue-controls';
 import { GroupSelect } from './group-select';
 import { LyricsPanel } from './lyrics-panel';
@@ -31,6 +32,7 @@ interface DialogueReaderProps {
  */
 export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: DialogueReaderProps) {
   const { t } = useTranslation();
+  const preference = useContentPreference();
   const [index, setIndex] = useState(0);
   const [groupIndex, setGroupIndex] = useState(0);
   const [speechRate, setSpeechRate] = useState(1);
@@ -155,6 +157,7 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
         <div className="space-y-1">
           {groups.map((group, groupIdx) => {
             const first = group[0];
+            const titleMeaning = getDisplayMeaning(first.dialogueTitleVi || '', first.dialogueTitleEn || '', preference);
             const active = groupIdx === safeGroupIndex;
             return (
               <button
@@ -172,8 +175,8 @@ export function DialogueReader({ title, lines, mode, onDone, sessionHeader }: Di
                   <span className="chinese-text">
                     {first.dialogueTitleHanzi ?? t('today.group.fallback', { index: groupIdx + 1 })}
                   </span>
-                  {first.dialogueTitleVi && (
-                    <span className="text-muted"> · {first.dialogueTitleVi}</span>
+                  {titleMeaning && (
+                    <span className="text-muted"> · {titleMeaning}</span>
                   )}
                 </span>
                 <span className="shrink-0 text-xs text-muted">

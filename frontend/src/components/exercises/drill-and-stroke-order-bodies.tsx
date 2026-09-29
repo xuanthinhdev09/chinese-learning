@@ -2,22 +2,17 @@ import { useTranslation } from 'react-i18next';
 import { ExerciseRendererProps } from './exercise-types';
 import { ExerciseImageSlot } from './exercise-image-slot';
 
-const DRILL_TYPE_LABELS: Record<string, string> = {
-  word_stress: 'Trọng âm từ',
-  sentence_stress: 'Trọng âm câu',
-  sentence_intonation: 'Ngữ điệu câu',
-  rising_intonation: 'Ngữ điệu lên',
-  stress_and_intonation: 'Trọng âm + ngữ điệu',
-};
-
 /** 语音 drill (bài 3-15): oral practice, no gradable answer — listen & repeat. */
 export function DrillBody({ payload }: ExerciseRendererProps) {
   const { t } = useTranslation();
+  const drillLabel = payload.drillType
+    ? t(`exercises.drill.${payload.drillType}`, { defaultValue: payload.drillType })
+    : undefined;
   return (
     <div className="space-y-3">
-      {payload.drillType && (
+      {drillLabel && (
         <span className="inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
-          {DRILL_TYPE_LABELS[payload.drillType] ?? payload.drillType} · {t('exercises.noAnswer')}
+          {drillLabel} · {t('exercises.noAnswer')}
         </span>
       )}
       <div className="flex flex-wrap gap-2">

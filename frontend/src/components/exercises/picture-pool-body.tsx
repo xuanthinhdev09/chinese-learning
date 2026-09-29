@@ -33,7 +33,7 @@ function ExampleBlock({ example, images }: { example: ExerciseExample; images: R
         {example.imageRef && images[example.imageRef] && (
           <ExerciseImageSlot image={images[example.imageRef]} compact />
         )}
-        <SentenceText hanzi={example.hanzi} pinyin={example.pinyin} />
+        <SentenceText hanzi={example.hanzi} pinyin={example.pinyin} vi={example.vi} en={example.en} />
         {example.answer && <span className="chinese-text text-sm font-semibold text-blue-700">→ {example.answer}</span>}
       </div>
     </div>
@@ -90,7 +90,7 @@ export function PicturePoolBody({ payload, images, answers, onAnswer, checked }:
                 <div className="flex items-center gap-3 sm:flex-1">
                   {numberBadge}
                   <div className="min-w-0 flex-1">
-                    <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} />
+                    <SentenceText hanzi={item.hanzi} pinyin={item.pinyin} vi={item.vi} en={item.en} />
                   </div>
                 </div>
               )}

@@ -22,6 +22,10 @@ export class VocabularyResponseDto {
 
   @IsString()
   @IsOptional()
+  meaningEn: string | null;
+
+  @IsString()
+  @IsOptional()
   audioUrl: string | null;
 
   @IsString()

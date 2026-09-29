@@ -54,6 +54,7 @@ export interface VocabularyWithProgressDto {
   traditional: string | null;
   pinyin: string;
   meaning: string;
+  meaningEn: string | null;
   pos: string | null;
   hskCode: string | null;
   hskLevel: number | null;

@@ -11,46 +11,7 @@ import {
 } from '../../ui/dropdown/dropdown';
 import { LanguageToggle } from '../language-toggle/language-toggle';
 import { cn } from '../../../utils/cn';
-
-/**
- * Avatar tròn: emoji đã chọn trong hồ sơ, hoặc chữ cái đầu của username khi
- * chưa chọn avatar. Email/username đầy đủ chỉ nằm trong dropdown.
- */
-function UserAvatar({
-  user,
-}: {
-  user?: { username: string; email: string; avatar?: string };
-}) {
-  const ring =
-    'transition-shadow hover:ring-2 hover:ring-primary/30 rounded-full';
-  if (user?.avatar) {
-    return (
-      <span
-        className={cn(
-          'flex h-9 w-9 items-center justify-center',
-          'bg-gray-100 text-lg select-none',
-          ring
-        )}
-        aria-hidden="true"
-      >
-        {user.avatar}
-      </span>
-    );
-  }
-  const initial = (user?.username ?? user?.email ?? '?').charAt(0).toUpperCase();
-  return (
-    <span
-      className={cn(
-        'flex h-9 w-9 items-center justify-center',
-        'bg-primary text-white text-sm font-semibold select-none',
-        ring
-      )}
-      aria-hidden="true"
-    >
-      {initial}
-    </span>
-  );
-}
+import { UserAvatar } from '../user-avatar';
 
 export interface HeaderProps {
   className?: string;
@@ -85,7 +46,6 @@ export const Header = React.forwardRef<HTMLElement, HeaderProps>(
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
-                <span className="text-2xl">🇨🇳</span>
                 <span className="font-display font-semibold text-xl text-foreground">
                   HSK Learning
                 </span>
