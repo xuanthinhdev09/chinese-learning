@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
 import { cn } from '../../utils/cn';
@@ -7,6 +7,8 @@ import {
   useContentPreference,
   type LanguagePreference,
 } from '../../stores/language-preference-store';
+import { buildHanziChoiceOptions } from '../../utils/build-hanzi-choice-quiz-options';
+import { useHanziQuizDistractorPool } from '../../hooks/use-hanzi-quiz-distractor-pool';
 
 export interface PracticeItem {
   id: string;
@@ -29,6 +31,10 @@ interface PracticeRunnerProps {
   /** Record the SM-2 quality for one item, then advance */
   onRate: (item: PracticeItem, quality: number) => Promise<void>;
   onDone: () => void;
+  /** Quiz: nguồn đáp án nhiễu thêm ngoài `items` (vd toàn bộ từ của bài) */
+  distractorPool?: PracticeItem[];
+  /** Quiz: bài đang học — thiếu đáp án nhiễu thì lấy thêm từ level của bài */
+  lessonId?: string;
 }
 
 const RATING_OPTIONS = [
@@ -47,23 +53,16 @@ const PRAISE_MILESTONES: Record<number, string> = {
   20: 'today.practice.praise20',
 };
 
-function shuffle<T>(array: T[]): T[] {
-  const copy = [...array];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
 /**
  * Sequential practice over a vocab list. Flashcard mode: reveal + SM-2 rate.
- * Quiz mode: pick the meaning out of 4 options (correct = Good, wrong = Again).
+ * Quiz mode: show the meaning, pick the hanzi out of 4 options (correct = Good,
+ * wrong = Again). Hanzi/pinyin/audio stay hidden until an option is picked.
  */
-export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeRunnerProps) {
+export function PracticeRunner({ title, items, mode, onRate, onDone, distractorPool, lessonId }: PracticeRunnerProps) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  /** id của đáp án đã chọn (quiz) */
   const [picked, setPicked] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,15 +73,22 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
 
   const current = items[index];
 
-  // Quiz options are stable per item while the card is visible
+  const getMeaning = useCallback((item: PracticeItem) => displayMeaning(item, preference), [preference]);
+  const { pool, isLoading: isPoolLoading } = useHanziQuizDistractorPool({
+    items,
+    extraPool: distractorPool,
+    lessonId,
+    enabled: mode === 'quiz',
+    getMeaning,
+  });
+
+  // Quiz options are stable per item while the card is visible; pool.length (not
+  // identity) so parent re-renders don't reshuffle — it only grows when the level pool arrives
   const options = useMemo(() => {
     if (mode !== 'quiz' || !current) return [];
-    const distractors = shuffle(items.filter((item) => item.id !== current.id))
-      .slice(0, 3)
-      .map((item) => displayMeaning(item, preference));
-    return shuffle([displayMeaning(current, preference), ...distractors]);
+    return buildHanziChoiceOptions(current, pool, getMeaning);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current?.id, mode, preference]);
+  }, [current?.id, mode, getMeaning, pool.length]);
 
   if (!current) {
     return (
@@ -119,10 +125,10 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
     }
   };
 
-  const handlePick = async (option: string) => {
+  const handlePick = async (optionId: string) => {
     if (picked || saving) return;
-    setPicked(option);
-    const correct = option === displayMeaning(current, preference);
+    setPicked(optionId);
+    const correct = optionId === current.id;
     const newStreak = correct ? correctStreak + 1 : 0;
     setCorrectStreak(newStreak);
     // Mốc chuỗi đúng → khen ngắn; trả lời sai reset chuỗi (xóa khen).
@@ -153,58 +159,77 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
       </div>
 
       <div className="card p-6 sm:p-8 text-center" style={{ minHeight: '280px' }}>
-        <button
-          onClick={() => play(current.hanzi)}
-          disabled={isSpeaking}
-          className={cn(
-            'float-right p-2 rounded-lg transition-all',
-            isSpeaking ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200 active:scale-95'
-          )}
-          title={t('today.practice.speak')}
-        >
-          <span className={cn(isSpeaking && 'animate-pulse')}>{isSpeaking ? '🔊' : '🔈'}</span>
-        </button>
-
-        <p className="text-4xl sm:text-5xl font-bold text-foreground chinese-text mb-3 break-words">
-          {current.hanzi}
-        </p>
-        <p className="text-xl text-primary font-light mb-6">{current.pinyin}</p>
+        {/* Quiz: nút loa ẩn tới khi đã chọn — nghe âm là lộ đáp án */}
+        {(mode === 'flashcard' || picked) && (
+          <button
+            onClick={() => play(current.hanzi)}
+            disabled={isSpeaking}
+            className={cn(
+              'float-right p-2 rounded-lg transition-all',
+              isSpeaking ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200 active:scale-95'
+            )}
+            title={t('today.practice.speak')}
+          >
+            <span className={cn(isSpeaking && 'animate-pulse')}>{isSpeaking ? '🔊' : '🔈'}</span>
+          </button>
+        )}
 
         {mode === 'flashcard' ? (
-          revealed ? (
-            <div className="animate-fade-in">
-              <div className="w-16 h-0.5 bg-border rounded mx-auto mb-4" />
-              <p className="text-xl font-semibold text-foreground">{displayMeaning(current, preference)}</p>
-            </div>
-          ) : (
-            <button
-              onClick={() => setRevealed(true)}
-              className="px-8 py-3 rounded-lg bg-primary-light text-primary-dark hover:bg-primary hover:text-white transition-colors"
-            >
-              {t('today.practice.reveal')}
-            </button>
-          )
-        ) : (
-          <div className="grid gap-2">
-            {options.map((option, optionIndex) => (
+          <>
+            {/* Mặt trước chỉ chữ Hán; pinyin + nghĩa hiện sau khi lật */}
+            <p className="text-4xl sm:text-5xl font-bold text-foreground chinese-text mb-6 break-words">
+              {current.hanzi}
+            </p>
+            {revealed ? (
+              <div className="animate-fade-in">
+                <p className="text-xl text-primary font-light mb-4">{current.pinyin}</p>
+                <div className="w-16 h-0.5 bg-border rounded mx-auto mb-4" />
+                <p className="text-xl font-semibold text-foreground">{displayMeaning(current, preference)}</p>
+              </div>
+            ) : (
               <button
-                // index prefix keeps keys unique when two options share the same meaning text
-                key={`${optionIndex}-${option}`}
-                onClick={() => handlePick(option)}
-                disabled={Boolean(picked) || saving}
-                className={cn(
-                  'px-4 py-3 rounded-lg border text-left transition-colors',
-                  picked === option && option === displayMeaning(current, preference)
-                    ? 'border-accent bg-accent/10 text-accent font-semibold'
-                    : picked === option
-                      ? 'border-destructive bg-destructive/10 text-destructive'
-                      : 'border-border hover:bg-background-alt disabled:opacity-60'
-                )}
+                onClick={() => setRevealed(true)}
+                className="px-8 py-3 rounded-lg bg-primary-light text-primary-dark hover:bg-primary hover:text-white transition-colors"
               >
-                {option}
+                {t('today.practice.reveal')}
               </button>
-            ))}
-          </div>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted mb-2">{t('today.practice.pickHanzi')}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-foreground mb-2 break-words">
+              {displayMeaning(current, preference)}
+            </p>
+            {/* Đáp án đúng chỉ hiện sau khi chọn */}
+            <p className={cn('text-lg text-primary mb-6 min-h-[1.75rem]', !picked && 'invisible')}>
+              <span className="chinese-text">{current.hanzi}</span> · {current.pinyin}
+            </p>
+
+            {isPoolLoading ? (
+              <p className="text-muted py-8">{t('common.loading')}</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {options.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => handlePick(option.id)}
+                    disabled={Boolean(picked) || saving}
+                    className={cn(
+                      'px-4 py-4 rounded-lg border text-3xl chinese-text transition-colors break-words',
+                      picked && option.isCorrect
+                        ? 'border-accent bg-accent/10 text-accent font-semibold'
+                        : picked === option.id
+                          ? 'border-destructive bg-destructive/10 text-destructive'
+                          : 'border-border hover:bg-background-alt disabled:opacity-60'
+                    )}
+                  >
+                    {option.hanzi}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -217,7 +242,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone }: PracticeR
       {error && (
         <p className="text-sm text-destructive text-center mt-4 animate-shake">
           {error}{' '}
-          <button onClick={() => handleRate(mode === 'quiz' ? (picked === displayMeaning(current, preference) ? 4 : 0) : 4)} className="underline">
+          <button onClick={() => handleRate(mode === 'quiz' ? (picked === current.id ? 4 : 0) : 4)} className="underline">
             {t('common.retry')}
           </button>
         </p>

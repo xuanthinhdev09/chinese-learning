@@ -177,7 +177,7 @@ export default function LessonLearnPage() {
 
   const renderStage = () => {
     if (stage === 0) {
-      return <VocabStage items={vocabItems} onComplete={() => markDone('vocab')} />;
+      return <VocabStage items={vocabItems} lessonId={lesson.id} onComplete={() => markDone('vocab')} />;
     }
     if (stage === 1) {
       return (

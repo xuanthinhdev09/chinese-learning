@@ -133,7 +133,7 @@
       "exercises": "Bài tập"
     },
     "vocabFlashcardTitle": "Từ vựng — lật thẻ",
-    "vocabQuizTitle": "Từ vựng — chọn nghĩa",
+    "vocabQuizTitle": "Từ vựng — chọn chữ Hán",
     "completeTitle": "Hoàn thành bài học!",
     "completeDesc": "Bạn đã hoàn thành cả 3 hoạt động của bài này.",
     "reStudy": "Học lại",
@@ -149,7 +149,7 @@
     "emptyNothing": "Không có gì để ôn hôm nay",
     "emptyNothingDesc": "Lịch ôn tập chưa đến hạn. Quay lại sau nhé!",
     "keywordCardsTitle": "Từ khóa chính — lật thẻ",
-    "keywordQuizTitle": "Từ khóa chính — chọn nghĩa",
+    "keywordQuizTitle": "Từ khóa chính — chọn chữ Hán",
     "vocabDueTitle": "Từ vựng đến hạn ôn",
     "vocabDueTitleWithCount": "Từ vựng đến hạn ôn ({{current}}/{{total}})",
     "segment": {
@@ -208,7 +208,8 @@
       "praise3": "🔥 Đang vào guồng!",
       "praise5": "⚡ Chuỗi 5 đúng!",
       "praise10": "🏆 Không thể ngăn cản!",
-      "praise20": "👑 Hoàn hảo!"
+      "praise20": "👑 Hoàn hảo!",
+      "pickHanzi": "Chữ Hán nào mang nghĩa này?"
     },
     "speed": {
       "title": "Tốc độ đọc",
@@ -271,11 +272,11 @@
     },
     "modes": {
       "flashcard": "Thẻ ghi nhớ",
-      "quiz": "Trắc nghiệm nghĩa"
+      "quiz": "Trắc nghiệm chữ Hán"
     },
     "modeDesc": {
       "flashcard": "Ôn tập với thẻ từ",
-      "quiz": "Chọn nghĩa đúng"
+      "quiz": "Chọn chữ Hán đúng"
     },
     "stats": {
       "loadError": "Không thể tải thống kê",
@@ -331,9 +332,9 @@
       "back": "Quay lại",
       "notLoaded": "Chưa có dữ liệu quiz",
       "scoreLabel": "Điểm",
-      "question": "Nghĩa của từ này là gì?",
-      "correct": "✓ Chính xác! {{hanzi}} nghĩa là \"{{meaning}}\"",
-      "wrong": "✗ Đáp án đúng là \"{{answer}}\""
+      "question": "Chữ Hán nào mang nghĩa này?",
+      "correct": "✓ Chính xác! \"{{meaning}}\" là {{hanzi}}",
+      "wrong": "✗ Đáp án đúng là {{hanzi}}"
     },
     "common": {
       "submit": "Gửi câu trả lời"

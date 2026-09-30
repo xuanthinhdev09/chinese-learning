@@ -32,55 +32,10 @@ export function QuizCard() {
     return () => clearTimeout(timer);
   }, [quiz.showResult, nextQuizQuestion]);
 
-  // Get meaning based on language preference
-  const getCurrentMeaning = () => {
-    if (!current) return '';
-    return getDisplayMeaning(
-      current.vietnamese || '',
-      current.english || '',
-      preference
-    );
-  };
-
-  // Get the correct meaning for options
-  const getCorrectMeaning = () => {
-    return getCurrentMeaning();
-  };
-
-  // Generate wrong options from other vocabularies
-  const generateWrongOptions = () => {
-    if (!current || !vocabularies.length) return [];
-
-    return vocabularies
-      .filter((v) => v.id !== current.id)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-      .map((v) => ({
-        id: v.id,
-        text: getDisplayMeaning(
-          v.vietnamese || '',
-          v.english || '',
-          preference
-        ),
-        isCorrect: false,
-      }));
-  };
-
-  // Shuffle options including correct answer
-  const generateOptions = () => {
-    if (!current) return []; // render đầu tiên sau khi bấm Quiz có thể chạy trước khi dữ liệu tải xong
-
-    const wrongOptions = generateWrongOptions();
-    const correctOption = {
-      id: current.id,
-      text: getCorrectMeaning(),
-      isCorrect: true,
-    };
-
-    return [...wrongOptions, correctOption]
-      .sort(() => Math.random() - 0.5)
-      .map((opt, idx) => ({ ...opt, id: `option-${idx}` }));
-  };
+  // Nghĩa theo ngôn ngữ nội dung — là đề bài của quiz chọn chữ Hán
+  const meaning = current
+    ? getDisplayMeaning(current.vietnamese || '', current.english || '', preference)
+    : '';
 
   // Quiz completed screen
   if (quizCompleted) {
@@ -129,9 +84,6 @@ export function QuizCard() {
     );
   }
 
-  // Use generated options or fallback to quiz state — đặt sau guard !current
-  const displayOptions = quiz.options.length > 0 ? quiz.options : generateOptions();
-
   return (
     <div className="max-w-md mx-auto p-6">
       {/* Header */}
@@ -156,26 +108,17 @@ export function QuizCard() {
 
       {/* Quiz Card */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        {/* Question */}
+        {/* Question — đề là nghĩa; chữ Hán/phồn thể/pinyin chỉ hiện sau khi chốt đáp án */}
         <div className="text-center mb-8">
           {current.hskCode && (
             <span className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">{current.hskCode}</span>
           )}
 
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            {current.hanzi}
+          <p className="text-gray-600 dark:text-gray-400 mb-3">{t('vocabulary.quiz.question')}</p>
+
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 break-words">
+            {meaning}
           </h2>
-
-          {current.traditional && current.traditional !== current.hanzi && (
-            <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">
-              {current.traditional}
-            </p>
-          )}
-
-          {/* Pinyin chỉ hiện sau khi đáp án đã được chốt (showResult) — không lộ cách đọc trước khi chọn */}
-          {quiz.showResult && (
-            <p className="text-2xl text-blue-600 dark:text-blue-400 mb-2">{current.pinyin}</p>
-          )}
 
           {current.pos && (
             <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm rounded">
@@ -183,12 +126,18 @@ export function QuizCard() {
             </span>
           )}
 
-          <p className="text-gray-600 dark:text-gray-400 mt-6">{t('vocabulary.quiz.question')}</p>
+          <div className={`mt-4 min-h-[2rem] ${quiz.showResult ? '' : 'invisible'}`}>
+            <span className="text-2xl chinese-text text-gray-900 dark:text-white">{current.hanzi}</span>
+            {current.traditional && current.traditional !== current.hanzi && (
+              <span className="ml-2 text-lg chinese-text text-gray-500 dark:text-gray-400">({current.traditional})</span>
+            )}
+            <span className="ml-3 text-xl text-blue-600 dark:text-blue-400">{current.pinyin}</span>
+          </div>
         </div>
 
-        {/* Options */}
-        <div className="space-y-3">
-          {displayOptions.map((option, index) => {
+        {/* Options — 4 chữ Hán */}
+        <div className="grid grid-cols-2 gap-3">
+          {quiz.options.map((option, index) => {
             const isSelected = quiz.selectedOption === option.id;
             const showCorrect = quiz.showResult && option.isCorrect;
             const showWrong = quiz.showResult && isSelected && !option.isCorrect;
@@ -198,7 +147,7 @@ export function QuizCard() {
                 key={option.id}
                 onClick={() => !quiz.showResult && selectQuizOption(option.id)}
                 disabled={quiz.showResult}
-                className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                className={`relative w-full p-4 rounded-lg border-2 transition-all ${
                   isSelected
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -214,19 +163,14 @@ export function QuizCard() {
                   quiz.showResult ? 'cursor-not-allowed' : 'cursor-pointer'
                 }`}
               >
-                <div className="flex items-center">
-                  <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 mr-3">
-                    {String.fromCharCode(65 + index)}
-                  </span>
-                  <span className="flex-grow">{option.text}</span>
-
-                  {showCorrect && (
-                    <span className="text-green-500">✓</span>
-                  )}
-                  {showWrong && (
-                    <span className="text-red-500">✗</span>
-                  )}
-                </div>
+                <span className="absolute top-1 left-2 text-xs text-gray-400">
+                  {String.fromCharCode(65 + index)}
+                </span>
+                <span className="block text-3xl chinese-text text-gray-900 dark:text-white break-words">
+                  {option.hanzi}
+                </span>
+                {showCorrect && <span className="absolute top-1 right-2 text-green-500">✓</span>}
+                {showWrong && <span className="absolute top-1 right-2 text-red-500">✗</span>}
               </button>
             );
           })}
@@ -248,11 +192,11 @@ export function QuizCard() {
           <div className="mt-4 text-center">
             {quiz.isCorrect ? (
               <p className="text-green-600 dark:text-green-400 font-semibold">
-                {t('vocabulary.quiz.correct', { hanzi: current.hanzi, meaning: getCorrectMeaning() })}
+                {t('vocabulary.quiz.correct', { hanzi: current.hanzi, meaning })}
               </p>
             ) : (
               <p className="text-red-600 dark:text-red-400 font-semibold">
-                {t('vocabulary.quiz.wrong', { answer: getCorrectMeaning() })}
+                {t('vocabulary.quiz.wrong', { hanzi: current.hanzi })}
               </p>
             )}
           </div>

@@ -2,6 +2,16 @@
 
 Ghi nhận các thay đổi đáng kể của dự án. Mục mới nhất ở trên cùng.
 
+## 2026-09-30 — Flashcard ẩn pinyin mặt trước + quiz "cho nghĩa → chọn chữ Hán"
+
+- `PracticeRunner` (Today + lesson wizard) flashcard: mặt trước chỉ chữ Hán; pinyin + nghĩa hiện sau "Xem nghĩa".
+- Quiz đổi ở cả 3 chỗ (Today `keyword-quiz`, lesson `vocab-stage`, trang Học từ vựng `QuizCard`): đề = nghĩa (vi/en theo content preference), chọn 1 trong 4 chữ Hán. Trước khi chọn ẩn chữ Hán/phồn thể/pinyin/nút loa; sau khi chọn hiện chữ + pinyin, không tự phát âm. Chấm theo id; SM-2 không đổi.
+- Util dùng chung `utils/build-hanzi-choice-quiz-options.ts`: loại đáp án nhiễu trùng nghĩa (vd 你/您) và trùng chữ Hán. Xóa code tạo đáp án trùng lặp trong `QuizCard`.
+- Luôn đủ 4 đáp án: pool = cả bài (Today truyền `nextLesson.vocabulary`); vẫn thiếu → lấy từ vựng level (hook `use-hanzi-quiz-distractor-pool.ts` / `startQuiz`), lỗi thì degrade.
+- i18n vi/en: "chọn nghĩa" → "chọn chữ Hán"; `vocabulary.quiz.wrong` đổi param `answer` → `hanzi`.
+
+**Verify:** `tsc` + `npm run build` sạch; util test ngẫu nhiên 2.200+ lượt pass (script tạm). Chưa test tay trên UI.
+
 ## 2026-09-29 — English cho phần hội thoại/listening (课文)
 
 - `Conversation` thêm cột `english` (migration `20260929170500_add_conversation_english`); wire qua DTO import + mapper + `DialogueLineDto`/`toLineDto`.

@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 import { vocabularyApi, Vocabulary } from '../api/vocabulary-api';
 import { getDisplayMeaning, LanguagePreference } from './language-preference-store';
+import {
+  buildHanziChoiceOptions,
+  HanziChoiceOption,
+  lacksHanziDistractors,
+} from '../utils/build-hanzi-choice-quiz-options';
 
 type StudyMode = 'flashcard' | 'quiz';
 
-interface QuizOption {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-}
-
 interface QuizState {
-  options: QuizOption[];
+  /** Quiz "cho nghĩa → chọn chữ Hán"; option id = id từ vựng */
+  options: HanziChoiceOption[];
   selectedOption: string | null;
   showResult: boolean;
   isCorrect: boolean | null;
@@ -36,6 +36,8 @@ interface VocabularyState {
 
   // Quiz State
   quiz: QuizState;
+  /** Từ vựng level lấy thêm làm đáp án nhiễu khi quiz 1 bài quá ít từ khác nghĩa */
+  quizDistractorPool: Vocabulary[];
   correctCount: number;
   quizCompleted: boolean;
 
@@ -77,38 +79,14 @@ export interface ProgressStatsResponse {
   streak: number;
 }
 
+const quizMeaning = (preference: LanguagePreference) => (v: Vocabulary) =>
+  getDisplayMeaning(v.vietnamese || '', v.english || '', preference);
+
 const createQuizOptions = (
   currentVocab: Vocabulary,
-  allVocab: Vocabulary[],
+  candidates: Vocabulary[],
   preference: LanguagePreference = 'vietnamese'
-): QuizOption[] => {
-  // Get 3 random wrong answers
-  const wrongAnswers = allVocab
-    .filter((v) => v.id !== currentVocab.id)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3)
-    .map((v) => ({
-      id: v.id,
-      text: getDisplayMeaning(v.vietnamese || '', v.english || '', preference),
-      isCorrect: false,
-    }));
-
-  // Add correct answer with language preference
-  const correctAnswer = {
-    id: currentVocab.id,
-    text: getDisplayMeaning(
-      currentVocab.vietnamese || '',
-      currentVocab.english || '',
-      preference
-    ),
-    isCorrect: true,
-  };
-
-  // Shuffle and return
-  return [...wrongAnswers, correctAnswer]
-    .sort(() => Math.random() - 0.5)
-    .map((opt, idx) => ({ ...opt, id: `option-${idx}` }));
-};
+): HanziChoiceOption[] => buildHanziChoiceOptions(currentVocab, candidates, quizMeaning(preference));
 
 export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   // Initial state
@@ -127,6 +105,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
     showResult: false,
     isCorrect: null,
   },
+  quizDistractorPool: [],
   correctCount: 0,
   quizCompleted: false,
   isSavingProgress: false,
@@ -225,6 +204,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
     if (mode !== 'quiz') {
       set({
         quiz: { options: [], selectedOption: null, showResult: false, isCorrect: null },
+        quizDistractorPool: [],
         correctCount: 0,
         quizCompleted: false,
       });
@@ -239,12 +219,24 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   ) => {
     set({ isLoading: true, error: null, progressError: null, languagePreference: preference });
     try {
-      const vocabularies = lessonId
-        ? await vocabularyApi.getByLesson(lessonId)
-        : await vocabularyApi.getByHSKLevel(level);
-      const options = createQuizOptions(vocabularies[0], vocabularies, preference);
+      const getMeaning = quizMeaning(preference);
+      // Đề bài là nghĩa → bỏ từ không có nghĩa (vi lẫn en) để không ra câu hỏi trống
+      const vocabularies = (
+        lessonId ? await vocabularyApi.getByLesson(lessonId) : await vocabularyApi.getByHSKLevel(level)
+      ).filter((v) => v.hanzi && getMeaning(v).trim());
+
+      // Quiz 1 bài: nếu có từ không đủ 3 đáp án nhiễu khác nghĩa → lấy thêm từ level
+      // (server chỉ trả từ của bài đã mở khóa). Lỗi → bỏ qua, quiz vẫn chạy với ít đáp án hơn.
+      let quizDistractorPool: Vocabulary[] = [];
+      if (lessonId && vocabularies.some((v) => lacksHanziDistractors(v, vocabularies, getMeaning))) {
+        quizDistractorPool = await vocabularyApi.getByHSKLevel(level).catch(() => []);
+      }
+      const options = vocabularies.length
+        ? createQuizOptions(vocabularies[0], [...vocabularies, ...quizDistractorPool], preference)
+        : [];
 
       set({
+        quizDistractorPool,
         vocabularies,
         currentLevel: level,
         currentLessonId: lessonId ?? null,
@@ -306,14 +298,18 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   nextQuizQuestion: () => {
-    const { vocabularies, currentIndex, languagePreference } = get();
+    const { vocabularies, quizDistractorPool, currentIndex, languagePreference } = get();
     const nextIndex = currentIndex + 1;
 
     if (nextIndex >= vocabularies.length) {
       set({ quizCompleted: true });
     } else {
       // Generate new options for next question
-      const options = createQuizOptions(vocabularies[nextIndex], vocabularies, languagePreference);
+      const options = createQuizOptions(
+        vocabularies[nextIndex],
+        [...vocabularies, ...quizDistractorPool],
+        languagePreference
+      );
       set({
         currentIndex: nextIndex,
         quiz: {
@@ -327,10 +323,14 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   },
 
   resetQuiz: () => {
-    const { vocabularies, currentLevel, languagePreference } = get();
+    const { vocabularies, quizDistractorPool, currentLevel, languagePreference } = get();
     if (!vocabularies.length || !currentLevel) return;
 
-    const options = createQuizOptions(vocabularies[0], vocabularies, languagePreference);
+    const options = createQuizOptions(
+      vocabularies[0],
+      [...vocabularies, ...quizDistractorPool],
+      languagePreference
+    );
     set({
       currentIndex: 0,
       quiz: {

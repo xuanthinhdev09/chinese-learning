@@ -245,6 +245,8 @@ export function TodaySessionPage() {
           title={t('today.keywordQuizTitle')}
           items={toPracticeItems(nextLesson.keywords)}
           mode="quiz"
+          distractorPool={toPracticeItems(nextLesson.vocabulary)}
+          lessonId={nextLesson.lessonId}
           onRate={recordVocabQuality}
           onDone={() => setStepIndex((i) => i + 1)}
         />

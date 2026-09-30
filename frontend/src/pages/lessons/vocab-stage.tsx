@@ -9,9 +9,12 @@ import { PracticeItem, PracticeRunner } from '../../components/today/practice-ru
  */
 export function VocabStage({
   items,
+  lessonId,
   onComplete,
 }: {
   items: PracticeItem[];
+  /** Quiz lấy thêm đáp án nhiễu từ level của bài khi bài quá ít từ */
+  lessonId: string;
   onComplete: () => void;
 }) {
   const { t } = useTranslation();
@@ -40,6 +43,7 @@ export function VocabStage({
       title={t('learn.vocabQuizTitle')}
       items={items}
       mode="quiz"
+      lessonId={lessonId}
       onRate={record}
       onDone={onComplete}
     />

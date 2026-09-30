@@ -136,7 +136,7 @@
       "exercises": "Exercises"
     },
     "vocabFlashcardTitle": "Vocabulary — flashcards",
-    "vocabQuizTitle": "Vocabulary — pick meaning",
+    "vocabQuizTitle": "Vocabulary — pick the character",
     "completeTitle": "Lesson complete!",
     "completeDesc": "You finished all 3 activities in this lesson.",
     "reStudy": "Study again",
@@ -152,7 +152,7 @@
     "emptyNothing": "Nothing to review today",
     "emptyNothingDesc": "No reviews are due yet. Come back later!",
     "keywordCardsTitle": "Key words — flip the cards",
-    "keywordQuizTitle": "Key words — pick the meaning",
+    "keywordQuizTitle": "Key words — pick the character",
     "vocabDueTitle": "Vocabulary due for review",
     "vocabDueTitleWithCount": "Vocabulary due for review ({{current}}/{{total}})",
     "segment": {
@@ -212,7 +212,8 @@
       "praise3": "🔥 On a roll!",
       "praise5": "⚡ 5 in a row!",
       "praise10": "🏆 Unstoppable!",
-      "praise20": "👑 Perfect!"
+      "praise20": "👑 Perfect!",
+      "pickHanzi": "Which character means this?"
     },
     "speed": {
       "title": "Reading speed",
@@ -279,11 +280,11 @@
     },
     "modes": {
       "flashcard": "Flashcards",
-      "quiz": "Quiz Meaning"
+      "quiz": "Character quiz"
     },
     "modeDesc": {
       "flashcard": "Review with flashcards",
-      "quiz": "Pick the correct meaning"
+      "quiz": "Pick the right character"
     },
     "stats": {
       "loadError": "Unable to load statistics",
@@ -341,9 +342,9 @@
       "back": "Back",
       "notLoaded": "No quiz loaded",
       "scoreLabel": "Score",
-      "question": "What does this word mean?",
-      "correct": "✓ Correct! {{hanzi}} means \"{{meaning}}\"",
-      "wrong": "✗ The correct answer is \"{{answer}}\""
+      "question": "Which character means this?",
+      "correct": "✓ Correct! \"{{meaning}}\" is {{hanzi}}",
+      "wrong": "✗ The answer is {{hanzi}}"
     },
     "common": {
       "submit": "Submit answer"
