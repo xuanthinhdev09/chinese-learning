@@ -9,6 +9,7 @@ import {
 } from '../../stores/language-preference-store';
 import { buildHanziChoiceOptions } from '../../utils/build-hanzi-choice-quiz-options';
 import { useHanziQuizDistractorPool } from '../../hooks/use-hanzi-quiz-distractor-pool';
+import { useScrollIntoViewWhenShown } from '../../hooks/use-scroll-into-view-when-shown';
 
 export interface PracticeItem {
   id: string;
@@ -72,6 +73,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone, distractorP
   const preference = useContentPreference();
 
   const current = items[index];
+  const ratingRef = useScrollIntoViewWhenShown<HTMLDivElement>(mode === 'flashcard' && revealed);
 
   const getMeaning = useCallback((item: PracticeItem) => displayMeaning(item, preference), [preference]);
   const { pool, isLoading: isPoolLoading } = useHanziQuizDistractorPool({
@@ -147,7 +149,8 @@ export function PracticeRunner({ title, items, mode, onRate, onDone, distractorP
   };
 
   return (
-    <div className="max-w-lg mx-auto p-4 sm:p-6">
+    // pb-24 trên mobile: chừa chỗ để các nút cuối trang cuộn được lên trên thanh công cụ Safari
+    <div className="max-w-lg mx-auto p-4 pb-24 sm:p-6">
       <p className="text-sm text-muted mb-2">
         {title} • {index + 1}/{items.length}
       </p>
@@ -249,7 +252,7 @@ export function PracticeRunner({ title, items, mode, onRate, onDone, distractorP
       )}
 
       {mode === 'flashcard' && revealed && (
-        <div className="grid grid-cols-4 gap-2 mt-6 animate-fade-in">
+        <div ref={ratingRef} className="grid grid-cols-4 gap-2 mt-6 scroll-mb-24 animate-fade-in sm:scroll-mb-6">
           {RATING_OPTIONS.map((option) => (
             <button
               key={option.value}

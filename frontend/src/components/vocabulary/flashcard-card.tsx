@@ -3,6 +3,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { useVocabularyStore } from '../../stores/vocabulary-store';
 import { getDisplayMeaning, useContentPreference } from '../../stores/language-preference-store';
 import { useTtsAudio } from '../../hooks/use-tts-audio';
+import { useScrollIntoViewWhenShown } from '../../hooks/use-scroll-into-view-when-shown';
 import { cn } from '../../utils/cn';
 import { Button, Badge, CircularProgress, Progress } from '../ui';
 import { EmptyStates } from '../common';
@@ -45,6 +46,7 @@ export function FlashcardCard() {
   const [resultAnimation, setResultAnimation] = useState<'correct' | 'wrong' | null>(null);
 
   const current = vocabularies[currentIndex];
+  const ratingRef = useScrollIntoViewWhenShown<HTMLDivElement>(isFlipped);
   const preference = useContentPreference();
   const progress = vocabularies.length > 0 ? `${currentIndex + 1}/${vocabularies.length}` : '0/0';
   const progressPercent = vocabularies.length > 0 ? ((currentIndex + 1) / vocabularies.length) * 100 : 0;
@@ -86,7 +88,8 @@ export function FlashcardCard() {
   );
 
   return (
-    <div className="max-w-lg mx-auto p-4 sm:p-6">
+    // pb-24 trên mobile: chừa chỗ để các nút cuối trang cuộn được lên trên thanh công cụ Safari
+    <div className="max-w-lg mx-auto p-4 pb-24 sm:p-6">
       {/* Progress header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
@@ -291,7 +294,7 @@ export function FlashcardCard() {
 
       {/* Rating buttons - show when flipped */}
       {isFlipped && (
-        <div className="mt-6 space-y-4 animate-fade-in">
+        <div ref={ratingRef} className="mt-6 space-y-4 scroll-mb-24 animate-fade-in sm:scroll-mb-6">
           <p className="text-sm text-center text-muted font-medium">
             {t('vocabulary.flashcard.howWell')}
           </p>
