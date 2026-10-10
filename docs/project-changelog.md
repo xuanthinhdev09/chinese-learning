@@ -2,6 +2,19 @@
 
 Ghi nhận các thay đổi đáng kể của dự án. Mục mới nhất ở trên cùng.
 
+## 2026-10-10 — Sửa giọng TTS hội thoại khớp giới tính nhân vật
+
+Giọng nam/nữ đang bị gán **cơ học xen kẽ A/B theo vị trí dòng**, không theo giới tính thật → dòng người vợ/mẹ đọc bằng giọng nam (vd bài 3 "这是我和我丈夫的…").
+
+- **Voice map** (`tts-voice-map.ts`): C đổi `YunxiaNeural` (trẻ con) → `YunjianNeural` (nam lớn tuổi). A/B/D giữ nguyên = nữ trẻ / nam trẻ / nữ lớn tuổi.
+- **Data**: gán lại `speaker` cho **39 dòng / 11 bài** theo giới tính từ xưng hô (`anh/chị/cô/em/ông`, `我丈夫/我妻子`). Các đoạn trung tính (`bạn/mình`) giữ nguyên A/B.
+- **Áp dụng**: dev DB + prod DB (qua SSH tunnel 5434), mỗi bên 39 row. Source JSON `extracted/import/hsk2-textbook-v2-fixed.json` + 15 file `lesson-NN.import.json` cũng sửa để re-import không revert.
+- SQL lưu tại `backend/prisma/scripts/fix-dialogue-speakers.sql` (idempotent, khóa theo lesson.order + dialogueOrder + order).
+
+**Verify:** chưa chạy test (node_modules bị chặn trong môi trường); thay đổi chỉ là string literal + 1 assertion spec. Chưa test nghe tay.
+
+**⚠️ Cần làm tiếp:** restart backend dev / redeploy prod (`docker compose -f docker/docker-compose.prod.yml up -d --build`) để nhận giọng C mới. Fix giới tính (A/B/D) đã live ngay; riêng vai "ông" (bài 11) + đồng nghiệp 3 người (bài 15) vẫn đọc giọng trẻ con tới khi redeploy.
+
 ## 2026-09-30 — Flashcard ẩn pinyin mặt trước + quiz "cho nghĩa → chọn chữ Hán"
 
 - `PracticeRunner` (Today + lesson wizard) flashcard: mặt trước chỉ chữ Hán; pinyin + nghĩa hiện sau "Xem nghĩa".

@@ -7,10 +7,13 @@
 export const SPEAKERS = ['A', 'B', 'C', 'D'] as const;
 export type SpeakerId = (typeof SPEAKERS)[number];
 
+// A/B/C/D = nữ trẻ / nam trẻ / nam lớn tuổi / nữ lớn tuổi. Giọng C trước đây
+// là YunxiaNeural (trẻ con) — đổi sang YunjianNeural để các vai "ông"/đồng nghiệp
+// lớn tuổi đọc đúng, phù hợp việc gán speaker theo giới tính nhân vật trong hội thoại.
 export const DEFAULT_SPEAKER_VOICES: Record<SpeakerId, string> = {
   A: 'zh-CN-XiaoxiaoNeural',
   B: 'zh-CN-YunxiNeural',
-  C: 'zh-CN-YunxiaNeural',
+  C: 'zh-CN-YunjianNeural',
   D: 'zh-CN-XiaohanNeural',
 };
 

@@ -5,7 +5,7 @@ describe('resolveSpeakerVoices', () => {
     const voices = resolveSpeakerVoices(null);
     expect(voices.A).toBe('zh-CN-XiaoxiaoNeural');
     expect(voices.B).toBe('zh-CN-YunxiNeural');
-    expect(voices.C).toBe('zh-CN-YunxiaNeural');
+    expect(voices.C).toBe('zh-CN-YunjianNeural');
     expect(voices.D).toBe('zh-CN-XiaohanNeural');
   });
 
