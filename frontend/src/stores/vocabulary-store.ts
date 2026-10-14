@@ -6,6 +6,7 @@ import {
   HanziChoiceOption,
   lacksHanziDistractors,
 } from '../utils/build-hanzi-choice-quiz-options';
+import { isPageReload, readVocabStudyPosition, saveVocabStudyPosition } from './vocab-study-position';
 
 type StudyMode = 'flashcard' | 'quiz';
 
@@ -88,6 +89,23 @@ const createQuizOptions = (
   preference: LanguagePreference = 'vietnamese'
 ): HanziChoiceOption[] => buildHanziChoiceOptions(currentVocab, candidates, quizMeaning(preference));
 
+/** Kẹp index về [0, length-1]; danh sách rỗng → 0. */
+const clampIndex = (index: number, length: number): number =>
+  length === 0 ? 0 : Math.min(Math.max(0, index), length - 1);
+
+/** Vị trí lưu trước đó khớp scope đang load thì trả về để khôi phục; ngược lại null. */
+const resolveRestore = (
+  mode: 'flashcard' | 'quiz',
+  level: number | null,
+  lessonId: string | null
+) => {
+  if (!isPageReload()) return null;
+  const saved = readVocabStudyPosition();
+  return saved && saved.mode === mode && saved.level === level && saved.lessonId === lessonId
+    ? saved
+    : null;
+};
+
 export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   // Initial state
   vocabularies: [],
@@ -118,11 +136,12 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
       const vocabularies = lessonId
         ? await vocabularyApi.getByLesson(lessonId)
         : await vocabularyApi.getByHSKLevel(level);
+      const restore = resolveRestore('flashcard', level, lessonId ?? null);
       set({
         vocabularies,
         currentLevel: level,
         currentLessonId: lessonId ?? null,
-        currentIndex: 0,
+        currentIndex: restore ? clampIndex(restore.index, vocabularies.length) : 0,
         isFlipped: false,
         isLoading: false,
       });
@@ -151,11 +170,12 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
         updatedAt: '',
       }));
 
+      const restore = resolveRestore('flashcard', null, null);
       set({
         vocabularies,
         currentLevel: null,
         currentLessonId: null,
-        currentIndex: 0,
+        currentIndex: restore ? clampIndex(restore.index, vocabularies.length) : 0,
         isFlipped: false,
         isLoading: false,
       });
@@ -231,8 +251,10 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
       if (lessonId && vocabularies.some((v) => lacksHanziDistractors(v, vocabularies, getMeaning))) {
         quizDistractorPool = await vocabularyApi.getByHSKLevel(level).catch(() => []);
       }
+      const restore = resolveRestore('quiz', level, lessonId ?? null);
+      const startIndex = restore ? clampIndex(restore.index, vocabularies.length) : 0;
       const options = vocabularies.length
-        ? createQuizOptions(vocabularies[0], [...vocabularies, ...quizDistractorPool], preference)
+        ? createQuizOptions(vocabularies[startIndex], [...vocabularies, ...quizDistractorPool], preference)
         : [];
 
       set({
@@ -240,7 +262,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
         vocabularies,
         currentLevel: level,
         currentLessonId: lessonId ?? null,
-        currentIndex: 0,
+        currentIndex: startIndex,
         studyMode: 'quiz',
         quiz: {
           options,
@@ -248,7 +270,7 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
           showResult: false,
           isCorrect: null,
         },
-        correctCount: 0,
+        correctCount: restore ? restore.correctCount : 0,
         quizCompleted: false,
         isLoading: false,
       });
@@ -367,3 +389,24 @@ export const useVocabularyStore = create<VocabularyState>((set, get) => ({
   clearError: () => set({ error: null }),
   clearProgressError: () => set({ progressError: null }),
 }));
+
+// Giữ vị trí học hiện tại để khôi phục khi reload trang (xem vocab-study-position.ts).
+// Chỉ ghi khi scope/vị trí thực sự đổi — tránh ghi sessionStorage trên mọi set().
+useVocabularyStore.subscribe((state, prev) => {
+  if (
+    state.currentIndex === prev.currentIndex &&
+    state.correctCount === prev.correctCount &&
+    state.studyMode === prev.studyMode &&
+    state.currentLevel === prev.currentLevel &&
+    state.currentLessonId === prev.currentLessonId
+  ) {
+    return;
+  }
+  saveVocabStudyPosition({
+    level: state.currentLevel,
+    lessonId: state.currentLessonId,
+    mode: state.studyMode,
+    index: state.currentIndex,
+    correctCount: state.correctCount,
+  });
+});
